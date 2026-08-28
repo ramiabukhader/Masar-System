@@ -28,7 +28,8 @@ export interface PlanState {
   held: { orderId: string; reason: string; detail: string }[];
 }
 
-const PLAN_DATE = new Date(2026, 8, 15);
+/** The demo delivery day. Fixed so the seeded scenario is reproducible. */
+export const PLAN_DATE = new Date(2026, 8, 15);
 
 /**
  * Runs a full wave in the browser. This is the real planner — the same `runWave` the
@@ -110,6 +111,62 @@ export function usePlan(disruptions: Disruptions): PlanState {
 
 export function fmtTime(date: Date): string {
   return date.toTimeString().slice(0, 5);
+}
+
+/** Formats minutes-from-midnight as HH:MM. */
+export function fmtClock(minutes: number): string {
+  const m = ((Math.round(minutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+}
+
+export function fmtDay(date: Date, lang: 'ar' | 'en'): string {
+  return date.toLocaleDateString(lang === 'ar' ? 'ar' : 'en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+}
+
+/**
+ * Arabic counts days with a dual form: one day is يوم, two is يومان, three to ten take the
+ * plural أيام, and eleven upwards goes back to the singular accusative يوماً. Writing
+ * "قبل 2 أيام" is the kind of thing that tells a native speaker immediately that nobody
+ * who speaks the language looked at the screen.
+ */
+function arabicDays(count: number): string {
+  if (count === 1) return 'يوم';
+  if (count === 2) return 'يومين';
+  if (count <= 10) return `${count} أيام`;
+  return `${count} يوماً`;
+}
+
+/**
+ * Timestamp with a day marker when it is not the delivery day itself. Milestones like
+ * "scheduled in the wave" happen the afternoon before, and a bare "16:00" next to a
+ * "06:40" reads as out of order without it.
+ */
+export function fmtStamp(date: Date, planDate: Date, lang: 'ar' | 'en'): string {
+  const dayDelta = Math.floor((date.getTime() - planDate.getTime()) / 86_400_000);
+  const time = fmtTime(date);
+  if (dayDelta === 0) return time;
+  if (dayDelta === -1) return `${lang === 'ar' ? 'أمس' : 'yesterday'} ${time}`;
+  if (dayDelta === 1) return `${lang === 'ar' ? 'غداً' : 'tomorrow'} ${time}`;
+  const days = Math.abs(dayDelta);
+  if (lang === 'en') return dayDelta < 0 ? `${days}d ago ${time}` : `in ${days}d ${time}`;
+  return dayDelta < 0 ? `قبل ${arabicDays(days)} ${time}` : `بعد ${arabicDays(days)} ${time}`;
+}
+
+/** Relative day label for a due date, e.g. "today 18:00" / "tomorrow 09:00". */
+export function fmtDue(due: Date, planDate: Date, lang: 'ar' | 'en'): string {
+  const dayDelta = Math.floor((due.getTime() - planDate.getTime()) / 86_400_000);
+  const time = fmtTime(due);
+  const label =
+    dayDelta <= 0
+      ? lang === 'ar' ? 'اليوم' : 'today'
+      : dayDelta === 1
+        ? lang === 'ar' ? 'غداً' : 'tomorrow'
+        : lang === 'ar' ? `بعد ${arabicDays(dayDelta)}` : `in ${dayDelta} days`;
+  return `${label} ${time}`;
 }
 
 export function fmtNum(value: number, digits = 0): string {
