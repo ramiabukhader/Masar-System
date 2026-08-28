@@ -1,4 +1,4 @@
-import { NetworkMap, ROUTE_COLOURS } from '../components/NetworkMap';
+import { NetworkMap } from '../components/NetworkMap';
 import { fmtNum, fmtTime, type Disruptions, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
@@ -156,7 +156,7 @@ export function ControlTower({
                     </tr>
                   </thead>
                   <tbody>
-                    {plan.routes.map((route, index) => {
+                    {plan.routes.map((route) => {
                       const vehicle = VEHICLE_MAP.get(route.vehicleId);
                       const driver = DRIVER_MAP.get(route.driverId);
                       const fill = route.metrics.cubeUtilisation;
@@ -167,7 +167,7 @@ export function ControlTower({
                           data-selected={selectedRouteId === route.id}
                           onClick={() => setSelectedRouteId(route.id)}
                         >
-                          <td><span className="dot" style={{ background: ROUTE_COLOURS[index % ROUTE_COLOURS.length] }} /></td>
+                          <td><span className="dot" data-on={selectedRouteId === route.id} /></td>
                           <td>
                             <div className="mono">{vehicle?.plate}</div>
                             <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{loc(lang, driver?.name, driver?.nameAr)}</div>

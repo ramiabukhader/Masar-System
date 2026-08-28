@@ -167,6 +167,8 @@ Access survey added at point of sale.
 ### Phase 3 — Run it (Weeks 11–18)
 Driver app in the field. Arrival windows offered to customers and confirmed at D-1. POD, photos,
 cash collection, exception codes. Control Tower goes live for real-time re-planning.
+**Paid haul-away of the old appliance launches here** — the one lever that adds margin
+without touching the free-delivery promise (docs/09 §4.4).
 > *Expected:* first-attempt success from ~85% to 95%+. This is the phase that pays for the programme.
 
 ### Phase 4 — Tune it, then accelerate (Month 5+)

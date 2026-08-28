@@ -17,12 +17,6 @@ const NODE_LABELS: Record<string, string> = {
   'BR-JRC': 'JRC',
 };
 
-export const ROUTE_COLOURS = [
-  '#f0b429', '#2dd4bf', '#60a5fa', '#a78bfa', '#4ade80',
-  '#fb923c', '#f472b6', '#38bdf8', '#facc15', '#c084fc',
-  '#34d399', '#fb7185', '#818cf8',
-];
-
 function project(point: LatLng): { x: number; y: number } {
   return {
     x: ((point.lng - BOUNDS.lngMin) / (BOUNDS.lngMax - BOUNDS.lngMin)) * WIDTH,
@@ -39,10 +33,16 @@ interface Props {
 }
 
 /**
- * Schematic network map. Deliberately a projection of real coordinates rather than a
- * tile map: it makes the corridor shape of the network legible at a glance, works with
- * no external map service, and cannot mislead anyone into thinking the drawn lines are
- * the actual driven roads.
+ * Schematic network map. Deliberately a projection of real coordinates rather than a tile
+ * map: it makes the corridor shape of the network legible at a glance, works with no
+ * external map service, and cannot mislead anyone into thinking the drawn lines are the
+ * actual driven roads.
+ *
+ * Routes are drawn recessive and the SELECTED one is highlighted, rather than giving each
+ * route its own colour. On a nine-to-thirteen route day no reader can hold that many hues
+ * apart, and no palette that size survives a colour-vision check. Identity lives in the
+ * route table beside the map, where it is carried by text; the map answers the different
+ * question of "where does this one actually go".
  */
 export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelectRoute }: Props) {
   const nodeList = [...nodes.values()];
@@ -58,7 +58,7 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
     >
       <defs>
         <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
-          <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#1b2230" strokeWidth="1" />
+          <path d="M 28 0 L 0 0 0 28" fill="none" className="dg-grid" strokeWidth="1" />
         </pattern>
       </defs>
       <rect width={WIDTH} height={HEIGHT} fill="url(#grid)" />
@@ -66,15 +66,14 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
       {/* Gazetteer localities, for geographic context behind the routes */}
       {LOCALITIES.map((locality) => {
         const p = project(locality.location);
-        return <circle key={locality.id} cx={p.x} cy={p.y} r={1.6} fill="#2b3444" />;
+        return <circle key={locality.id} cx={p.x} cy={p.y} r={1.6} className="dg-locality" />;
       })}
 
       {/* Routes */}
-      {plan.routes.map((route, index) => {
+      {plan.routes.map((route) => {
         const origin = nodes.get(route.originNodeId);
         if (!origin) return null;
-        const colour = ROUTE_COLOURS[index % ROUTE_COLOURS.length];
-        const dimmed = selectedRouteId !== null && selectedRouteId !== route.id;
+        const selected = selectedRouteId === route.id;
 
         const points = [
           project(origin.location),
@@ -88,30 +87,22 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
         return (
           <g
             key={route.id}
-            opacity={dimmed ? 0.14 : 1}
             style={{ cursor: 'pointer' }}
             onClick={() => onSelectRoute(route.id)}
+            aria-label={route.id}
           >
             <polyline
               points={points.map((p) => `${p.x},${p.y}`).join(' ')}
               fill="none"
-              stroke={colour}
-              strokeWidth={selectedRouteId === route.id ? 3 : 2}
+              className={selected ? 'dg-route-on' : 'dg-route'}
+              strokeWidth={selected ? 2.6 : 1.4}
               strokeLinejoin="round"
               strokeLinecap="round"
-              strokeOpacity={selectedRouteId === route.id ? 0.95 : 0.72}
             />
-            {points.slice(1, -1).map((p, i) => (
-              <circle
-                key={i}
-                cx={p.x}
-                cy={p.y}
-                r={selectedRouteId === route.id ? 4.5 : 3.2}
-                fill={colour}
-                stroke="#0c0f14"
-                strokeWidth={1}
-              />
-            ))}
+            {selected &&
+              points.slice(1, -1).map((p, i) => (
+                <circle key={i} cx={p.x} cy={p.y} r={4} className="dg-stop" strokeWidth={1.5} />
+              ))}
           </g>
         );
       })}
@@ -128,8 +119,7 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
               width={isDc ? 12 : 9}
               height={isDc ? 12 : 9}
               rx={2}
-              fill={isDc ? '#e8ecf3' : '#0c0f14'}
-              stroke="#e8ecf3"
+              className={isDc ? 'dg-node-dc' : 'dg-node'}
               strokeWidth={1.6}
             />
             {/* Painted twice: a dark halo underneath keeps the label readable
@@ -139,8 +129,7 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
                 key={layer}
                 x={p.x + 11}
                 y={p.y + 4}
-                fill={layer === 'halo' ? 'none' : '#c9d3e2'}
-                stroke={layer === 'halo' ? '#0c0f14' : 'none'}
+                className={layer === 'halo' ? 'dg-label-halo' : 'dg-label'}
                 strokeWidth={layer === 'halo' ? 3.5 : 0}
                 strokeLinejoin="round"
                 fontSize="10"
