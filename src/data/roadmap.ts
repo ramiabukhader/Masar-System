@@ -70,8 +70,8 @@ export const PHASES: ProgrammePhase[] = [
     labelEn: 'Phase 2 · Plan it',
     timingAr: 'الأسابيع ٥–١٠',
     timingEn: 'Weeks 5–10',
-    goalAr: 'تشغيل مخطط الموجة كمستشار: يرى المخطط الخطة المحسّنة بجانب ما كانت الفروع ستفعله ويختار.',
-    goalEn: 'Wave planner live in advisory mode: the planner sees the optimised plan next to what the branches would have done, and chooses.',
+    goalAr: 'تشغيل مخطط الموجة كمستشار، وحجز نوافذ التوصيل عند نقطة البيع كما تفعل جون لويس، وتمرير الأجهزة الكبيرة خارج المعارض كما تفعل لوز.',
+    goalEn: "Wave planner live in advisory mode, delivery slots booked at the point of sale as John Lewis does, and major appliances routed past the showrooms as Lowe's does.",
     outcomeAr: 'انخفاض متوقع ١٥–٢٥٪ في الكيلومترات، وتحسّن ملموس في تعبئة المركبات.',
     outcomeEn: 'Expected 15–25% fewer kilometres, and a measurable improvement in vehicle fill.',
     status: 'later',
@@ -80,6 +80,9 @@ export const PHASES: ProgrammePhase[] = [
       { titleAr: 'قوائم التجهيز وبيانات التحميل للفروع', titleEn: 'Pick lists and loading manifests to branches', status: 'later' },
       { titleAr: 'إضافة مسح الوصول في نقطة البيع', titleEn: 'Access survey added at point of sale', status: 'later' },
       { titleAr: 'دمج التوزيع بين الفروع عبر النقل الليلي', titleEn: 'Cross-branch consolidation via the overnight shuttle', status: 'later' },
+      { titleAr: 'حجز نافذة التوصيل عند نقطة البيع مباشرة', titleEn: 'Book the delivery slot at the point of sale', status: 'later' },
+      { titleAr: 'الأجهزة الكبيرة لا تمر عبر المعارض', titleEn: 'Major appliances bypass the showrooms', status: 'later' },
+      { titleAr: 'فصل شبكتي التوصيل: شخص واحد وشخصان', titleEn: 'Split the 1-man and 2-man delivery networks', status: 'later' },
     ],
   },
   {
@@ -99,6 +102,7 @@ export const PHASES: ProgrammePhase[] = [
       { titleAr: 'إثبات التسليم بالصور والتوقيع', titleEn: 'Proof of delivery with photos and signature', status: 'later' },
       { titleAr: 'رموز الاستثناءات والتسوية اليومية', titleEn: 'Exception codes and daily reconciliation', status: 'later' },
       { titleAr: 'إعادة التخطيط المباشر خلال اليوم', titleEn: 'Live intra-day re-planning', status: 'later' },
+      { titleAr: 'إطلاق خدمة سحب الجهاز القديم المدفوعة', titleEn: 'Launch the paid haul-away service', status: 'later' },
     ],
   },
   {

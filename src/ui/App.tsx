@@ -189,7 +189,7 @@ export function App() {
               onOpenOrder={setOpenOrderId}
             />
           ) : view === 'options' ? (
-            <DeliveryOptions t={t} lang={lang} />
+            <DeliveryOptions t={t} lang={lang} state={state} />
           ) : view === 'roadmap' ? (
             <Roadmap t={t} lang={lang} />
           ) : view === 'tower' ? (

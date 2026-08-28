@@ -3,7 +3,6 @@ import { fmtNum, fmtTime, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { VEHICLE_MAP } from '../../data/fleet';
-import { ROUTE_COLOURS } from '../components/NetworkMap';
 import { loc, type Lang } from '../i18n';
 
 interface Props {
@@ -58,7 +57,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
         </div>
         <div className="panel-body">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {plan.routes.map((option, index) => (
+            {plan.routes.map((option) => (
               <button
                 key={option.id}
                 className={`btn ${option.id === route.id ? '' : 'ghost'}`}
@@ -68,7 +67,6 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                   setVerified(new Set());
                 }}
               >
-                <span className="dot" style={{ background: ROUTE_COLOURS[index % ROUTE_COLOURS.length] }} />
                 {VEHICLE_MAP.get(option.vehicleId)?.plate}
                 <span style={{ opacity: 0.7, fontWeight: 400 }}>· {option.metrics.stopCount}</span>
               </button>

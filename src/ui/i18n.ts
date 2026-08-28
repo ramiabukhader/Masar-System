@@ -145,6 +145,34 @@ export const STRINGS: Dict = {
 
 
   // ── Navigation ──────────────────────────────────────────────────────────
+  // Promise engine
+  promiseTitle: { ar: 'محرّك الوعد — النوافذ المتاحة الآن', en: 'Promise engine — slots available now' },
+  promiseSub: {
+    ar: 'ما يراه البائع في المعرض: النوافذ التي تستطيع الشبكة فعلاً خدمتها، وأيّها أرخص. الزبون يختار ويؤكد قبل أن يغادر.',
+    en: 'What the salesperson sees on the showroom floor: the slots the network can actually serve, and which is cheapest. The customer picks and confirms before they leave.',
+  },
+  promiseZone: { ar: 'منطقة التسليم', en: 'Delivery zone' },
+  slotLoad: { ar: 'محجوز', en: 'Booked' },
+  slotCapacity: { ar: 'الطاقة', en: 'Capacity' },
+  slotMarginal: { ar: 'كلفة الإضافة', en: 'Cost to add' },
+  slotRecommended: { ar: 'الأفضل للشبكة', en: 'Best for the network' },
+  slotFull: { ar: 'ممتلئ — لا يُعرض', en: 'Full — not offered' },
+  costLow: { ar: 'منخفضة', en: 'Low' },
+  costMedium: { ar: 'متوسطة', en: 'Medium' },
+  costHigh: { ar: 'مرتفعة', en: 'High' },
+  promiseNote: {
+    ar: 'كلفة الإضافة ليست خطية: النافذة الفارغة غالية لأنها تتطلب رحلة كاملة لمحطة واحدة، والنافذة الممتلئة غالية لأنها تتطلب مركبة إضافية. الأرخص هي نافذة فيها رحلة مارّة أصلاً وفيها متسع.',
+    en: 'Cost to add is not linear: an empty slot is expensive because it needs a whole trip for one stop, and a full slot is expensive because it needs another vehicle. The cheapest is a slot with a route already passing through and room on it.',
+  },
+  zone_north: { ar: 'الشمال', en: 'North' },
+  zone_central: { ar: 'الوسط', en: 'Central' },
+  zone_south: { ar: 'الجنوب', en: 'South' },
+  zone_jerusalem: { ar: 'القدس', en: 'Jerusalem' },
+  zone_jordan_valley: { ar: 'الأغوار', en: 'Jordan Valley' },
+  slot_morning: { ar: 'صباحاً ٩:٠٠–١٢:٠٠', en: 'Morning 09:00–12:00' },
+  slot_midday: { ar: 'ظهراً ١٢:٠٠–١٥:٠٠', en: 'Midday 12:00–15:00' },
+  slot_afternoon: { ar: 'عصراً ١٥:٠٠–١٨:٠٠', en: 'Afternoon 15:00–18:00' },
+
   riskTight: { ar: 'هامش ضيّق', en: 'Tight' },
   riskBreach: { ar: 'تجاوز المدة', en: 'Overdue' },
   technicalDetail: { ar: 'التفصيل الفني', en: 'Technical detail' },

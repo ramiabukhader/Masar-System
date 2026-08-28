@@ -30,6 +30,7 @@ but cannot yet measure.
 | [`05-optimization-spec.md`](docs/05-optimization-spec.md) | What the optimiser solves and how |
 | [`06-sop-en.md`](docs/06-sop-en.md) | End-to-end SOPs, English |
 | [`07-sop-ar.md`](docs/07-sop-ar.md) | نفس الإجراءات بالعربية — للفريق والسائقين |
+| [`09-industry-benchmarks.md`](docs/09-industry-benchmarks.md) | How Coolblue, John Lewis, Lowe's, Home Depot and Best Buy run own-fleet delivery — and the four things we changed because of it |
 
 ---
 
@@ -54,7 +55,7 @@ also download that one file on its own and open it.
 ```bash
 npm install
 npm run dev        # http://localhost:5173, hot reload
-npm test           # 31 tests over the planning engine and order lifecycle
+npm test           # 36 tests over the planning engine, order lifecycle and promise engine
 ```
 
 ### للتشغيل محلياً
@@ -66,6 +67,35 @@ npm run build:standalone
 
 ثم افتح ملف `masar-demo.html` بالضغط عليه مرتين — يعمل كاملاً بدون إنترنت وبدون خادم.
 الواجهة عربية بالكامل من اليمين إلى اليسار، مع زر تبديل إلى الإنجليزية في الأعلى.
+
+---
+
+## Theming
+
+Every colour in the application resolves through one block at the top of
+[`src/ui/styles.css`](src/ui/styles.css) — six values:
+
+```css
+--brand:          /* primary: nav, buttons, links, highlights */
+--brand-strong:   /* hover / pressed                          */
+--brand-ink:      /* brand-coloured text on a light ground    */
+--brand-wash:     /* tinted fill behind brand elements        */
+--brand-line:     /* brand-tinted border                      */
+--brand-contrast: /* text sitting ON the brand colour         */
+```
+
+Change those and the whole app re-skins: sidebar, navigation, buttons, focus rings,
+progress bars, milestone timeline, map highlight.
+
+**The values currently in there are a placeholder.** The research environment could not
+reach `maslamanihome.com` to sample the real palette, so they need to be replaced with
+Maslamani Home's actual brand colours.
+
+Status colours (green / amber / red) and the product-class palette are deliberately *not*
+derived from the brand, and should not be changed with it: a red brand must not make every
+warning look like a brand element, and a blue brand must not make "information"
+indistinguishable from "Maslamani". The product-class palette is validated as a set for
+colour-vision safety — worst-pair CVD ΔE 9.2, normal-vision ΔE 27.6 on a light surface.
 
 ---
 
@@ -95,9 +125,13 @@ closed and the ones still open are exactly the ones worth looking at.
 
 **Setup**
 
-- **خيارات التوصيل · Delivery options** — the service tiers: what can be promised, to
-  whom, and what it costs to serve. Same-day sits here deliberately as a switched-off
-  option carrying the five prerequisites that must be true before it can be turned on.
+- **خيارات التوصيل · Delivery options** — opens with the **promise engine**: the slots the
+  network can actually serve in a given zone right now, with the cheapest one to serve
+  labelled. That is the John Lewis practice — book the slot while the customer is still in
+  the showroom, instead of confirming a window by message the day before. Below it, the
+  service tiers: what can be promised, to whom, and what it costs to serve. Same-day sits
+  there deliberately as a switched-off option carrying the five prerequisites that must be
+  true before it can be turned on.
 
 **Reference**
 
