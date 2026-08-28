@@ -3,6 +3,7 @@ import { fmtNum, fmtTime, type Disruptions, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { loc, type Lang } from '../i18n';
+import { reasonText } from '../reasons';
 
 interface Props {
   t: (key: string) => string;
@@ -262,8 +263,11 @@ export function ControlTower({
             ) : (
               plan.unassigned.map((item) => (
                 <div key={item.shipmentId} style={{ padding: '9px 0', borderBottom: '1px solid var(--border)' }}>
-                  <div className="mono" style={{ fontSize: 12 }}>{item.shipmentId}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.detail}</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span className="mono" style={{ fontSize: 12 }}>{item.shipmentId}</span>
+                    <span className="chip warn">{reasonText(item.reason, lang)}</span>
+                  </div>
+                  <div className="tech-detail">{item.detail}</div>
                 </div>
               ))
             )}
@@ -279,9 +283,9 @@ export function ControlTower({
                 <div key={item.orderId} style={{ padding: '9px 0', borderBottom: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <span className="mono" style={{ fontSize: 12 }}>{item.orderId}</span>
-                    <span className="chip warn">{t(`reason_${item.reason}`)}</span>
+                    <span className="chip warn">{reasonText(item.reason, lang)}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.detail}</div>
+                  <div className="tech-detail">{item.detail}</div>
                 </div>
               ))}
             </div>
