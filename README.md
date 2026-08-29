@@ -109,10 +109,11 @@ This is the option to use if the client needs a link before the meeting.
 
 ### 3. GitHub Pages — only if you are on GitHub Pro
 
-`.github/workflows/pages.yml` is committed and needs no API key at all: it authenticates
-with the `GITHUB_TOKEN` that Actions mints for the single run, scoped to this repository
-and expiring with the job. Nothing to store, rotate or revoke. Enable it with
-**Settings → Pages → Source: GitHub Actions**.
+`.github/workflows/pages.yml` is committed but set to **manual trigger only**, so it never
+races the Vercel deploy. To use it instead: enable **Settings → Pages → Source: GitHub
+Actions**, then run the workflow from the Actions tab. It needs no API key at all — it
+authenticates with the `GITHUB_TOKEN` Actions mints for the single run, scoped to this
+repository and expiring with the job. Nothing to store, rotate or revoke.
 
 Two hard constraints, both worth checking before you rely on it:
 
@@ -145,6 +146,12 @@ discoverability control, not access control:** anyone with the link can still op
 
 `render.yaml` is committed. Same two settings, static site, PR previews on. The free tier's
 published URL is likewise public.
+
+### Continuous integration
+
+`.github/workflows/ci.yml` runs the test suite and a production build on every push and
+pull request. Vercel builds the app but does not run the tests, so this is the check that
+actually catches a broken commit.
 
 ### Whichever you pick
 
