@@ -1,0 +1,59 @@
+# Publishes the Masar demo to GitHub Pages.
+#
+# There is no API key, no secret and no third-party account involved. The job
+# authenticates with the GITHUB_TOKEN that Actions mints for this run: it is
+# scoped to THIS repository, it expires when the job ends, and the permissions
+# block below is the entire grant. Nothing outside this repo is reachable, so
+# there is nothing to leak and nothing to revoke later.
+name: Publish demo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - claude/delivery-automation-optimization-9m8mrh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; a newer push supersedes an in-flight older one.
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # A red test must never reach the client's screen.
+      - run: npm test
+
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

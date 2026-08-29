@@ -72,10 +72,64 @@ npm run build:standalone
 
 ## Hosting the demo
 
-It is a static bundle — no server, no database, no API. Any static host works, and all
-three of these are free.
+It is a static bundle — no server, no database, no API, no secrets. So the question is not
+"can it be hosted" but **who do you have to trust, and with what**.
 
-**Settings are identical everywhere:**
+**This repository is private, and it should stay that way** — it carries the client
+research, the operating model and the SOPs, not just the demo. Every option below is
+weighed against that.
+
+### 1. Don't host it — send the file *(safest, and already built)*
+
+```bash
+npm run build:standalone     # → masar-demo.html
+```
+
+One self-contained file, ~310 KB. Double-click to open. No server, no account, no
+credential, no URL for anyone to find. Email it, put it on a USB stick, or open it on the
+laptop you present from.
+
+**Attack surface: zero.** For a demo shown in a meeting this is not a compromise, it is
+simply the right answer. Take the URL only when you actually need one.
+
+### 2. A separate, empty Cloudflare account *(when you need a private URL)*
+
+If it must be reachable over the internet, do **not** put a token on your production
+Cloudflare account. Create a **second, free Cloudflare account** used for nothing else:
+
+- A brand-new account holds no zones, no DNS, no Workers, no billing relationship. Even a
+  fully compromised credential there reaches nothing, because there is nothing to reach.
+- Use the dashboard's **Git integration**, not an API token — then no credential exists at
+  all. When you install its GitHub app, grant it **this repository only**, not the account.
+- **Cloudflare Access** on the free plan gates the site to a list of invited email
+  addresses, so the demo is not public even though it is online.
+- Build `npm run build`, output `dist`, Node 20 or 22.
+
+This is the option to use if the client needs a link before the meeting.
+
+### 3. GitHub Pages — only if you are on GitHub Pro
+
+`.github/workflows/pages.yml` is committed and needs no API key at all: it authenticates
+with the `GITHUB_TOKEN` that Actions mints for the single run, scoped to this repository
+and expiring with the job. Nothing to store, rotate or revoke. Enable it with
+**Settings → Pages → Source: GitHub Actions**.
+
+Two hard constraints, both worth checking before you rely on it:
+
+- **Publishing Pages from a private repository requires a paid GitHub plan.** On the free
+  plan the only way to make it work is to make the repository public — which would expose
+  the research and the SOPs, not just the demo. Don't.
+- **The published site is public regardless.** GitHub Pages has no password or email gate
+  outside Enterprise. Fine for simulated data, but decide it deliberately.
+
+### 4. Vercel / Render
+
+`vercel.json` and `render.yaml` are committed. Same two settings. Grant either one access
+to **this repository only** when installing its GitHub app. Note that on Vercel's free tier
+the only protection is "team members only" — there is no shareable password link without a
+paid plan, so it does not solve the gating problem the way Cloudflare Access does.
+
+### Settings, wherever you land
 
 | | |
 |---|---|
@@ -83,59 +137,8 @@ three of these are free.
 | Output directory | `dist` |
 | Node version | 20 or 22 |
 
-### Cloudflare Pages — recommended
-
-Two ways in. **Pick one, not both** — running the dashboard's Git integration and the
-Actions workflow against the same project makes every push deploy twice.
-
-**A. Dashboard Git integration — no API token at all.**
-Workers & Pages → Create → Pages → Connect to Git → pick the repo and branch → enter the
-build settings above. Cloudflare then builds and deploys on every push by itself. This is
-the simplest path and the one to use unless you need the tests to gate the deploy.
-
-**B. GitHub Actions — `.github/workflows/deploy.yml` is committed.**
-Use this when you want `npm test` to run before anything ships. It needs two repository
-secrets and a scoped API token; see below.
-
-Either way, the reason to choose Cloudflare for a client demo is **Cloudflare Access**: on
-the free plan it sits in front of the site so only invited email addresses can open it. A
-pre-launch demo for Maslamani should not be on a public URL anyone can find.
-
-#### The API token — scope it down
-
-Create it at **My Profile → API Tokens → Create Token → Create Custom Token**:
-
-| Setting | Value |
-|---|---|
-| Permissions | `Account` → `Cloudflare Pages` → `Edit` |
-| Account Resources | Include → your account only |
-| Zone Resources | *leave empty* |
-| TTL | set an expiry date |
-
-That is the whole grant. A token scoped this way can deploy Pages projects and **cannot**
-read or change DNS, other zones, R2, Workers, or billing. Do not use the Global API Key —
-it is unscoped and cannot be limited.
-
-Then add both secrets in GitHub → Settings → Secrets and variables → Actions:
-`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
-
-#### Custom domain
-
-Pages project → Custom domains → Set up a custom domain → `demo.yourdomain.com`.
-If the domain's zone is already on the same Cloudflare account, the CNAME is created for
-you and the certificate is issued automatically — usually within a couple of minutes.
-
-### Vercel
-`vercel.json` is committed — import the repo and it picks up the Vite preset with no input.
-Password protection on a preview deployment is a paid feature, so use a hard-to-guess
-project name if the link needs to stay quiet.
-
-### Render
-`render.yaml` is committed — create a Blueprint from the repo and it deploys as a static
-site with PR previews on.
-
-> No environment variables, no secrets, no build-time configuration. The seeded scenario is
-> compiled into the bundle, so a deploy is reproducible and there is nothing to leak.
+No environment variables, no secrets, no build-time configuration. The seeded scenario is
+compiled into the bundle, so a deploy is reproducible and there is nothing to leak.
 
 ---
 
