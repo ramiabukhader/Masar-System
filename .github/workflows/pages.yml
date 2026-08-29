@@ -7,11 +7,10 @@
 # there is nothing to leak and nothing to revoke later.
 name: Publish demo to GitHub Pages
 
+# Manual only. Hosting runs on Vercel; this stays as a ready alternative rather
+# than a second pipeline racing it — and it would fail noisily on every push
+# until Pages is switched on in Settings, which it is not.
 on:
-  push:
-    branches:
-      - main
-      - claude/delivery-automation-optimization-9m8mrh
   workflow_dispatch:
 
 permissions:
