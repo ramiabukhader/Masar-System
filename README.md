@@ -122,12 +122,34 @@ Two hard constraints, both worth checking before you rely on it:
 - **The published site is public regardless.** GitHub Pages has no password or email gate
   outside Enterprise. Fine for simulated data, but decide it deliberately.
 
-### 4. Vercel / Render
+### 4. Vercel
 
-`vercel.json` and `render.yaml` are committed. Same two settings. Grant either one access
-to **this repository only** when installing its GitHub app. Note that on Vercel's free tier
-the only protection is "team members only" — there is no shareable password link without a
-paid plan, so it does not solve the gating problem the way Cloudflare Access does.
+Technically the easiest of the lot — `vercel.json` is committed, import the repo and it
+picks up the Vite preset with no input. Private repos deploy fine and custom domains are
+included. Two things to know before choosing it:
+
+- **The production URL is public on the free plan.** Vercel's free tier offers
+  *Vercel Authentication*, which restricts a deployment to members of your Vercel account —
+  that keeps the client out too, so it does not solve sharing. **Password Protection**, the
+  one that would, is a paid feature. Confirm the current plan limits before relying on either.
+- **The Hobby plan is for non-commercial use.** This is paid client work, which puts it
+  outside what the free tier is for. Worth knowing rather than discovering later.
+
+So on Vercel free you get a public-but-unlisted URL. Given what the bundle actually
+contains — the app and simulated orders, and nothing from `docs/` — that is a reasonable
+trade for a demo, as long as it is a decision rather than an accident. The build ships with
+`robots.txt` and a `noindex` meta tag so it stays out of search results. **That is
+discoverability control, not access control:** anyone with the link can still open it.
+
+### 5. Render
+
+`render.yaml` is committed. Same two settings, static site, PR previews on. The free tier's
+published URL is likewise public.
+
+### Whichever you pick
+
+Grant the platform's GitHub app access to **this repository only**, never to the whole
+account. Every one of them offers per-repository selection at install time.
 
 ### Settings, wherever you land
 
