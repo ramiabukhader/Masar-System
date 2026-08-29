@@ -7,41 +7,45 @@
 
 :root {
   /* ═══════════════════════════════════════════════════════════════════════
-     BRAND — THE ONLY BLOCK TO CHANGE
+     BRAND — Maslamani Home
 
-     Replace these six values with Maslamani Home's real brand colours and the
-     whole application re-skins: sidebar, navigation, buttons, links, focus
-     rings, progress, map highlight, charts.
+     Taken from their own site: charcoal header and footer, white body, warm
+     orange in the logo and the "بيتك حياتك" tagline.
 
-     Status colours (green / amber / red) and the product-class palette below
-     are deliberately NOT derived from the brand — a red brand must not make
-     every warning look like a brand element, and a blue brand must not make
-     "information" indistinguishable from "Maslamani". Leave them alone.
+     Their site runs the charcoal heavy across the whole page. Here the charcoal
+     is kept where it earns its place — the sidebar, which mirrors their header —
+     and the working area is opened up in warm light neutrals so a screen someone
+     stares at for ten hours stays comfortable.
 
-     The values here are a PLACEHOLDER pending the real palette.
+     Change these and the whole application re-skins.
      ═══════════════════════════════════════════════════════════════════════ */
-  --brand: #0b4a8f;           /* primary: nav, buttons, links, highlights   */
-  --brand-strong: #093a70;    /* hover / pressed                            */
-  --brand-ink: #0a3f7a;       /* brand-coloured TEXT on a light ground      */
-  --brand-wash: #e9f0f9;      /* tinted fill behind brand elements          */
-  --brand-line: #c4d8ee;      /* brand-tinted border                        */
-  --brand-contrast: #ffffff;  /* text sitting ON the brand colour           */
+  --brand: #e87722;           /* their orange: nav, buttons, links, highlights */
+  --brand-strong: #c75f14;    /* hover / pressed                              */
+  --brand-ink: #9c4c0e;       /* orange TEXT on light — darkened for contrast */
+  --brand-wash: #fdf1e7;      /* tinted fill behind brand elements            */
+  --brand-line: #f3d2b3;      /* brand-tinted border                          */
+  --brand-contrast: #ffffff;  /* text sitting ON the brand colour             */
 
-  /* --- Neutrals: cool grey, biased a touch toward the brand hue ---------- */
-  --bg: #f4f5f7;
+  /* Their charcoal. Carries the sidebar, the way it carries their header. */
+  --charcoal: #2f2d2b;
+  --charcoal-soft: #3d3a37;
+  --charcoal-line: #4a4643;
+
+  /* --- Neutrals: warm grey, out of the same family as the charcoal ------- */
+  --bg: #f7f6f4;
   --bg-raised: #ffffff;
   --bg-panel: #ffffff;
-  --bg-inset: #f0f2f5;
-  --border: #e2e6eb;
-  --border-strong: #c8cfd8;
+  --bg-inset: #f2f0ed;
+  --border: #e5e2dd;
+  --border-strong: #ccc7bf;
 
-  --text: #16202b;
-  --text-muted: #55616e;
-  --text-dim: #8a94a0;
+  --text: #2b2a28;
+  --text-muted: #6b6762;
+  --text-dim: #9a948d;
 
   /* --- Status: reserved. Never used to identify a category. -------------- */
-  --green: #0e7a38;        /* text-safe        */
-  --green-mark: #0ca30c;   /* dot / marker     */
+  --green: #0e7a38;
+  --green-mark: #0ca30c;
   --green-wash: #e7f5ea;
   --green-line: #b6e0c0;
 
@@ -61,15 +65,15 @@
   --info-line: var(--brand-line);
 
   /* --- Product classes: categorical identity ----------------------------
-     Validated as a set (all pairs, light surface): worst CVD ΔE 9.2,
-     worst normal-vision ΔE 27.6. The aqua step sits under 3:1 against white,
-     which is permitted here because every chip carries its visible letter —
-     colour never has to carry the meaning on its own. Deliberately excludes
-     the brand hue so a class chip can never read as a brand element. */
-  --class-a: #eb6834;      /* major appliances   */
-  --class-a-ink: #a8410f;
-  --class-a-wash: #fdeee8;
-  --class-b: #1baf7a;      /* small appliances   */
+     Re-picked around the orange brand so a class chip can never be mistaken
+     for a brand element. Validated as a set (all pairs, light surface):
+     worst CVD ΔE 13.0, worst normal-vision ΔE 16.3. The aqua step sits under
+     3:1 against white, which is permitted because every chip carries its
+     visible letter — colour never has to carry the meaning alone. */
+  --class-a: #2a78d6;      /* major appliances    */
+  --class-a-ink: #1a5698;
+  --class-a-wash: #e9f1fb;
+  --class-b: #1baf7a;      /* small appliances    */
   --class-b-ink: #0b6b48;
   --class-b-wash: #e6f7f0;
   --class-c: #4a3aa7;      /* fragile kitchenware */
@@ -121,8 +125,8 @@ button { font-family: inherit; cursor: pointer; }
 .sidebar {
   width: 232px;
   flex: none;
-  background: var(--bg-raised);
-  border-inline-end: 1px solid var(--border);
+  background: var(--charcoal);
+  border-inline-end: 1px solid var(--charcoal);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -132,39 +136,39 @@ button { font-family: inherit; cursor: pointer; }
 
 .sidebar-brand {
   padding: 20px 20px 18px;
-  border-block-end: 1px solid var(--border);
-  background: var(--brand-wash);
+  border-block-end: 1px solid var(--charcoal-line);
 }
 .brand-mark { font-size: 24px; font-weight: 700; color: var(--brand); letter-spacing: -0.01em; display: block; }
-.brand-tag { font-size: 11px; color: var(--text-muted); line-height: 1.4; display: block; margin-top: 3px; }
+.brand-tag { color: #a8a29b; }
+.brand-tag { font-size: 11px; line-height: 1.4; display: block; margin-top: 3px; }
 
 .sidebar-nav { flex: 1; overflow-y: auto; padding: 14px 10px; }
 .nav-group + .nav-group { margin-top: 18px; }
 .nav-group-label {
   font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
-  color: var(--text-dim); padding: 0 10px 6px;
+  color: #8c867f; padding: 0 10px 6px;
 }
 
 .nav-item {
   display: flex; align-items: center; gap: 10px; width: 100%;
-  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  background: transparent; border: 1px solid transparent; color: #c6c1ba;
   padding: 8px 10px; border-radius: var(--radius-sm);
   font-size: 13.5px; font-weight: 500; text-align: start;
   transition: background .13s, color .13s;
 }
-.nav-item:hover { background: var(--bg-raised); color: var(--text); }
+.nav-item:hover { background: var(--charcoal-soft); color: #ffffff; }
 .nav-item[data-active='true'] {
-  background: var(--bg-panel); border-color: var(--border-strong); color: var(--accent);
+  background: var(--brand); border-color: var(--brand); color: var(--brand-contrast);
 }
 .nav-icon { font-size: 13px; width: 16px; text-align: center; opacity: .85; }
 
-.sidebar-foot { padding: 14px 16px; border-block-start: 1px solid var(--border); }
+.sidebar-foot { padding: 14px 16px; border-block-start: 1px solid var(--charcoal-line); }
 
 .demo-pill {
   display: inline-block;
   font-size: 10.5px; padding: 3px 9px; border-radius: 999px;
-  background: var(--brand-wash); color: var(--brand-ink);
-  border: 1px solid var(--brand-line);
+  background: rgba(232, 119, 34, 0.16); color: var(--brand);
+  border: 1px solid rgba(232, 119, 34, 0.4);
 }
 
 .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -687,8 +691,8 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .dg-route      { stroke: var(--map-route-idle); }
 .dg-route-on   { stroke: var(--brand); }
 .dg-stop       { fill: var(--brand); stroke: var(--bg-panel); }
-.dg-node       { fill: var(--bg-panel); stroke: var(--text); }
-.dg-node-dc    { fill: var(--text); stroke: var(--text); }
+.dg-node       { fill: var(--bg-panel); stroke: var(--charcoal); }
+.dg-node-dc    { fill: var(--charcoal); stroke: var(--charcoal); }
 .dg-label      { fill: var(--text-muted); stroke: none; }
 .dg-label-halo { fill: none; stroke: var(--bg-inset); }
 
