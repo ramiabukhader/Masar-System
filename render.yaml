@@ -1,0 +1,15 @@
+# Render — static site. Free tier is enough; this is a static bundle with no server.
+services:
+  - type: web
+    name: masar-demo
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff

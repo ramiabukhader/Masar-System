@@ -70,6 +70,39 @@ npm run build:standalone
 
 ---
 
+## Hosting the demo
+
+It is a static bundle — no server, no database, no API. Any static host works, and all
+three of these are free.
+
+**Settings are identical everywhere:**
+
+| | |
+|---|---|
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Node version | 20 or 22 |
+
+### Cloudflare Pages — recommended
+Connect the repo, pick the branch, enter the two settings above. What makes it the right
+choice for a client demo: **Cloudflare Access** can sit in front of it on the free plan, so
+only invited email addresses can open the link. A pre-launch demo for Maslamani should not
+be sitting on a public URL that anyone can find.
+
+### Vercel
+`vercel.json` is committed — import the repo and it picks up the Vite preset with no input.
+Password protection on a preview deployment is a paid feature, so use a hard-to-guess
+project name if the link needs to stay quiet.
+
+### Render
+`render.yaml` is committed — create a Blueprint from the repo and it deploys as a static
+site with PR previews on.
+
+> No environment variables, no secrets, no build-time configuration. The seeded scenario is
+> compiled into the bundle, so a deploy is reproducible and there is nothing to leak.
+
+---
+
 ## Theming
 
 Every colour in the application resolves through one block at the top of
@@ -87,9 +120,11 @@ Every colour in the application resolves through one block at the top of
 Change those and the whole app re-skins: sidebar, navigation, buttons, focus rings,
 progress bars, milestone timeline, map highlight.
 
-**The values currently in there are a placeholder.** The research environment could not
-reach `maslamanihome.com` to sample the real palette, so they need to be replaced with
-Maslamani Home's actual brand colours.
+**These are Maslamani Home's own colours**, read off their site: the charcoal of their
+header and footer, and the warm orange from the logo and the "بيتك حياتك" tagline. Their
+site runs the charcoal heavy across the whole page; here it is kept where it earns its
+place — the sidebar, mirroring their header — while the working area is opened up in warm
+light neutrals, because this is a screen people look at for ten hours a day.
 
 Status colours (green / amber / red) and the product-class palette are deliberately *not*
 derived from the brand, and should not be changed with it: a red brand must not make every
