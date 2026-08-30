@@ -145,7 +145,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                         <td style={{ fontSize: 12 }}>{t(line.zoneInVehicle)}</td>
                         <td className="mono">{line.deliverySeq}</td>
                         <td>
-                          <span className="check-box" style={isVerified ? { background: 'var(--green)', borderColor: 'var(--green)' } : undefined}>
+                          <span className="check-box" style={isVerified ? { background: 'var(--green-solid)', borderColor: 'var(--green-solid)' } : undefined}>
                             {isVerified ? '✓' : ''}
                           </span>
                         </td>

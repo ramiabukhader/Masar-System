@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +9,15 @@
       section of the README for the difference.
     -->
     <meta name="robots" content="noindex, nofollow" />
+    <!--
+      Stamped here rather than only from React so the first paint is already on
+      the brand's charcoal — otherwise the page flashes white before mounting.
+    -->
+    <meta name="theme-color" content="#232120" />
+    <style>
+      html { background: #232120; color-scheme: dark; }
+      html[data-theme='light'] { background: #f7f6f4; color-scheme: light; }
+    </style>
     <title>مسار — نظام إدارة وتحسين التوصيل | Masar Delivery Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
