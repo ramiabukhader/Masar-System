@@ -134,7 +134,7 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
                 strokeLinejoin="round"
                 fontSize="10"
                 fontWeight="600"
-                fontFamily="IBM Plex Mono, monospace"
+                fontFamily="IBM Plex Mono, Tajawal, monospace"
               >
                 {NODE_LABELS[node.id] ?? node.id}
               </text>
