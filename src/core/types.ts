@@ -339,9 +339,17 @@ export interface DeliveryPlan {
   solverLog: SolverLogEntry[];
 }
 
+export type SolverPhase = 'setup' | 'construct' | 'improve' | 'finalise';
+
+/**
+ * A trace line carries a stable code and its numbers, never a prose sentence.
+ * The solver has no business deciding what language the control tower speaks,
+ * and this screen is read in Arabic; the wording lives in the UI's own strings.
+ */
 export interface SolverLogEntry {
-  phase: string;
-  message: string;
+  phase: SolverPhase;
+  code: string;
+  params: Record<string, string | number>;
   cost?: number;
   elapsedMs: number;
 }

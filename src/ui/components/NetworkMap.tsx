@@ -133,7 +133,7 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
                 strokeWidth={layer === 'halo' ? 3.5 : 0}
                 strokeLinejoin="round"
                 fontSize="10"
-                fontWeight="600"
+                fontWeight="700"
                 fontFamily="IBM Plex Mono, Tajawal, monospace"
               >
                 {NODE_LABELS[node.id] ?? node.id}

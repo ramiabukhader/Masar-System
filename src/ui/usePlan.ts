@@ -172,3 +172,14 @@ export function fmtDue(due: Date, planDate: Date, lang: 'ar' | 'en'): string {
 export function fmtNum(value: number, digits = 0): string {
   return value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
+
+/**
+ * Volumes, at a precision that never lies. A hair dryer is 0.004 m³, and at the
+ * fixed two decimals this used to use it rendered as "0.00" — which reads as
+ * missing data rather than as a small box. Anything that would round away to
+ * zero gets the decimals it needs to stay a number.
+ */
+export function fmtCube(value: number): string {
+  if (value === 0) return '0';
+  return fmtNum(value, value < 0.01 ? 3 : 2);
+}

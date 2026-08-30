@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { fmtNum, fmtTime, type PlanState } from '../usePlan';
+import { InfoTip } from '../components/InfoTip';
+import { fmtCube, fmtNum, fmtTime, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { VEHICLE_MAP } from '../../data/fleet';
@@ -80,17 +81,17 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
         <div className="panel">
           <div className="panel-head">
             <h2>{t('pickList')}</h2>
-            <span className="sub">{pickList.length} SKU · {fmtNum(route.metrics.loadM3, 2)} m³</span>
+            <span className="sub">{pickList.length} SKU · {fmtCube(route.metrics.loadM3)} {t('m3')}</span>
           </div>
           <div className="panel-body tight">
             <table>
               <thead>
-                <tr><th>SKU</th><th>{lang === 'ar' ? 'الصنف' : 'Item'}</th><th>{lang === 'ar' ? 'الكمية' : 'Qty'}</th><th>m³</th></tr>
+                <tr><th>SKU</th><th>{lang === 'ar' ? 'الصنف' : 'Item'}</th><th>{lang === 'ar' ? 'الكمية' : 'Qty'}</th><th>{t('m3')}</th></tr>
               </thead>
               <tbody>
                 {pickList.map((line) => (
                   <tr key={line.sku}>
-                    <td className="mono" style={{ fontSize: 11 }}>{line.sku}</td>
+                    <td className="mono">{line.sku}</td>
                     <td>
                       <div>{lang === 'ar' ? line.product.nameAr : line.product.nameEn}</div>
                       <div style={{ display: 'flex', gap: 5, marginTop: 3, flexWrap: 'wrap' }}>
@@ -101,7 +102,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                       </div>
                     </td>
                     <td className="mono">{line.quantity}</td>
-                    <td className="mono">{(line.product.cubeM3 * line.quantity).toFixed(2)}</td>
+                    <td className="mono">{fmtCube(line.product.cubeM3 * line.quantity)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -112,11 +113,10 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
         {/* ---- Load manifest ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('loadManifest')}</h2>
+            <h2>{t('loadManifest')}<InfoTip text={t('loadOrderHint')} label={t('explain')} /></h2>
             <span className="sub">{verified.size}/{route.loadPlan.length} {t('verified')}</span>
           </div>
           <div className="panel-body">
-            <p className="hint">{t('loadOrderHint')}</p>
             <div className="bar" style={{ marginBottom: 12, height: 8 }}>
               <i style={{ width: `${progress * 100}%`, background: progress === 1 ? 'var(--green)' : 'var(--progress)' }} />
             </div>
@@ -139,10 +139,10 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                       <tr key={line.loadSeq} className="clickable" onClick={() => toggle(line.loadSeq)}>
                         <td className="mono" style={{ fontWeight: 700, color: 'var(--progress)' }}>{line.loadSeq}</td>
                         <td>
-                          <div style={{ fontSize: 12.5 }}>{lang === 'ar' ? product.nameAr : product.nameEn}</div>
+                          <div>{lang === 'ar' ? product.nameAr : product.nameEn}</div>
                           {line.fragile && <span className="chip fragile">{t('fragile')}</span>}
                         </td>
-                        <td style={{ fontSize: 12 }}>{t(line.zoneInVehicle)}</td>
+                        <td>{t(line.zoneInVehicle)}</td>
                         <td className="mono">{line.deliverySeq}</td>
                         <td>
                           <span className="check-box" style={isVerified ? { background: 'var(--green-solid)', borderColor: 'var(--green-solid)' } : undefined}>
@@ -164,7 +164,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
         <div className="panel-head">
           <h2>{vehicle?.plate} · {t('stops')}</h2>
           <span className="sub ltr">
-            {fmtTime(route.startAt)} → {fmtTime(route.endAt)} · {fmtNum(route.metrics.loadM3, 2)}/{vehicle?.capacityM3} m³ · {fmtNum(route.metrics.loadKg)}/{vehicle?.capacityKg} kg
+            {fmtTime(route.startAt)} → {fmtTime(route.endAt)} · {fmtCube(route.metrics.loadM3)}/{vehicle?.capacityM3} {t('m3')} · {fmtNum(route.metrics.loadKg)}/{vehicle?.capacityKg} {t('kg')}
           </span>
         </div>
         <div className="panel-body tight">
@@ -182,10 +182,10 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                       <td className="mono">{stop.seq}</td>
                       <td>
                         <div>{loc(lang, customer?.name, customer?.nameAr)}</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{loc(lang, customer?.addressLine, customer?.addressLineAr)}</div>
+                        <div className="cell-sub">{loc(lang, customer?.addressLine, customer?.addressLineAr)}</div>
                       </td>
                       <td className="mono ltr">{fmtTime(stop.promisedWindow.earliest)}–{fmtTime(stop.promisedWindow.latest)}</td>
-                      <td style={{ fontSize: 12 }}>
+                      <td>
                         {customer && (
                           <>
                             {t('floor')} {customer.access.floor}

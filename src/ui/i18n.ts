@@ -12,6 +12,7 @@ export const STRINGS: Dict = {
   appTagline: { ar: 'نظام إدارة وتحسين التوصيل — مسلماني هوم', en: 'Delivery orchestration & optimisation — Maslamani Home' },
   demoNotice: { ar: 'نسخة تجريبية ببيانات محاكاة', en: 'Demo build on simulated data' },
   themeToggle: { ar: 'تبديل السمة — غامق / فاتح', en: 'Switch theme — dark / light' },
+  langToggle: { ar: 'التبديل إلى الإنجليزية', en: 'Switch to Arabic' },
 
   navTower: { ar: 'غرفة التحكم', en: 'Control Tower' },
   navBranch: { ar: 'عمليات الفرع', en: 'Branch Ops' },
@@ -33,8 +34,14 @@ export const STRINGS: Dict = {
   before: { ar: 'الوضع الحالي (نموذج)', en: 'Current state (modelled)' },
   after: { ar: 'بعد التحسين', en: 'Optimised' },
   saving: { ar: 'التوفير', en: 'Saving' },
+  explain: { ar: 'شرح', en: 'Explain' },
+  guardLabel: { ar: 'ما يمنعه هذا الإجراء', en: 'What this step prevents' },
+  processIntro: {
+    ar: 'من البيع في المعرض حتى التسليم عند باب الزبون وتسوية المبالغ. كل خطوة لها مسؤول، وكل تحذير يمنع خسارة محددة.',
+    en: 'From the showroom sale to the drop at the door and the cash reconciled. Every step has an owner; every guard prevents a named loss.',
+  },
   baselineCaveat: {
-    ar: 'المقارنة مبنية على نموذج للوضع الحالي (توزيع من كل فرع على حدة، بدون دمج أو تخطيط حجمي). الأرقام الحقيقية تُقاس من بياناتهم في المرحلة الأولى.',
+    ar: 'المقارنة مقابل نموذج للوضع الحالي: توزيع من كل فرع على حدة، بلا دمج أو تخطيط حجمي. الأرقام الحقيقية تُقاس من بياناتهم في المرحلة الأولى.',
     en: 'Comparison against a modelled current state (branch-siloed dispatch, no consolidation, no cube planning). The real baseline is measured from their own data in Phase 1.',
   },
 
@@ -45,6 +52,32 @@ export const STRINGS: Dict = {
   disruptions: { ar: 'محاكاة الاضطرابات', en: 'Disruption simulator' },
   exceptions: { ar: 'الاستثناءات', en: 'Exceptions' },
   solverLog: { ar: 'سجل المحرّك', en: 'Solver log' },
+  solverLogNote: {
+    ar: 'خطوات المحرّك وهو يبني خطة اليوم، بالترتيب ومع زمن كل خطوة. للتشخيص عند الحاجة.',
+    en: 'The steps the solver took to build today’s plan, in order and timed. Diagnostic detail.',
+  },
+  showDetail: { ar: 'عرض التفاصيل', en: 'Show detail' },
+  // Solver phases and trace lines. {name} placeholders are filled from the
+  // entry's params, so the numbers come from the solver and the wording
+  // from here.
+  sp_setup: { ar: 'إعداد', en: 'setup' },
+  sp_construct: { ar: 'بناء', en: 'construct' },
+  sp_improve: { ar: 'تحسين', en: 'improve' },
+  sp_finalise: { ar: 'إنهاء', en: 'finalise' },
+  sl_poolReady: { ar: '{count} مركبة وسائق متاحون', en: '{count} vehicle/driver pairs available' },
+  sl_budgetReached: { ar: 'انتهى الوقت المتاح، {count} شحنة بلا خطة', en: 'time budget reached, {count} shipment(s) unplaced' },
+  sl_budgetReachedPass: { ar: 'انتهى الوقت المتاح بعد {pass} جولة', en: 'time budget reached after {pass} pass(es)' },
+  sl_routesBuilt: { ar: '{routes} رحلة، بكلفة {cost}', en: '{routes} routes, cost {cost}' },
+  sl_routesBuiltWithUnplaced: { ar: '{routes} رحلة، بكلفة {cost} (+{unplaced} بلا خطة)', en: '{routes} routes, cost {cost} (+{unplaced} unplaced)' },
+  sl_routeOpened: { ar: 'فتح {route} على {plate} من {originAr}', en: 'opened {route} on {plate} from {origin}' },
+  sl_improved: {
+    ar: '{passes} جولة، {moves} تحسين، الكلفة من {before} إلى {after} (توفير {saved}٪)',
+    en: '{passes} pass(es), {moves} improving move(s), cost {before} → {after} ({saved}% saved)',
+  },
+  sl_planned: {
+    ar: '{routes} رحلة، {drops} توصيلة، {unassigned} بلا جدولة — الهدف {objective}',
+    en: '{routes} routes, {drops} drops, {unassigned} unassigned — objective {objective}',
+  },
 
   closeJerusalem: { ar: 'إغلاق معابر القدس', en: 'Close Jerusalem crossings' },
   slowNorth: { ar: 'ازدحام شديد شمالاً', en: 'Heavy delay — north corridor' },
@@ -52,8 +85,8 @@ export const STRINGS: Dict = {
   replan: { ar: 'إعادة التخطيط', en: 'Re-plan' },
   replanning: { ar: 'جارٍ إعادة التخطيط…', en: 'Re-planning…' },
   disruptionHint: {
-    ar: 'الإغلاقات وتعطل المركبات مُدخلات أساسية في النظام وليست مكالمة هاتفية لمدير العمليات. غيّر أي مفتاح لترى الخطة تُعاد خلال ثوانٍ.',
-    en: 'Closures and breakdowns are first-class planning inputs, not a phone call to the ops manager. Toggle any switch and watch the plan rebuild in seconds.',
+    ar: 'غيّر أي مفتاح لتُعاد الخطة فوراً على الوضع الجديد.',
+    en: 'Toggle any switch and the plan rebuilds on the new conditions.',
   },
 
   // Route detail
@@ -135,8 +168,8 @@ export const STRINGS: Dict = {
   // Exceptions panel
   heldOrders: { ar: 'طلبات موقوفة عند بوابة الجودة', en: 'Orders held at the data gate' },
   heldHint: {
-    ar: 'هذه الطلبات لم تصل إلى الشاحنة لأن بياناتها ناقصة. كل واحدة منها مهمة لشخص، وليست خطأ في النظام.',
-    en: 'These never reached a truck because their data is incomplete. Each one is a task for a person, not a system error.',
+    ar: 'طلبات لم تصل إلى الشاحنة لأن بياناتها ناقصة — كل واحدة تحتاج تدخّلاً يدوياً.',
+    en: 'Orders that never reached a truck because their data is incomplete — each needs a person to resolve it.',
   },
   unassignedHint: {
     ar: 'شحنات لم يمكن جدولتها اليوم، مع السبب الدقيق لكل منها.',
@@ -149,8 +182,8 @@ export const STRINGS: Dict = {
   // Promise engine
   promiseTitle: { ar: 'محرّك الوعد — النوافذ المتاحة الآن', en: 'Promise engine — slots available now' },
   promiseSub: {
-    ar: 'ما يراه البائع في المعرض: النوافذ التي تستطيع الشبكة فعلاً خدمتها، وأيّها أرخص. الزبون يختار ويؤكد قبل أن يغادر.',
-    en: 'What the salesperson sees on the showroom floor: the slots the network can actually serve, and which is cheapest. The customer picks and confirms before they leave.',
+    ar: 'النوافذ التي تستطيع الشبكة خدمتها فعلاً، وأيّها أرخص. يختارها الزبون ويؤكدها قبل أن يغادر المعرض.',
+    en: 'The slots the network can actually serve, and which is cheapest. The customer picks and confirms before leaving the showroom.',
   },
   promiseZone: { ar: 'منطقة التسليم', en: 'Delivery zone' },
   slotLoad: { ar: 'محجوز', en: 'Booked' },
@@ -272,6 +305,13 @@ export const STRINGS: Dict = {
   // ── Delivery options ────────────────────────────────────────────────────
   optionsTitle: { ar: 'خيارات التوصيل', en: 'Delivery options' },
   optionsSub: { ar: 'ما يمكن وعد الزبون به، ولمن، وكم يكلّف الوفاء به', en: 'What can be promised, to whom, and what it costs to keep' },
+  // One line per screen, shown from the ⓘ beside the page title so every screen
+  // is introduced the same way and none of them spends a paragraph doing it.
+  towerSub: { ar: 'خطة اليوم بعد التحسين، مقابل الوضع الحالي، مع الاستثناءات', en: "Today's optimised plan against the current state, with the exceptions" },
+  branchSub: { ar: 'ما يجهّزه الفرع ويحمّله لكل رحلة، بالترتيب الصحيح', en: 'What the branch picks and loads for each route, in the right order' },
+  driverSub: { ar: 'ما يراه السائق في الميدان، محطة بمحطة', en: 'What the driver sees in the field, stop by stop' },
+  processSub: { ar: 'مسار الطلب من البيع حتى التسليم، ومسؤول كل خطوة', en: 'The order from sale to doorstep, and who owns each step' },
+  orderSub: { ar: 'كل ما يخص هذا الطلب: مساره، شحنته، ومن يحمله', en: 'Everything about this order: its track, its shipment, and who carries it' },
   tierActive: { ar: 'مفعّل', en: 'Active' },
   tierPilot: { ar: 'قيد التطبيق', en: 'Rolling out' },
   tierPlanned: { ar: 'غير مفعّل', en: 'Not enabled' },
@@ -303,6 +343,8 @@ export const STRINGS: Dict = {
   st_later: { ar: 'لاحقاً', en: 'Later' },
 
   km: { ar: 'كم', en: 'km' },
+  m3: { ar: 'م³', en: 'm³' },
+  kg: { ar: 'كغ', en: 'kg' },
   min: { ar: 'دقيقة', en: 'min' },
   hours: { ar: 'ساعة', en: 'h' },
   currency: { ar: '₪', en: '₪' },
@@ -310,6 +352,17 @@ export const STRINGS: Dict = {
 
 export function makeT(lang: Lang) {
   return (key: string): string => STRINGS[key]?.[lang] ?? key;
+}
+
+/**
+ * Fills {name} placeholders in a template string from a params record. Used for
+ * the solver trace, where the numbers come from the engine and the sentence
+ * around them comes from these strings.
+ */
+export function fill(template: string, params: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (whole, name) =>
+    name in params ? String(params[name]) : whole,
+  );
 }
 
 /** Picks the localised variant of a bilingual record (customer, driver, node, product). */

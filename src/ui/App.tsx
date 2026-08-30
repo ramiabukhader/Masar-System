@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { makeT, type Lang } from './i18n';
+import { InfoTip } from './components/InfoTip';
 import { fmtClock, fmtDay, NO_DISRUPTIONS, PLAN_DATE, usePlan, type Disruptions } from './usePlan';
 import { buildOrderTracks } from '../core/lifecycle';
 import { OrdersBoard } from './screens/OrdersBoard';
@@ -52,6 +53,21 @@ const NAV: NavGroup[] = [
   },
 ];
 
+/**
+ * The one-line description of each screen. It hangs off the ⓘ beside the page
+ * title rather than sitting under it as a paragraph: every screen gets the same
+ * introduction, and none of them spends a line of the viewport on it.
+ */
+const SUB: Record<View, string> = {
+  orders: 'ordersSub',
+  tower: 'towerSub',
+  branch: 'branchSub',
+  driver: 'driverSub',
+  options: 'optionsSub',
+  process: 'processSub',
+  roadmap: 'roadmapSub',
+};
+
 const SHIFT_START = 7 * 60;
 const SHIFT_END = 18 * 60;
 
@@ -103,6 +119,7 @@ export function App() {
 
   const titleKey =
     openTrack ? 'orderDetail' : NAV.flatMap((g) => g.items).find((i) => i.id === view)?.key ?? 'navOrders';
+  const subKey = openTrack ? 'orderSub' : SUB[view];
 
   const go = (next: View) => {
     setOpenOrderId(null);
@@ -146,7 +163,10 @@ export function App() {
       <div className="content">
         <header className="topbar">
           <div className="topbar-title">
-            <h1>{t(titleKey)}</h1>
+            <h1>
+              {t(titleKey)}
+              <InfoTip text={t(subKey)} label={t('explain')} />
+            </h1>
             {openTrack && (
               <button className="btn ghost sm" onClick={() => setOpenOrderId(null)}>
                 ← {t('backToOrders')}
@@ -174,14 +194,19 @@ export function App() {
 
           <div className="topbar-toggles">
             <button
-              className="lang-toggle"
+              className="topbar-toggle theme-toggle"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               title={t('themeToggle')}
               aria-label={t('themeToggle')}
             >
               {theme === 'dark' ? '☀' : '☾'}
             </button>
-            <button className="lang-toggle" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>
+            <button
+              className="topbar-toggle lang-toggle"
+              onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+              title={t('langToggle')}
+              aria-label={t('langToggle')}
+            >
               {lang === 'ar' ? 'EN' : 'ع'}
             </button>
           </div>

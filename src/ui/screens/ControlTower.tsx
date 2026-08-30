@@ -1,8 +1,9 @@
 import { NetworkMap } from '../components/NetworkMap';
+import { InfoTip } from '../components/InfoTip';
 import { fmtNum, fmtTime, type Disruptions, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
-import { loc, type Lang } from '../i18n';
+import { fill, loc, type Lang } from '../i18n';
 import { reasonText } from '../reasons';
 
 interface Props {
@@ -58,7 +59,7 @@ export function ControlTower({
         {/* ---- Before / after ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('planTitle')}</h2>
+            <h2>{t('planTitle')}<InfoTip text={t('baselineCaveat')} label={t('explain')} /></h2>
             <span className="sub">{plan.id}</span>
           </div>
           <div className="panel-body">
@@ -81,18 +82,16 @@ export function ControlTower({
                 <CompareRow label={t('kpiDriveTime')} value={`${fmtNum(plan.metrics.totalDriveMinutes / 60, 1)} ${t('hours')}`} />
               </div>
             </div>
-            <p className="hint" style={{ marginTop: 14, marginBottom: 0 }}>{t('baselineCaveat')}</p>
           </div>
         </div>
 
         {/* ---- Disruption simulator ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('disruptions')}</h2>
+            <h2>{t('disruptions')}<InfoTip text={t('disruptionHint')} label={t('explain')} /></h2>
             {loading && <span className="sub">{t('replanning')}</span>}
           </div>
           <div className="panel-body">
-            <p className="hint">{t('disruptionHint')}</p>
             <Toggle
               label={t('closeJerusalem')}
               on={disruptions.jerusalemClosed}
@@ -109,18 +108,24 @@ export function ControlTower({
               onToggle={() => setDisruptions({ ...disruptions, truckDown: !disruptions.truckDown })}
             />
 
-            <div className="panel-head" style={{ marginTop: 18, marginInline: -16, borderBlockStart: '1px solid var(--border)' }}>
-              <h2>{t('solverLog')}</h2>
-            </div>
-            <div style={{ marginTop: 10 }}>
-              {plan.solverLog.map((entry, i) => (
-                <div className="log-line" key={i}>
-                  <span className="log-phase">{entry.phase}</span>
-                  <span style={{ flex: 1 }}>{entry.message}</span>
-                  <span className="log-time">{entry.elapsedMs}ms</span>
-                </div>
-              ))}
-            </div>
+            {/* Diagnostic, not operational — folded away so it stops competing
+                with the switches above it for the reader's attention. */}
+            <details className="log-details">
+              <summary>
+                {t('solverLog')}
+                <span className="log-count">{plan.solverLog.length}</span>
+                <InfoTip text={t('solverLogNote')} label={t('explain')} />
+              </summary>
+              <div className="log-body">
+                {plan.solverLog.map((entry, i) => (
+                  <div className="log-line" key={i}>
+                    <span className="log-phase">{t(`sp_${entry.phase}`)}</span>
+                    <span style={{ flex: 1 }}>{fill(t(`sl_${entry.code}`), entry.params)}</span>
+                    <span className="log-time">{entry.elapsedMs}ms</span>
+                  </div>
+                ))}
+              </div>
+            </details>
           </div>
         </div>
       </div>
@@ -170,19 +175,19 @@ export function ControlTower({
                           <td><span className="dot" data-on={selectedRouteId === route.id} /></td>
                           <td>
                             <div className="mono">{vehicle?.plate}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{loc(lang, driver?.name, driver?.nameAr)}</div>
+                            <div className="cell-sub">{loc(lang, driver?.name, driver?.nameAr)}</div>
                           </td>
-                          <td style={{ fontSize: 12 }}>{NODE_MAP.get(route.originNodeId)?.[lang === 'ar' ? 'nameAr' : 'nameEn']}</td>
+                          <td>{NODE_MAP.get(route.originNodeId)?.[lang === 'ar' ? 'nameAr' : 'nameEn']}</td>
                           <td className="mono">{route.metrics.stopCount}</td>
                           <td className="mono">{fmtNum(route.metrics.distanceKm)}</td>
                           <td>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               <div className="bar"><i style={{ width: `${Math.min(fill * 100, 100)}%` }} data-low={fill < 0.5} /></div>
-                              <span className="mono" style={{ fontSize: 11 }}>{fmtNum(fill * 100)}%</span>
+                              <span className="mono">{fmtNum(fill * 100)}%</span>
                             </div>
                           </td>
                           <td className="mono">{fmtNum(route.metrics.cost)}</td>
-                          <td className="mono ltr" style={{ fontSize: 11 }}>{fmtTime(route.startAt)}–{fmtTime(route.endAt)}</td>
+                          <td className="mono ltr">{fmtTime(route.startAt)}–{fmtTime(route.endAt)}</td>
                         </tr>
                       );
                     })}
@@ -226,11 +231,11 @@ export function ControlTower({
                         <td className="mono">{stop.seq}</td>
                         <td>
                           <div>{loc(lang, customer?.name, customer?.nameAr)}</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{loc(lang, customer?.addressLine, customer?.addressLineAr)}</div>
+                          <div className="cell-sub">{loc(lang, customer?.addressLine, customer?.addressLineAr)}</div>
                         </td>
                         <td className="mono ltr">{fmtTime(stop.promisedWindow.earliest)}–{fmtTime(stop.promisedWindow.latest)}</td>
                         <td className="mono">{fmtTime(stop.arriveAt)}</td>
-                        <td className="mono" style={{ fontSize: 11 }}>{fmtNum(stop.travelKmFromPrev, 1)} {t('km')} · {stop.travelMinutesFromPrev} {t('min')}</td>
+                        <td className="mono">{fmtNum(stop.travelKmFromPrev, 1)} {t('km')} · {stop.travelMinutesFromPrev} {t('min')}</td>
                         <td className="mono">{stop.serviceMinutes} {t('min')}</td>
                         <td>
                           <span className={`chip ${tight ? 'warn' : 'ok'}`}>{Math.round(stop.slackMinutes / 60)} {t('hours')}</span>
@@ -255,43 +260,67 @@ export function ControlTower({
       {/* ---- Exceptions ---- */}
       <div className="grid grid-2">
         <div className="panel">
-          <div className="panel-head"><h2>{t('kpiUnassigned')}</h2><span className="sub">{plan.unassigned.length}</span></div>
+          <div className="panel-head"><h2>{t('kpiUnassigned')}<InfoTip text={t('unassignedHint')} label={t('explain')} /></h2><span className="sub">{plan.unassigned.length}</span></div>
           <div className="panel-body">
-            <p className="hint">{t('unassignedHint')}</p>
             {plan.unassigned.length === 0 ? (
               <div className="empty">{t('noneToday')}</div>
             ) : (
               plan.unassigned.map((item) => (
-                <div key={item.shipmentId} style={{ padding: '9px 0', borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span className="mono" style={{ fontSize: 12 }}>{item.shipmentId}</span>
-                    <span className="chip warn">{reasonText(item.reason, lang)}</span>
-                  </div>
-                  <div className="tech-detail">{item.detail}</div>
-                </div>
+                <ExceptionRow
+                  key={item.shipmentId}
+                  id={item.shipmentId}
+                  reason={reasonText(item.reason, lang)}
+                  detail={item.detail}
+                  t={t}
+                />
               ))
             )}
           </div>
         </div>
 
         <div className="panel">
-          <div className="panel-head"><h2>{t('heldOrders')}</h2><span className="sub">{held.length}</span></div>
+          <div className="panel-head"><h2>{t('heldOrders')}<InfoTip text={t('heldHint')} label={t('explain')} /></h2><span className="sub">{held.length}</span></div>
           <div className="panel-body">
-            <p className="hint">{t('heldHint')}</p>
             <div className="scroll">
               {held.map((item) => (
-                <div key={item.orderId} style={{ padding: '9px 0', borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span className="mono" style={{ fontSize: 12 }}>{item.orderId}</span>
-                    <span className="chip warn">{reasonText(item.reason, lang)}</span>
-                  </div>
-                  <div className="tech-detail">{item.detail}</div>
-                </div>
+                <ExceptionRow
+                  key={item.orderId}
+                  id={item.orderId}
+                  reason={reasonText(item.reason, lang)}
+                  detail={item.detail}
+                  t={t}
+                />
               ))}
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * One exception, on one line. The reason a dispatcher acts on is in Arabic and
+ * in front of them; the solver's own English technical detail is real evidence
+ * but it is for whoever is debugging the gate, so it hangs off the ⓘ instead of
+ * putting a line of untranslated prose under every row.
+ */
+function ExceptionRow({
+  id,
+  reason,
+  detail,
+  t,
+}: {
+  id: string;
+  reason: string;
+  detail: string;
+  t: (key: string) => string;
+}) {
+  return (
+    <div className="exception-row">
+      <span className="mono">{id}</span>
+      <span className="chip warn">{reason}</span>
+      <InfoTip text={detail} label={t('technicalDetail')} />
     </div>
   );
 }
@@ -343,7 +372,7 @@ function Toggle({ label, on, onToggle }: { label: string; on: boolean; onToggle:
   return (
     <div className="switch-row" onClick={onToggle} style={{ cursor: 'pointer' }}>
       <span className="switch" data-on={on} />
-      <span style={{ fontSize: 13 }}>{label}</span>
+      <span>{label}</span>
     </div>
   );
 }

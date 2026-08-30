@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fmtNum, fmtTime, type PlanState } from '../usePlan';
+import { fmtCube, fmtNum, fmtTime, type PlanState } from '../usePlan';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { NODE_MAP } from '../../data/gazetteer';
@@ -108,7 +108,7 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
         <div className="phone-body">
           {done ? (
             <>
-              <div className="alert ok" style={{ fontSize: 15, fontWeight: 600 }}>{t('routeComplete')}</div>
+              <div className="alert ok lead-line">{t('routeComplete')}</div>
               <div className="panel" style={{ background: 'var(--bg-inset)' }}>
                 <div className="panel-body">
                   {route.stops.map((s) => {
@@ -176,7 +176,7 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
                           <div className="grow">
                             <div className="name">{lang === 'ar' ? product.nameAr : product.nameEn}</div>
                             <div className="meta">
-                              <span className="ltr">×{unit.quantity} · {unit.cubeM3.toFixed(2)} m³ · {unit.weightKg.toFixed(0)} kg</span>
+                              <span className="ltr">×{unit.quantity} · {fmtCube(unit.cubeM3)} {t('m3')} · {unit.weightKg.toFixed(0)} {t('kg')}</span>
                               {product.crewRequired === 2 ? ` · ${lang === 'ar' ? 'شخصان' : '2 crew'}` : ''}
                             </div>
                           </div>
@@ -285,7 +285,7 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
                     <tr key={s.shipmentId} data-selected={s.seq === (stop?.seq ?? -1)}>
                       <td className="mono" style={{ width: 30 }}>{s.seq}</td>
                       <td>{loc(lang, c?.name, c?.nameAr)}</td>
-                      <td className="mono ltr" style={{ fontSize: 11 }}>{fmtTime(s.promisedWindow.earliest)}–{fmtTime(s.promisedWindow.latest)}</td>
+                      <td className="mono ltr">{fmtTime(s.promisedWindow.earliest)}–{fmtTime(s.promisedWindow.latest)}</td>
                       <td>{outcome && <span className={`chip ${outcome === 'delivered' ? 'ok' : 'danger'}`}>{outcome === 'delivered' ? '✓' : '!'}</span>}</td>
                     </tr>
                   );
