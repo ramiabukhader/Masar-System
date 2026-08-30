@@ -64,7 +64,6 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
 
   return (
     <div className="grid" style={{ opacity: loading ? 0.55 : 1, transition: 'opacity .2s' }}>
-      <p className="page-sub">{t('ordersSub')}</p>
 
       {/* ── Summary ─────────────────────────────────────────────────── */}
       <div className="grid grid-kpi">
@@ -147,7 +146,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                         className="clickable"
                         onClick={() => onOpenOrder(track.orderId)}
                       >
-                        <td className="mono" style={{ fontSize: 12 }}>{track.orderId}</td>
+                        <td className="mono">{track.orderId}</td>
                         <td>
                           <div>{loc(lang, track.customer?.name, track.customer?.nameAr)}</div>
                           <div className="cell-sub">{t(`channel_${track.order.channel}`)}</div>
@@ -168,7 +167,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                         <td>
                           <div className="cell-sub">{t(`pay_${track.order.paymentType}`)}</div>
                           {track.order.amountDue > 0 && (
-                            <div className="mono" style={{ fontSize: 12 }}>
+                            <div className="mono">
                               {fmtNum(track.order.amountDue)} {t('currency')}
                             </div>
                           )}
@@ -176,7 +175,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                         <td>
                           <div className="cell-sub">{fmtDue(track.order.dueAt, PLAN_DATE, lang)}</div>
                           {track.promisedWindow && (
-                            <div className="mono ltr" style={{ fontSize: 11.5 }}>
+                            <div className="mono ltr">
                               {fmtTime(track.promisedWindow.earliest)}–{fmtTime(track.promisedWindow.latest)}
                             </div>
                           )}

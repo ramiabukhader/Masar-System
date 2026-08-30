@@ -10,6 +10,7 @@ import type {
   RouteMetrics,
   Shipment,
   SolverLogEntry,
+  SolverPhase,
   UnassignedShipment,
   Vehicle,
 } from './types';
@@ -450,7 +451,7 @@ export class WavePlanner {
     pool.sort((a, b) => a.vehicle.fixedCost - b.vehicle.fixedCost);
     this.idleAssignments = pool;
 
-    this.trace('setup', `${pool.length} vehicle/driver pairs available`);
+    this.trace('setup', 'poolReady', { count: pool.length });
   }
 
   // -- construction ---------------------------------------------------------
@@ -472,7 +473,7 @@ export class WavePlanner {
 
     while (pending.length > 0) {
       if (Date.now() - this.startedAt > this.config.timeBudgetMs) {
-        this.trace('construct', `time budget reached, ${pending.length} shipment(s) unplaced`);
+        this.trace('construct', 'budgetReached', { count: pending.length });
         break;
       }
 
@@ -523,8 +524,12 @@ export class WavePlanner {
 
     this.trace(
       'construct',
-      `${this.routes.length} routes, cost ${this.routeCost().toFixed(0)}` +
-        (this.unassigned.length ? ` (+${this.unassigned.length} unplaced)` : ''),
+      this.unassigned.length ? 'routesBuiltWithUnplaced' : 'routesBuilt',
+      {
+        routes: this.routes.length,
+        cost: this.routeCost().toFixed(0),
+        unplaced: this.unassigned.length,
+      },
       this.routeCost(),
     );
   }
@@ -592,7 +597,12 @@ export class WavePlanner {
       };
       this.routes.push(route);
       pending.splice(pending.indexOf(seed), 1);
-      this.trace('construct', `opened ${route.id} on ${assignment.vehicle.plate} from ${assignment.originNode.nameEn}`);
+      this.trace('construct', 'routeOpened', {
+        route: route.id,
+        plate: assignment.vehicle.plate,
+        origin: assignment.originNode.nameEn,
+        originAr: assignment.originNode.nameAr,
+      });
       return true;
     }
     return false;
@@ -644,7 +654,7 @@ export class WavePlanner {
 
     while (pass < this.config.improvementPasses) {
       if (Date.now() - this.startedAt > this.config.timeBudgetMs) {
-        this.trace('improve', `time budget reached after ${pass} pass(es)`);
+        this.trace('improve', 'budgetReachedPass', { pass });
         break;
       }
       pass++;
@@ -669,7 +679,14 @@ export class WavePlanner {
     const costAfter = this.routeCost();
     this.trace(
       'improve',
-      `${pass} pass(es), ${improvedTotal} improving move(s), cost ${costBefore.toFixed(0)} -> ${costAfter.toFixed(0)} (${(((costBefore - costAfter) / Math.max(costBefore, 1)) * 100).toFixed(1)}% saved)`,
+      'improved',
+      {
+        passes: pass,
+        moves: improvedTotal,
+        before: costBefore.toFixed(0),
+        after: costAfter.toFixed(0),
+        saved: (((costBefore - costAfter) / Math.max(costBefore, 1)) * 100).toFixed(1),
+      },
       costAfter,
     );
   }
@@ -884,8 +901,13 @@ export class WavePlanner {
     return this.routeCost() + this.unassigned.length * this.config.unassignedPenalty;
   }
 
-  private trace(phase: string, message: string, cost?: number): void {
-    this.log.push({ phase, message, cost, elapsedMs: Date.now() - this.startedAt });
+  private trace(
+    phase: SolverPhase,
+    code: string,
+    params: Record<string, string | number> = {},
+    cost?: number,
+  ): void {
+    this.log.push({ phase, code, params, cost, elapsedMs: Date.now() - this.startedAt });
   }
 
   // -- output ---------------------------------------------------------------
@@ -973,11 +995,12 @@ export class WavePlanner {
       slaAtRiskCount,
     };
 
-    this.trace(
-      'finalise',
-      `${routes.length} routes, ${assignedCount} drops, ${this.unassigned.length} unassigned` +
-        ` — objective ${this.totalCost().toFixed(0)}`,
-    );
+    this.trace('finalise', 'planned', {
+      routes: routes.length,
+      drops: assignedCount,
+      unassigned: this.unassigned.length,
+      objective: this.totalCost().toFixed(0),
+    });
 
     return {
       id: `PLAN-${planDate.toISOString().slice(0, 10)}-${this.input.waveName}`,

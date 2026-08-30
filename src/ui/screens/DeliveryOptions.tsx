@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { InfoTip } from '../components/InfoTip';
 import { SERVICE_TIERS, type ServiceTier } from '../../data/services';
 import { offerSlots } from '../../core/promise';
 import { ZONES, type Zone } from '../../core/types';
@@ -47,7 +48,6 @@ export function DeliveryOptions({ t, lang, state }: Props) {
 
   return (
     <div className="grid">
-      <p className="page-sub">{t('optionsSub')}</p>
 
       {/* ── Promise engine ─────────────────────────────────────────────
           The single most transferable practice from the benchmarks: offer the
@@ -55,7 +55,7 @@ export function DeliveryOptions({ t, lang, state }: Props) {
           showroom, instead of confirming a window by message the day before. */}
       <div className="panel">
         <div className="panel-head">
-          <h2>{t('promiseTitle')}</h2>
+          <h2>{t('promiseTitle')}<InfoTip text={t('promiseSub')} label={t('explain')} /></h2>
           <div className="zone-picker">
             <span>{t('promiseZone')}</span>
             {ZONES.map((option) => (
@@ -71,7 +71,6 @@ export function DeliveryOptions({ t, lang, state }: Props) {
           </div>
         </div>
         <div className="panel-body">
-          <p className="hint">{t('promiseSub')}</p>
           <div className="slots">
             {offers.map((offer) => (
               <div
@@ -111,13 +110,12 @@ export function DeliveryOptions({ t, lang, state }: Props) {
               </div>
             ))}
           </div>
-          <p className="hint" style={{ marginTop: 14, marginBottom: 0 }}>{t('promiseNote')}</p>
         </div>
       </div>
 
       {/* Comparison first — the whole menu at a glance. */}
       <div className="panel">
-        <div className="panel-head"><h2>{t('optionsTitle')}</h2></div>
+        <div className="panel-head"><h2>{t('optionsTitle')}<InfoTip text={t('optionsNote')} label={t('explain')} /></h2></div>
         <div className="panel-body tight">
           <div className="scroll-x">
             <table>
@@ -163,7 +161,6 @@ export function DeliveryOptions({ t, lang, state }: Props) {
         </div>
       </div>
 
-      <p className="hint">{t('optionsNote')}</p>
 
       {/* Then each tier in full. */}
       <div className="grid grid-2">
@@ -175,34 +172,26 @@ export function DeliveryOptions({ t, lang, state }: Props) {
                 {t(STATUS_KEY[tier.status])}
               </span>
             </div>
+            {/* Only what the comparison table above cannot show. Name, tagline,
+                SLA, window, price and cost are all in that table already, and
+                repeating them here doubled the length of the page without
+                adding a fact. */}
             <div className="panel-body">
-              <p style={{ color: 'var(--text-muted)', fontSize: 13.5, marginTop: 0 }}>
-                {lang === 'ar' ? tier.taglineAr : tier.taglineEn}
-              </p>
-
               <div className="kv-list">
-                <div className="kv"><span>{t('tierSla')}</span><b className="mono">{tier.slaHours} {lang === 'ar' ? 'ساعة' : 'hours'}</b></div>
-                <div className="kv">
-                  <span>{t('tierWindow')}</span>
-                  <b className="mono">
-                    {tier.windowMinutes ? `${tier.windowMinutes / 60} ${lang === 'ar' ? 'ساعات' : 'hours'}` : t('tierNoWindow')}
-                  </b>
-                </div>
                 <div className="kv">
                   <span>{t('tierZones')}</span>
                   <b>{tier.eligibility.zones === 'all' ? t('tierAllZones') : tier.eligibility.zones.length}</b>
                 </div>
-                {tier.eligibility.maxCubeM3 !== undefined && (
-                  <div className="kv"><span>{t('tierMaxCube')}</span><b className="mono">{tier.eligibility.maxCubeM3} m³</b></div>
-                )}
                 <div className="kv">
                   <span>{t('tierInstall')}</span>
                   <b>{tier.eligibility.installIncluded ? (lang === 'ar' ? 'نعم' : 'Yes') : (lang === 'ar' ? 'لا' : 'No')}</b>
                 </div>
-                <div className="kv"><span>{t('tierCost')}</span><b className="mono">{fmtNum(tier.costToServe)} {t('currency')}</b></div>
+                {tier.eligibility.maxCubeM3 !== undefined && (
+                  <div className="kv"><span>{t('tierMaxCube')}</span><b className="mono">{tier.eligibility.maxCubeM3} {t('m3')}</b></div>
+                )}
               </div>
 
-              <h4 style={{ margin: '18px 0 8px', fontSize: 13 }}>{t('tierRequires')}</h4>
+              <h4 className="tier-req-head">{t('tierRequires')}</h4>
               <ul className="req-list">
                 {(lang === 'ar' ? tier.requiresAr : tier.requiresEn).map((requirement) => (
                   <li key={requirement}>{requirement}</li>

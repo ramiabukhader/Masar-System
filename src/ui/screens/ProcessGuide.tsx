@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n';
+import { InfoTip } from '../components/InfoTip';
 
 interface Step {
   role: { ar: string; en: string };
@@ -251,16 +252,10 @@ export function ProcessGuide({ t, lang }: { t: (key: string) => string; lang: La
     <div className="grid">
       <div className="panel">
         <div className="panel-head">
-          <h2>{t('navProcess')}</h2>
+          <h2>{t('navProcess')}<InfoTip text={t('processIntro')} label={t('explain')} /></h2>
           <span className="sub">{STEPS.length} {lang === 'ar' ? 'خطوة' : 'steps'}</span>
         </div>
         <div className="panel-body">
-          <p className="hint">
-            {lang === 'ar'
-              ? 'من لحظة البيع في المعرض حتى وصول الشحنة إلى باب الزبون في المدينة المستهدفة، وتسوية المبالغ وقياس الكلفة. كل خطوة لها مسؤول، وكل تحذير يمنع خسارة محددة.'
-              : 'From the sale on the showroom floor to the shipment at the customer’s door in the target city, the cash reconciled and the cost measured. Every step has an owner; every guard prevents a specific, named loss.'}
-          </p>
-
           <div className="flow">
             {STEPS.map((step, index) => (
               <div className="flow-step" key={index}>
@@ -270,9 +265,15 @@ export function ProcessGuide({ t, lang }: { t: (key: string) => string; lang: La
                 </div>
                 <div className="flow-content">
                   <div className="flow-role">{step.role[lang]}</div>
-                  <div className="flow-title">{step.title[lang]}</div>
+                  <div className="flow-title">
+                    {step.title[lang]}
+                    {/* The guard is what this step exists to prevent. It is worth
+                        keeping and worth reading once, but printing all 23 of
+                        them turned the guide into a wall you had to scroll past
+                        rather than a list you could scan. */}
+                    {step.guard && <InfoTip text={step.guard[lang]} label={t('guardLabel')} />}
+                  </div>
                   <p className="flow-desc">{step.desc[lang]}</p>
-                  {step.guard && <div className="flow-guard">{step.guard[lang]}</div>}
                 </div>
               </div>
             ))}

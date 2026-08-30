@@ -23,7 +23,6 @@ export function Roadmap({ t, lang }: Props) {
 
   return (
     <div className="grid">
-      <p className="page-sub">{t('roadmapSub')}</p>
 
       <div className="panel">
         <div className="panel-body">
@@ -48,11 +47,11 @@ export function Roadmap({ t, lang }: Props) {
             <div className="grid grid-2" style={{ marginBottom: 16 }}>
               <div>
                 <div className="mini-label">{t('phaseGoal')}</div>
-                <p style={{ margin: 0, fontSize: 14 }}>{lang === 'ar' ? phase.goalAr : phase.goalEn}</p>
+                <p className="phase-text">{lang === 'ar' ? phase.goalAr : phase.goalEn}</p>
               </div>
               <div>
                 <div className="mini-label">{t('phaseOutcome')}</div>
-                <p style={{ margin: 0, fontSize: 14 }}>{lang === 'ar' ? phase.outcomeAr : phase.outcomeEn}</p>
+                <p className="phase-text">{lang === 'ar' ? phase.outcomeAr : phase.outcomeEn}</p>
               </div>
             </div>
 

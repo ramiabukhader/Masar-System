@@ -2,7 +2,7 @@ import { MILESTONES, type OrderTrack } from '../../core/lifecycle';
 import { LOCALITY_MAP, NODE_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
-import { fmtDue, fmtNum, fmtStamp, fmtTime, PLAN_DATE, type PlanState } from '../usePlan';
+import { fmtCube, fmtDue, fmtNum, fmtStamp, fmtTime, PLAN_DATE, type PlanState } from '../usePlan';
 import { loc, type Lang } from '../i18n';
 import { reasonText } from '../reasons';
 
@@ -112,7 +112,7 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
             <span className="chip danger mono">{track.blocker.reason}</span>
           </div>
           <div className="panel-body">
-            <p style={{ margin: '0 0 6px', fontSize: 15 }}>{reasonText(track.blocker.reason, lang)}</p>
+            <p className="lead-line">{reasonText(track.blocker.reason, lang)}</p>
             <p className="tech-detail">
               <span>{t('technicalDetail')}</span> {track.blocker.detail}
             </p>
@@ -232,7 +232,7 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
           <h2>{t('orderItems')}</h2>
           {shipment && (
             <span className="sub ltr">
-              {fmtNum(shipment.totalCubeM3, 2)} m³ · {fmtNum(shipment.totalWeightKg)} kg · {shipment.serviceMinutes} min
+              {fmtCube(shipment.totalCubeM3)} {t('m3')} · {fmtNum(shipment.totalWeightKg)} {t('kg')} · {shipment.serviceMinutes} {t('min')}
             </span>
           )}
         </div>
@@ -244,8 +244,8 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
                   <th>SKU</th>
                   <th>{lang === 'ar' ? 'الصنف' : 'Item'}</th>
                   <th>{lang === 'ar' ? 'الكمية' : 'Qty'}</th>
-                  <th>m³</th>
-                  <th>kg</th>
+                  <th>{t('m3')}</th>
+                  <th>{t('kg')}</th>
                   <th>{t('skillsNeeded')}</th>
                 </tr>
               </thead>
@@ -255,7 +255,7 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
                   if (!product) return null;
                   return (
                     <tr key={line.sku}>
-                      <td className="mono" style={{ fontSize: 11 }}>{line.sku}</td>
+                      <td className="mono">{line.sku}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                           <span className={`chip ${product.productClass.toLowerCase()}`}>{product.productClass}</span>
@@ -264,7 +264,7 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
                         </div>
                       </td>
                       <td className="mono">{line.quantity}</td>
-                      <td className="mono">{(product.cubeM3 * line.quantity).toFixed(2)}</td>
+                      <td className="mono">{fmtCube(product.cubeM3 * line.quantity)}</td>
                       <td className="mono">{(product.weightKg * line.quantity).toFixed(0)}</td>
                       <td>
                         <span className="chip">{t(`install_${product.installType}`)}</span>
