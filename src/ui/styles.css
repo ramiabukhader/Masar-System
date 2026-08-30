@@ -354,9 +354,25 @@ button { font-family: inherit; cursor: pointer; }
 
 .grid { display: grid; gap: 16px; }
 .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-.grid-kpi { grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 1180px) { .grid-kpi { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 820px)  { .grid-kpi { grid-template-columns: repeat(2, 1fr); } }
+/*
+  One row, whatever the count — the orders board has six of these and the
+  control tower eight, and `auto-flow: column` fits them all across without
+  either screen having to name its own number. minmax(0, 1fr) rather than a
+  bare 1fr so a long label wraps inside its card instead of widening it and
+  pushing the row past the viewport.
+*/
+.grid-kpi {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-template-columns: none;
+}
+/* Below this the cards are too narrow to read, so they wrap again. */
+@media (max-width: 1180px) {
+  .grid-kpi { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 820px) {
+  .grid-kpi { grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); }
+}
 
 .panel {
   background: var(--bg-panel);
