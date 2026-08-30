@@ -47,8 +47,10 @@ npm run build:standalone     # writes masar-demo.html
 
 `masar-demo.html` is a single self-contained file — double-click it and the whole
 application opens in your browser. No server, no terminal, nothing to install on the
-machine you demo from. A pre-built copy is committed at the repository root, so you can
-also download that one file on its own and open it.
+machine you demo from, and no network: the typeface is embedded in the file along with
+everything else, so it renders identically on a branch PC with no internet. A pre-built
+copy is committed at the repository root, so you can also download that one file on its
+own and open it.
 
 ### Option B — the dev server, for making changes
 

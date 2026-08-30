@@ -19,19 +19,13 @@
       html[data-theme='dark'] { background: #232120; color-scheme: dark; }
     </style>
     <title>مسار — نظام إدارة وتحسين التوصيل | Masar Delivery Platform</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!--
-      Loaded non-blocking. This app is meant to run on a branch PC that may be offline or
-      behind a restrictive network; a webfont stylesheet must never hold up first paint.
-      Without it the app falls back to the system Arabic and monospace faces.
+      Tajawal (UI) and IBM Plex Mono (digits) are served from this app, not from a
+      CDN: a branch PC may be offline or behind a restrictive network, and the app
+      has to look the same either way. Split by unicode-range, so only the subsets
+      a page actually paints get downloaded.
     -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
+    <link rel="stylesheet" href="./fonts.css" />
   </head>
   <body>
     <div id="root"></div>
