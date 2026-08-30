@@ -6,117 +6,123 @@
    --------------------------------------------------------------------------- */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* ═══════════════════════════════════════════════════════════════════════
      BRAND — Maslamani Home
 
-     Read off their own site: a dark charcoal ground, red section headings,
-     grey links. That is the default here, because that is what their brand
-     looks like. The light ground is one click away in the top bar.
+     Their orange, off their own logo and the "بيتك حياتك" tagline. Light is
+     the default; the charcoal ground their site uses is one click away in the
+     top bar.
 
-     Red is both their identity colour and the only colour an operations
-     screen can use to mean "something is wrong", so the two are kept apart
-     by ROLE, not by shade:
+     Only ONE hue is saturated on the working surface at a time. Everything
+     else is warm neutral, and the colours that do appear are each doing a job
+     nothing else may do:
 
-       red, solid and saturated  → identity and action (chrome, buttons, selection)
-       red, dark wash + light ink → alarm (late, blocked, failed) — chips only
-       light graphite             → progress and completion
-       green / amber              → on time / at risk
+       orange     identity and action — sidebar, buttons, selection, focus
+       green      on time / done
+       amber      at risk
+       red        late / blocked / failed
+       one blue   product class, three steps of it (see below)
+       graphite   progress
 
-     Every pair below is measured, not eyeballed. Body text clears 4.5:1 on
-     its own surface, UI boundaries clear 3:1, and the three product-class
-     colours pass an all-pairs colour-vision check on this ground.
+     White does NOT go on this orange — it manages 3.0:1. The text on a solid
+     orange fill is near-black instead, which is also what their own buttons do.
+
+     Every pair below is measured. Body text clears 4.5:1 on its own surface,
+     controls clear 3:1, and the class ramp passes an ordinal check in both
+     themes.
      ═══════════════════════════════════════════════════════════════════════ */
-  --brand: #dc333b;           /* their red: solid fills, buttons, active nav  */
-  --brand-strong: #f0555d;    /* hover — on a dark ground, hover means LIGHTER */
-  --brand-ink: #ffa0a5;       /* brand-coloured TEXT — 7.2:1 on a panel        */
-  --brand-wash: #3a1f20;      /* a wash is a DARK tint here, not a pale one    */
-  --brand-line: #6e3033;
-  --brand-contrast: #ffffff;  /* text sitting ON the brand red — 4.6:1         */
-  --brand-on-dark: #ffa0a5;
+  --brand: #d97022;           /* solid fills: buttons, active nav, selection   */
+  --brand-strong: #b8601a;    /* hover / pressed, and thin marks on light      */
+  --brand-ink: #8f4a10;       /* orange TEXT on a light surface — 6.7:1        */
+  --brand-wash: #fbeee1;      /* peach tint — deliberately not the amber cream */
+  --brand-line: #f0d3b5;
+  --brand-contrast: #241f1a;  /* text sitting ON the orange — 4.9:1            */
+  --brand-on-dark: #ef9243;   /* orange TEXT on the charcoal sidebar — 5.1:1   */
 
-  /* --- Sidebar: the deepest plane, so the app is anchored on one edge ----- */
-  --side-bg: #1c1a19;
-  --side-soft: #282524;
-  --side-line: #35312e;
-  --side-text: #c9c3bc;
-  --side-text-dim: #8f8880;
+  /* --- Sidebar: their charcoal, in both themes --------------------------- */
+  --side-bg: #383634;
+  --side-soft: #454240;
+  --side-line: #524f4c;
+  --side-text: #c6c1ba;
+  --side-text-dim: #8c867f;
   --side-text-strong: #ffffff;
 
-  /* --- Surfaces: an elevation ramp, deepest to highest -------------------- */
-  --bg: #232120;              /* the page ground                              */
-  --bg-raised: #383533;       /* their exact footer charcoal — top bar, hover */
-  --bg-panel: #2e2b2a;        /* cards and panels                             */
-  --bg-inset: #1b1918;        /* wells: inputs, table heads, progress tracks  */
-  --border: #3d3936;
-  --border-strong: #7a736c;   /* checkbox and chip boundaries — 3.0:1         */
+  /* --- Surfaces ---------------------------------------------------------- */
+  --bg: #faf8f6;
+  --bg-raised: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-inset: #f4f1ee;
+  --border: #e8e4df;          /* the quiet default — panels, rows, chips      */
+  --border-strong: #c4beb6;   /* emphasis only                                */
+  --control-line: #938d85;    /* checkbox and switch outlines — 3:1, required */
 
-  --text: #ece7e1;
-  --text-muted: #ada69e;
-  --text-dim: #9a938a;
+  --text: #2b2a28;
+  --text-muted: #6b6762;
+  --text-dim: #726c65;
 
-  /* --- Progress: how far along, not how good -----------------------------
-     Light graphite. On a dark ground the "filled" end of a meter has to be
-     the lighter one, which is the exact inverse of the light theme. */
-  --progress: #c2bab2;
-  --progress-soft: #847d76;
-  --progress-contrast: #232120;  /* glyph sitting ON --progress */
+  /* --- Progress: how far along, not how good ----------------------------- */
+  --progress: #4a4642;
+  --progress-soft: #857f77;
+  --progress-contrast: #ffffff;  /* glyph sitting ON --progress              */
+  --glyph-on-solid: #ffffff;     /* glyph sitting ON a solid status fill     */
 
   /* --- Status: reserved. Never used to identify a category. --------------
-     On dark the ink goes lighter and the wash goes darker — the mirror of
-     what these values are on a white page. */
-  --green: #5fd68f;
-  --green-mark: #2fbf6a;
-  --green-solid: #17864a;     /* solid fill under white glyphs — 4.6:1        */
-  --green-wash: #102a1b;
-  --green-line: #2c6b45;
+     The amber is pushed toward yellow and its wash toward cream, because the
+     brand is now orange and "at risk" must not read as a brand element. */
+  --green: #0e7a38;
+  --green-mark: #12a04b;
+  --green-solid: #0e7a38;
+  --green-wash: #e8f5ec;
+  --green-line: #b4dfbf;
 
-  --amber: #f5bf4a;
-  --amber-mark: #e8a317;
-  --amber-wash: #302408;
-  --amber-line: #6f5518;
+  --amber: #8a6100;
+  --amber-mark: #e8b400;
+  --amber-wash: #fdf7d9;
+  --amber-line: #ecdca0;
 
-  --red: #ff7676;
-  --red-mark: #e4494f;
-  --red-solid: #cc3940;       /* solid fill under white glyphs — 5.0:1        */
-  --red-wash: #351b1c;
-  --red-line: #6d3032;
+  --red: #a4161a;
+  --red-mark: #d13c3c;
+  --red-solid: #a4161a;
+  --red-wash: #fbeaea;
+  --red-line: #f0c4c4;
 
-  /* "Information" is slate, not brand. A red brand cannot also carry the
-     neutral, nothing-is-happening note. */
-  --info: #a3bcd6;
-  --info-wash: #1a232c;
-  --info-line: #37485a;
+  /* "Information" is a desaturated slate, so it sits under the class blues
+     rather than competing with them. */
+  --info: #4f5a66;
+  --info-wash: #eef1f4;
+  --info-line: #d8dee5;
 
-  /* --- Product classes: categorical identity ----------------------------
-     Blue, aqua, gold. Violet had to go: on a dark ground blue and violet
-     collapse into each other under protanopia and deuteranopia (ΔE 1.9,
-     against a floor of 8) and they are hard to separate even with full
-     colour vision (ΔE 9.8, floor 15). Blue / aqua / gold is the one triad
-     that clears every gate on this ground — all pairs, worst CVD ΔE 8.4,
-     worst normal-vision ΔE 19.8, every step above 3:1 against the panel. */
-  --class-a: #3987e5;      /* major appliances    */
-  --class-a-ink: #9cc6f5;
-  --class-a-wash: #142433;
-  --class-b: #199e70;      /* small appliances    */
-  --class-b-ink: #74dcb4;
-  --class-b-wash: #0e2b22;
-  --class-c: #c98500;      /* fragile kitchenware */
-  --class-c-ink: #f0c264;
-  --class-c-wash: #33260c;
+  /* --- Product classes: ONE hue, three steps -----------------------------
+     A, B and C are not three unrelated categories — they are an ordinal
+     handling scale (bulky white goods → small appliances → fragile
+     kitchenware). A sequential ramp is the correct encoding for that, and it
+     is also the calm one: three saturated hues on every row of a 78-row table
+     was most of what made the old palette noisy. A is the heaviest step.
+
+     Passes the ordinal check in both themes — monotone lightness, every
+     adjacent gap at or above ΔL 0.06, single hue (spread 4°) — and lightness
+     is the one channel colour-vision deficiency cannot take away. */
+  --class-a: #1c5aa8;      /* major appliances — the heaviest step */
+  --class-a-ink: #ffffff;
+  --class-a-wash: #1c5aa8;
+  --class-b: #4d8fd0;      /* small appliances                     */
+  --class-b-ink: #0f3a66;
+  --class-b-wash: #7fb0e2;
+  --class-c: #a8c8ec;      /* fragile kitchenware — the lightest    */
+  --class-c-ink: #1c5aa8;
+  --class-c-wash: #dbe9f8;
 
   /* --- Chrome ------------------------------------------------------------ */
-  --phone-bezel: #0d0c0b;
-  --map-grid: #2c2927;
-  --map-locality: #4b4642;
-  --map-route-idle: #5c5651;
+  --phone-bezel: #2a2724;
+  --map-grid: #eae7e3;
+  --map-locality: #d2ccc5;
+  --map-route-idle: #bdb6ae;
 
   --radius: 10px;
   --radius-sm: 6px;
-  /* A soft dark shadow does nothing on a dark ground, so it is deepened and
-     paired with the lighter panel fill to read as elevation. */
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 26px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 2px rgba(40, 34, 28, 0.04), 0 6px 18px rgba(40, 34, 28, 0.06);
 
   --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
@@ -130,82 +136,84 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LIGHT — the same brand on a warm light ground.
+   DARK — the same brand on the charcoal their own site uses.
 
-   Same six brand values, same role system, same three class hues stepped for
-   a white surface. Offered because a dispatcher reads this screen for ten
-   hours and not everyone wants to do that on charcoal.
+   Not a token swap: a wash becomes a dark tint, ink goes lighter instead of
+   darker, and a filled meter is the lighter end of the bar. The class ramp
+   reverses so the heaviest step stays the most prominent one.
    ═══════════════════════════════════════════════════════════════════════════ */
-:root[data-theme='light'] {
-  color-scheme: light;
+:root[data-theme='dark'] {
+  color-scheme: dark;
 
-  --brand: #d4262e;
-  --brand-strong: #ae1a22;    /* hover — on a light ground, hover means DARKER */
-  --brand-ink: #9b1920;       /* 8.2:1 on white                                */
-  --brand-wash: #fdecec;
-  --brand-line: #f2cacc;
-  --brand-contrast: #ffffff;
-  --brand-on-dark: #f97b81;   /* the sidebar stays charcoal even here          */
+  --brand: #e07b2c;           /* a step brighter — it sits on charcoal now    */
+  --brand-strong: #ef9243;    /* hover — on a dark ground, hover means LIGHTER */
+  --brand-ink: #f2a05a;
+  --brand-wash: #3a2718;
+  --brand-line: #6d4520;
+  --brand-contrast: #241f1a;
+  --brand-on-dark: #ef9243;
 
-  --side-bg: #383634;
-  --side-soft: #454240;
-  --side-line: #524f4c;
-  --side-text: #c6c1ba;
-  --side-text-dim: #8c867f;
+  --side-bg: #1c1a19;
+  --side-soft: #282524;
+  --side-line: #35312e;
+  --side-text: #c9c3bc;
+  --side-text-dim: #8f8880;
   --side-text-strong: #ffffff;
 
-  --bg: #f7f6f4;
-  --bg-raised: #ffffff;
-  --bg-panel: #ffffff;
-  --bg-inset: #f2f0ed;
-  --border: #e5e2dd;
-  --border-strong: #ccc7bf;
+  --bg: #232120;
+  --bg-raised: #383533;       /* their exact footer charcoal                  */
+  --bg-panel: #2e2b2a;
+  --bg-inset: #1b1918;
+  --border: #3d3936;
+  --border-strong: #57524d;
+  --control-line: #7a736c;
 
-  --text: #2b2a28;
-  --text-muted: #6b6762;
-  --text-dim: #857f78;
+  --text: #ece7e1;
+  --text-muted: #ada69e;
+  --text-dim: #9a938a;
 
-  --progress: #43403c;
-  --progress-soft: #7d7871;
-  --progress-contrast: #ffffff;
+  --progress: #c2bab2;
+  --progress-soft: #847d76;
+  --progress-contrast: #232120;
+  --glyph-on-solid: #ffffff;
 
-  --green: #0e7a38;
-  --green-mark: #0ca30c;
-  --green-solid: #0e7a38;
-  --green-wash: #e7f5ea;
-  --green-line: #b6e0c0;
+  --green: #5fd68f;
+  --green-mark: #2fbf6a;
+  --green-solid: #17864a;     /* solid fill under a white glyph — 4.6:1       */
+  --green-wash: #102a1b;
+  --green-line: #2c6b45;
 
-  --amber: #8a5d00;
-  --amber-mark: #fab219;
-  --amber-wash: #fdf3df;
-  --amber-line: #f0dba6;
+  --amber: #f0c95a;
+  --amber-mark: #e8b400;
+  --amber-wash: #2e2708;
+  --amber-line: #6b5a18;
 
-  --red: #a4161a;
-  --red-mark: #d13c3c;
-  --red-solid: #a4161a;
-  --red-wash: #fbeaea;
-  --red-line: #f0c4c4;
+  --red: #ff7676;
+  --red-mark: #e4494f;
+  --red-solid: #cc3940;
+  --red-wash: #351b1c;
+  --red-line: #6d3032;
 
-  --info: #44515e;
-  --info-wash: #eef1f5;
-  --info-line: #d4dbe3;
+  --info: #a3b4c4;
+  --info-wash: #1c222a;
+  --info-line: #38434f;
 
-  --class-a: #2a78d6;
-  --class-a-ink: #1a5698;
-  --class-a-wash: #e9f1fb;
-  --class-b: #1baf7a;
-  --class-b-ink: #0b6b48;
-  --class-b-wash: #e6f7f0;
-  --class-c: #eda100;
-  --class-c-ink: #7a5300;
-  --class-c-wash: #fdf4e0;
+  --class-a: #5a9bea;
+  --class-a-ink: #0d2039;
+  --class-a-wash: #5a9bea;
+  --class-b: #4a7cb4;
+  --class-b-ink: #dbe8f6;
+  --class-b-wash: #2f5f96;
+  --class-c: #35597f;
+  --class-c-ink: #a9c8ea;
+  --class-c-wash: #203c5c;
 
-  --phone-bezel: #2a2724;
-  --map-grid: #eae7e3;
-  --map-locality: #d2ccc5;
-  --map-route-idle: #bdb6ae;
+  --phone-bezel: #0d0c0b;
+  --map-grid: #2c2927;
+  --map-locality: #4b4642;
+  --map-route-idle: #5c5651;
 
-  --shadow: 0 1px 2px rgba(32, 28, 26, 0.05), 0 6px 20px rgba(32, 28, 26, 0.07);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 26px rgba(0, 0, 0, 0.4);
 }
 
 * { box-sizing: border-box; }
@@ -301,7 +309,7 @@ button { font-family: inherit; cursor: pointer; }
 .clock-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); }
 .clock-day { font-size: 11.5px; color: var(--text-muted); }
 .clock-time {
-  font-family: var(--font-mono); font-size: 19px; font-weight: 600; color: var(--accent);
+  font-family: var(--font-mono); font-size: 19px; font-weight: 600; color: var(--brand-ink);
   direction: ltr; unicode-bidi: isolate; min-width: 64px; text-align: center;
 }
 .clock input[type='range'] { width: 168px; accent-color: var(--accent); cursor: pointer; }
@@ -446,7 +454,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   color: var(--text-muted);
   background: var(--bg-inset);
   white-space: nowrap;
@@ -481,7 +489,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   height: 22px;
   border-radius: 999px;
   background: var(--bg-inset);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--control-line);
   flex: none;
   transition: background 0.16s;
 }
@@ -597,9 +605,9 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .check-item[data-done='true'] { border-color: var(--green-line); background: var(--green-wash); }
 .check-box {
   width: 19px; height: 19px; flex: none; border-radius: 5px;
-  border: 2px solid var(--border-strong);
+  border: 2px solid var(--control-line);
   display: grid; place-items: center;
-  font-size: 12px; font-weight: 700; color: var(--brand-contrast);
+  font-size: 12px; font-weight: 700; color: var(--glyph-on-solid);
   margin-top: 1px;
 }
 .check-item[data-done='true'] .check-box { background: var(--green-solid); border-color: var(--green-solid); }
@@ -747,10 +755,10 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   width: 24px; height: 24px; border-radius: 50%;
   background: var(--bg-inset); border: 2px solid var(--border);
   display: grid; place-items: center;
-  font-size: 12px; font-weight: 700; color: var(--brand-contrast);
+  font-size: 12px; font-weight: 700; color: var(--glyph-on-solid);
 }
 .tl-item[data-done='true'] .tl-dot { background: var(--progress); border-color: var(--progress); color: var(--progress-contrast); }
-.tl-item[data-blocked='true'] .tl-dot { background: var(--red-solid); border-color: var(--red); color: #ffffff; }
+.tl-item[data-blocked='true'] .tl-dot { background: var(--red-solid); border-color: var(--red); color: var(--glyph-on-solid); }
 
 .tl-body { display: flex; justify-content: space-between; gap: 14px; flex: 1; padding-top: 2px; }
 .tl-title { font-size: 13.5px; }
@@ -785,8 +793,8 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .check-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--text-muted); }
 .check-mark {
   flex: none; width: 17px; height: 17px; border-radius: 4px; margin-top: 2px;
-  border: 1.5px solid var(--border-strong); display: grid; place-items: center;
-  font-size: 11px; font-weight: 700; color: var(--brand-contrast);
+  border: 1.5px solid var(--control-line); display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: var(--glyph-on-solid);
 }
 .check-list li[data-status='done'] { color: var(--text); }
 .check-list li[data-status='done'] .check-mark { background: var(--green-solid); border-color: var(--green-solid); }
@@ -808,7 +816,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .dg-grid       { stroke: var(--map-grid); }
 .dg-locality   { fill: var(--map-locality); }
 .dg-route      { stroke: var(--map-route-idle); }
-.dg-route-on   { stroke: var(--brand); }
+.dg-route-on   { stroke: var(--brand-strong); }
 .dg-stop       { fill: var(--brand); stroke: var(--bg-panel); }
 .dg-node       { fill: var(--bg-panel); stroke: var(--text-muted); }
 .dg-node-dc    { fill: var(--text-muted); stroke: var(--text-muted); }

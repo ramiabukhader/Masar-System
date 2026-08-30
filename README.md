@@ -189,16 +189,22 @@ Every colour in the application resolves through one block at the top of
 Change those and the whole app re-skins: sidebar, navigation, buttons, focus rings,
 selection, map highlight.
 
-**These are Maslamani Home's own colours**, read off their site: a dark charcoal ground,
-red section headings, grey links. That is the default here, because that is what their
-brand looks like — the whole application sits on the charcoal, not just a 232px rail down
-one side. The red is lightened for text on the charcoal (`--brand-on-dark`) so it clears
-4.5:1 at any size, where the solid brand red would manage 2.4:1.
+**These are Maslamani Home's own colours** — the orange off their logo and the
+"بيتك حياتك" tagline, and the charcoal of their header and footer, which carries the
+sidebar. Light is the default, because a dispatcher reads this screen for ten hours; the
+full charcoal ground their own site uses is one click away in the top bar
+(`[data-theme='dark']`).
 
-A **light theme** ships alongside it, one click away in the top bar (`[data-theme='light']`
-— same six brand values, same role system, the three class hues stepped for a white
-surface). A dispatcher reads this screen for ten hours; not everyone wants to do that on
-charcoal, and the client can see both in the demo and pick.
+**White does not go on this orange.** It manages 3.0:1, which fails. `--brand-contrast` is
+a near-black instead, which is what their own buttons do and what almost every orange brand
+ends up doing. For orange as a *thin* mark on a light ground — a 19px numeral, a 2px route
+line — the solid brand only clears 3.2:1, so those use `--brand-ink` and `--brand-strong`.
+
+Only **one hue is saturated on the working surface at a time**. That is the difference
+between this palette and a noisy one: orange lives in the chrome, the class ramp is a single
+blue, progress is graphite, and the three status hues appear only inside small labelled
+chips. The amber is pushed toward yellow and its wash toward cream, because "at risk" must
+never read as a brand element next to an orange accent.
 
 Going dark is not a token swap. Three things invert, and every one of them is a bug if you
 miss it:
@@ -208,6 +214,7 @@ miss it:
   charcoal it has to be lightened. `--red` is `#a4161a` light and `#ff7676` dark.
 - **A "filled" meter is the lighter end.** `--progress` is graphite on white and bone on
   charcoal — and anything drawn *on* it needs `--progress-contrast`, which flips with it.
+- **The class ramp reverses**, so the heaviest step stays the most prominent one.
 
 Shadows also stop working (a soft dark shadow does nothing on a dark ground, so elevation
 is carried by the panel fill and a deepened shadow), and `--green-solid` / `--red-solid`
@@ -232,12 +239,18 @@ on every one of those rows teaches a loader to ignore red by Tuesday.
 Status colours (green / amber / red) and the product-class palette are deliberately *not*
 derived from the brand, and should not be changed with it.
 
-The product classes are **blue, aqua, gold** — stepped per mode, same three hues in both.
-Violet had to go when the app went dark: on a charcoal ground blue and violet collapse into
-each other under protanopia and deuteranopia (ΔE 1.9 against a floor of 8) and are hard to
-separate even with full colour vision (ΔE 9.8 against a floor of 15). Blue / aqua / gold is
-the one triad that clears every gate on both grounds — all pairs, worst CVD ΔE 8.4 dark and
-9.1 light, worst normal-vision ΔE 19.8 dark and 22.9 light.
+The product classes are **one blue in three steps**, not three hues. A, B and C are not
+unrelated categories — they are an ordinal handling scale (bulky white goods → small
+appliances → fragile kitchenware), and a sequential ramp is the correct encoding for that.
+It is also the calm one: three saturated hues on every row of a 78-row table was most of
+what made the earlier palette noisy, and every triad of distinct hues that survives a
+colour-vision check on white fails on charcoal (blue and violet collapse under protanopia
+at ΔE 1.9 against a floor of 8). The ramp sidesteps that entirely — lightness is the one
+channel colour-vision deficiency cannot take away. It passes the ordinal check in both
+themes: monotone lightness, every adjacent gap at or above ΔL 0.06, single hue within 4°.
+
+The chip carries the step as its **fill**, not as a tint, so A / B / C read as dark → mid →
+pale at a glance; each step's letter clears 4.5:1 against its own fill.
 
 ---
 
