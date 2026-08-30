@@ -180,7 +180,7 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
                               {product.crewRequired === 2 ? ` · ${lang === 'ar' ? 'شخصان' : '2 crew'}` : ''}
                             </div>
                           </div>
-                          {unit.fragile && <span className="chip danger">{t('fragile')}</span>}
+                          {unit.fragile && <span className="chip fragile">{t('fragile')}</span>}
                         </div>
                       );
                     })}

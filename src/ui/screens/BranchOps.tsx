@@ -95,8 +95,8 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                       <div>{lang === 'ar' ? line.product.nameAr : line.product.nameEn}</div>
                       <div style={{ display: 'flex', gap: 5, marginTop: 3, flexWrap: 'wrap' }}>
                         <span className={`chip ${line.product.productClass.toLowerCase()}`}>{line.product.productClass}</span>
-                        {line.product.fragile && <span className="chip danger">{t('fragile')}</span>}
-                        {line.product.installType !== 'none' && <span className="chip warn">{t('installNeeded')}</span>}
+                        {line.product.fragile && <span className="chip fragile">{t('fragile')}</span>}
+                        {line.product.installType !== 'none' && <span className="chip attr">{t('installNeeded')}</span>}
                         {line.product.dimensionsEstimated && <span className="chip">{t('estimatedDims')}</span>}
                       </div>
                     </td>
@@ -118,7 +118,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
           <div className="panel-body">
             <p className="hint">{t('loadOrderHint')}</p>
             <div className="bar" style={{ marginBottom: 12, height: 8 }}>
-              <i style={{ width: `${progress * 100}%`, background: progress === 1 ? 'var(--green)' : 'var(--accent)' }} />
+              <i style={{ width: `${progress * 100}%`, background: progress === 1 ? 'var(--green)' : 'var(--progress)' }} />
             </div>
             <div className="scroll">
               <table>
@@ -137,10 +137,10 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                     const isVerified = verified.has(line.loadSeq);
                     return (
                       <tr key={line.loadSeq} className="clickable" onClick={() => toggle(line.loadSeq)}>
-                        <td className="mono" style={{ fontWeight: 700, color: 'var(--accent)' }}>{line.loadSeq}</td>
+                        <td className="mono" style={{ fontWeight: 700, color: 'var(--progress)' }}>{line.loadSeq}</td>
                         <td>
                           <div style={{ fontSize: 12.5 }}>{lang === 'ar' ? product.nameAr : product.nameEn}</div>
-                          {line.fragile && <span className="chip danger">{t('fragile')}</span>}
+                          {line.fragile && <span className="chip fragile">{t('fragile')}</span>}
                         </td>
                         <td style={{ fontSize: 12 }}>{t(line.zoneInVehicle)}</td>
                         <td className="mono">{line.deliverySeq}</td>

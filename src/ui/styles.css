@@ -9,27 +9,32 @@
   /* ═══════════════════════════════════════════════════════════════════════
      BRAND — Maslamani Home
 
-     Taken from their own site: charcoal header and footer, white body, warm
-     orange in the logo and the "بيتك حياتك" tagline.
+     Taken from their own footer: charcoal ground, red section headings, grey
+     links. Red is the identity colour, so it is spent where identity belongs —
+     the sidebar, the primary button, the thing you just selected — and never
+     on a number that reports how the day is going. An operations screen has to
+     keep one hue free to mean "something is wrong", and on this brand that hue
+     is also red; the two are kept apart by ROLE, not by shade:
 
-     Their site runs the charcoal heavy across the whole page. Here the charcoal
-     is kept where it earns its place — the sidebar, which mirrors their header —
-     and the working area is opened up in warm light neutrals so a screen someone
-     stares at for ten hours stays comfortable.
+       red, solid and saturated  → identity and action (chrome, buttons, selection)
+       red, pale wash + dark ink → alarm (late, blocked, failed) — chips only
+       graphite                  → progress and completion
+       green / amber             → on time / at risk
 
-     Change these and the whole application re-skins.
+     Change the six --brand values and the whole application re-skins.
      ═══════════════════════════════════════════════════════════════════════ */
-  --brand: #e87722;           /* their orange: nav, buttons, links, highlights */
-  --brand-strong: #c75f14;    /* hover / pressed                              */
-  --brand-ink: #9c4c0e;       /* orange TEXT on light — darkened for contrast */
-  --brand-wash: #fdf1e7;      /* tinted fill behind brand elements            */
-  --brand-line: #f3d2b3;      /* brand-tinted border                          */
-  --brand-contrast: #ffffff;  /* text sitting ON the brand colour             */
+  --brand: #d4262e;           /* their red: solid fills, buttons, active nav  */
+  --brand-strong: #ae1a22;    /* hover / pressed                             */
+  --brand-ink: #9b1920;       /* red TEXT on light — 8.2:1 on white          */
+  --brand-wash: #fdecec;      /* tinted fill behind brand elements           */
+  --brand-line: #f2cacc;      /* brand-tinted border                         */
+  --brand-contrast: #ffffff;  /* text sitting ON the brand colour            */
+  --brand-on-dark: #f97b81;   /* red TEXT on charcoal — 4.7:1, AA at any size */
 
-  /* Their charcoal. Carries the sidebar, the way it carries their header. */
-  --charcoal: #2f2d2b;
-  --charcoal-soft: #3d3a37;
-  --charcoal-line: #4a4643;
+  /* Their charcoal. Carries the sidebar, the way it carries their footer. */
+  --charcoal: #383634;
+  --charcoal-soft: #454240;
+  --charcoal-line: #524f4c;
 
   /* --- Neutrals: warm grey, out of the same family as the charcoal ------- */
   --bg: #f7f6f4;
@@ -43,6 +48,13 @@
   --text-muted: #6b6762;
   --text-dim: #9a948d;
 
+  /* --- Progress: how far along, not how good --------------------------------
+     The milestone bar, the timeline, the load meter. Graphite, because these
+     move on every row of every screen and a brand-red one would read as an
+     alarm on an order that is doing perfectly well. */
+  --progress: #43403c;
+  --progress-soft: #7d7871;
+
   /* --- Status: reserved. Never used to identify a category. -------------- */
   --green: #0e7a38;
   --green-mark: #0ca30c;
@@ -54,41 +66,41 @@
   --amber-wash: #fdf3df;
   --amber-line: #f0dba6;
 
-  --red: #b02a2a;
-  --red-mark: #d03b3b;
+  --red: #a4161a;
+  --red-mark: #d13c3c;
   --red-wash: #fbeaea;
   --red-line: #f0c4c4;
 
-  /* "Information" is the brand — one less hue competing on screen. */
-  --info: var(--brand-ink);
-  --info-wash: var(--brand-wash);
-  --info-line: var(--brand-line);
+  /* "Information" is slate, not brand. On a red brand the brand colour cannot
+     also carry the neutral, everything-is-fine note. */
+  --info: #44515e;
+  --info-wash: #eef1f5;
+  --info-line: #d4dbe3;
 
   /* --- Product classes: categorical identity ----------------------------
-     Re-picked around the orange brand so a class chip can never be mistaken
-     for a brand element. Validated as a set (all pairs, light surface):
-     worst CVD ΔE 13.0, worst normal-vision ΔE 16.3. The aqua step sits under
-     3:1 against white, which is permitted because every chip carries its
-     visible letter — colour never has to carry the meaning alone. */
+     Blue / teal / violet — the three hues left once red is spent on the brand
+     and green and amber are held for status. Validated as a set (all pairs,
+     light surface): worst CVD ΔE 13.0 (deutan), worst normal-vision ΔE 16.3,
+     every step at or above 3:1 against the panel. */
   --class-a: #2a78d6;      /* major appliances    */
   --class-a-ink: #1a5698;
   --class-a-wash: #e9f1fb;
-  --class-b: #1baf7a;      /* small appliances    */
-  --class-b-ink: #0b6b48;
-  --class-b-wash: #e6f7f0;
+  --class-b: #0f9d8e;      /* small appliances    */
+  --class-b-ink: #0a6b60;
+  --class-b-wash: #e4f5f2;
   --class-c: #4a3aa7;      /* fragile kitchenware */
   --class-c-ink: #3b2e85;
   --class-c-wash: #ecebf7;
 
   /* --- Chrome ------------------------------------------------------------ */
-  --phone-bezel: #232a33;
-  --map-grid: #e8ebef;
-  --map-locality: #ccd3dc;
-  --map-route-idle: #b7c0cb;
+  --phone-bezel: #2a2724;
+  --map-grid: #eae7e3;
+  --map-locality: #d2ccc5;
+  --map-route-idle: #bdb6ae;
 
   --radius: 10px;
   --radius-sm: 6px;
-  --shadow: 0 1px 2px rgba(22, 32, 43, 0.05), 0 6px 20px rgba(22, 32, 43, 0.06);
+  --shadow: 0 1px 2px rgba(32, 28, 26, 0.05), 0 6px 20px rgba(32, 28, 26, 0.07);
 
   --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
@@ -96,7 +108,7 @@
   /* Legacy aliases so every existing rule resolves through the brand. */
   --accent: var(--brand);
   --accent-dim: var(--brand-line);
-  --teal: var(--brand);
+  --teal: var(--brand-ink);
   --blue: var(--info);
   --violet: var(--class-c);
 }
@@ -138,7 +150,7 @@ button { font-family: inherit; cursor: pointer; }
   padding: 20px 20px 18px;
   border-block-end: 1px solid var(--charcoal-line);
 }
-.brand-mark { font-size: 24px; font-weight: 700; color: var(--brand); letter-spacing: -0.01em; display: block; }
+.brand-mark { font-size: 24px; font-weight: 700; color: var(--brand-on-dark); letter-spacing: -0.01em; display: block; }
 .brand-tag { color: #a8a29b; }
 .brand-tag { font-size: 11px; line-height: 1.4; display: block; margin-top: 3px; }
 
@@ -167,8 +179,8 @@ button { font-family: inherit; cursor: pointer; }
 .demo-pill {
   display: inline-block;
   font-size: 10.5px; padding: 3px 9px; border-radius: 999px;
-  background: rgba(232, 119, 34, 0.16); color: var(--brand);
-  border: 1px solid rgba(232, 119, 34, 0.4);
+  background: rgba(212, 38, 46, 0.20); color: var(--brand-on-dark);
+  border: 1px solid rgba(249, 123, 129, 0.45);
 }
 
 .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -348,10 +360,18 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .chip.danger { color: var(--red); border-color: var(--red-line); background: var(--red-wash); }
 .chip.ok { color: var(--green); border-color: var(--green-line); background: var(--green-wash); }
 
+/* Handling attributes. A property of the goods, not a problem with the order —
+   half the kitchenware is fragile, and a red chip on every one of those rows
+   teaches the loader to ignore red. Fragile borrows the class-C violet it
+   already carries in the catalogue; the class itself is a circled letter, so
+   the two never collide. */
+.chip.fragile { color: var(--class-c-ink); border-color: var(--class-c); background: var(--class-c-wash); }
+.chip.attr { color: var(--info); border-color: var(--info-line); background: var(--info-wash); }
+
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
 
 .bar { height: 6px; background: var(--bg-inset); border-radius: 999px; overflow: hidden; min-width: 60px; }
-.bar > i { display: block; height: 100%; border-radius: 999px; background: var(--brand); }
+.bar > i { display: block; height: 100%; border-radius: 999px; background: var(--progress); }
 .bar > i[data-low='true'] { background: var(--amber-mark); }
 
 /* --- Toggles -------------------------------------------------------------- */
@@ -501,7 +521,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .step-rail i {
   flex: 1; height: 3px; border-radius: 999px; background: var(--border); display: block;
 }
-.step-rail i[data-on='true'] { background: var(--accent); }
+.step-rail i[data-on='true'] { background: var(--progress); }
 
 .driver-notes { flex: 1; min-width: 300px; max-width: 560px; }
 
@@ -514,7 +534,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   width: 30px; height: 30px; border-radius: 50%;
   background: var(--bg-inset); border: 1px solid var(--border-strong);
   display: grid; place-items: center;
-  font-size: 12px; font-weight: 700; color: var(--accent);
+  font-size: 12px; font-weight: 700; color: var(--brand-ink);
   font-family: var(--font-mono);
 }
 .flow-line { flex: 1; width: 2px; background: var(--border); min-height: 14px; }
@@ -533,7 +553,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 
 .log-line { font-family: var(--font-mono); font-size: 12px; padding: 5px 0; border-block-end: 1px solid var(--border); display: flex; gap: 10px; }
 .log-line:last-child { border: none; }
-.log-phase { color: var(--accent); min-width: 76px; }
+.log-phase { color: var(--info); min-width: 76px; }
 .log-time { color: var(--text-dim); margin-inline-start: auto; }
 
 .empty { color: var(--text-dim); font-size: 13px; padding: 18px; text-align: center; }
@@ -558,12 +578,12 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   font-size: 12.5px; font-weight: 500; transition: all .13s;
 }
 .filter-chip:hover { color: var(--text); border-color: var(--border-strong); }
-.filter-chip[data-active='true'] { background: var(--bg-inset); border-color: var(--accent); color: var(--accent); }
+.filter-chip[data-active='true'] { background: var(--brand-wash); border-color: var(--brand); color: var(--brand-ink); }
 .filter-count {
   font-family: var(--font-mono); font-size: 11px;
   background: var(--bg-inset); border-radius: 999px; padding: 1px 6px; color: var(--text-dim);
 }
-.filter-chip[data-active='true'] .filter-count { color: var(--accent); }
+.filter-chip[data-active='true'] .filter-count { color: var(--brand-ink); }
 
 .search {
   flex: 1; min-width: 220px; max-width: 380px;
@@ -584,7 +604,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .milestone-bar > i {
   display: block; flex: 1; height: 5px; border-radius: 1px; background: var(--bg-inset);
 }
-.milestone-bar > i[data-on='true'] { background: var(--brand); }
+.milestone-bar > i[data-on='true'] { background: var(--progress); }
 .milestone-bar > i[data-blocked='true'] { background: var(--red-mark); }
 
 .chip.info { color: var(--info); border-color: var(--info-line); background: var(--info-wash); }
@@ -621,7 +641,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   width: 2px; background: var(--border);
 }
 .tl-item[data-last='true']::before { display: none; }
-.tl-item[data-done='true']::before { background: var(--brand); }
+.tl-item[data-done='true']::before { background: var(--progress-soft); }
 
 .tl-dot {
   position: relative; z-index: 1; flex: none;
@@ -630,7 +650,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   display: grid; place-items: center;
   font-size: 12px; font-weight: 700; color: var(--brand-contrast);
 }
-.tl-item[data-done='true'] .tl-dot { background: var(--brand); border-color: var(--brand); }
+.tl-item[data-done='true'] .tl-dot { background: var(--progress); border-color: var(--progress); }
 .tl-item[data-blocked='true'] .tl-dot { background: var(--red); border-color: var(--red); color: #ffffff; }
 
 .tl-body { display: flex; justify-content: space-between; gap: 14px; flex: 1; padding-top: 2px; }
