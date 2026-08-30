@@ -39,22 +39,28 @@
   --brand-wash: #fbeee1;      /* peach tint — deliberately not the amber cream */
   --brand-line: #f0d3b5;
   --brand-contrast: #241f1a;  /* text sitting ON the orange — 4.9:1            */
-  --brand-on-dark: #ef9243;   /* orange TEXT on the charcoal sidebar — 5.1:1   */
+  --brand-on-dark: #f5a962;   /* orange TEXT on the sidebar — 4.8:1            */
 
-  /* --- Sidebar: their charcoal, in both themes --------------------------- */
-  --side-bg: #383634;
-  --side-soft: #454240;
-  --side-line: #524f4c;
-  --side-text: #c6c1ba;
-  --side-text-dim: #8c867f;
+  /* --- Sidebar -----------------------------------------------------------
+     Their charcoal, opened up a couple of steps. Everything sitting on it
+     moves with it: a lighter rail eats the contrast of the text it carries,
+     so the label greys and the orange are re-picked against this value, not
+     inherited from the darker one. */
+  --side-bg: #4a4643;
+  --side-soft: #565250;
+  --side-line: #635e5a;
+  --side-text: #dcd7d0;
+  --side-text-dim: #bab4ab;
   --side-text-strong: #ffffff;
 
   /* --- Surfaces ---------------------------------------------------------- */
-  --bg: #faf8f6;
+  --bg: #fdfbf9;              /* barely tinted — the beige is a hint, not a wash */
   --bg-raised: #ffffff;
   --bg-panel: #ffffff;
-  --bg-inset: #f4f1ee;
-  --border: #e8e4df;          /* the quiet default — panels, rows, chips      */
+  --bg-inset: #f7f4f1;
+  --border: #e6e1db;          /* carries a little more now: on a ground this
+                                 close to white, the panel edge does the work
+                                 the fill difference used to do              */
   --border-strong: #c4beb6;   /* emphasis only                                */
   --control-line: #938d85;    /* checkbox and switch outlines — 3:1, required */
 
