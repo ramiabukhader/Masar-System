@@ -11,6 +11,7 @@ export const STRINGS: Dict = {
   appName: { ar: 'مسار', en: 'Masar' },
   appTagline: { ar: 'نظام إدارة وتحسين التوصيل — مسلماني هوم', en: 'Delivery orchestration & optimisation — Maslamani Home' },
   demoNotice: { ar: 'نسخة تجريبية ببيانات محاكاة', en: 'Demo build on simulated data' },
+  themeToggle: { ar: 'تبديل السمة — غامق / فاتح', en: 'Switch theme — dark / light' },
 
   navTower: { ar: 'غرفة التحكم', en: 'Control Tower' },
   navBranch: { ar: 'عمليات الفرع', en: 'Branch Ops' },

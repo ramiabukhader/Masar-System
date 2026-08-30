@@ -177,28 +177,67 @@ Every colour in the application resolves through one block at the top of
 [`src/ui/styles.css`](src/ui/styles.css) — six values:
 
 ```css
---brand:          /* primary: nav, buttons, links, highlights */
---brand-strong:   /* hover / pressed                          */
---brand-ink:      /* brand-coloured text on a light ground    */
---brand-wash:     /* tinted fill behind brand elements        */
---brand-line:     /* brand-tinted border                      */
---brand-contrast: /* text sitting ON the brand colour         */
+--brand:          /* primary: nav, buttons, selection, highlights */
+--brand-strong:   /* hover — lighter on dark, darker on light     */
+--brand-ink:      /* brand-coloured text on the working surface   */
+--brand-wash:     /* tinted fill behind brand elements            */
+--brand-line:     /* brand-tinted border                          */
+--brand-contrast: /* text sitting ON the brand colour             */
+--brand-on-dark:  /* brand-coloured text on the charcoal sidebar  */
 ```
 
 Change those and the whole app re-skins: sidebar, navigation, buttons, focus rings,
-progress bars, milestone timeline, map highlight.
+selection, map highlight.
 
-**These are Maslamani Home's own colours**, read off their site: the charcoal of their
-header and footer, and the warm orange from the logo and the "بيتك حياتك" tagline. Their
-site runs the charcoal heavy across the whole page; here it is kept where it earns its
-place — the sidebar, mirroring their header — while the working area is opened up in warm
-light neutrals, because this is a screen people look at for ten hours a day.
+**These are Maslamani Home's own colours**, read off their site: a dark charcoal ground,
+red section headings, grey links. That is the default here, because that is what their
+brand looks like — the whole application sits on the charcoal, not just a 232px rail down
+one side. The red is lightened for text on the charcoal (`--brand-on-dark`) so it clears
+4.5:1 at any size, where the solid brand red would manage 2.4:1.
+
+A **light theme** ships alongside it, one click away in the top bar (`[data-theme='light']`
+— same six brand values, same role system, the three class hues stepped for a white
+surface). A dispatcher reads this screen for ten hours; not everyone wants to do that on
+charcoal, and the client can see both in the demo and pick.
+
+Going dark is not a token swap. Three things invert, and every one of them is a bug if you
+miss it:
+
+- **A wash is a dark tint, not a pale one.** `--red-wash` is `#351b1c` here, not `#fbeaea`.
+- **Ink goes lighter, not darker.** On white, status text is darkened for contrast; on
+  charcoal it has to be lightened. `--red` is `#a4161a` light and `#ff7676` dark.
+- **A "filled" meter is the lighter end.** `--progress` is graphite on white and bone on
+  charcoal — and anything drawn *on* it needs `--progress-contrast`, which flips with it.
+
+Shadows also stop working (a soft dark shadow does nothing on a dark ground, so elevation
+is carried by the panel fill and a deepened shadow), and `--green-solid` / `--red-solid`
+exist because a white tick cannot sit on the light status ink that dark mode requires.
+
+### Red is the brand *and* the alarm — so roles, not shades, keep them apart
+
+An operations screen has to keep one hue free to mean "something is wrong", and on this
+brand that hue is also the logo. Four rules resolve it, and they are what stop the app
+from looking like everything is on fire:
+
+| Role | Treatment | Where |
+|---|---|---|
+| Identity and action | red, solid and saturated | sidebar, active nav, primary button, selection, focus ring, the route you clicked |
+| Alarm | red, pale wash + dark ink | blocked orders, missed windows, unavailable slots — chips only |
+| Progress and completion | graphite (`--progress`) | milestone bars, timeline, load meters, step rails |
+| Handling attributes | class-C violet / slate | "fragile", "needs installation" — properties of the goods, not problems |
+
+The last row matters more than it looks: half the kitchenware is fragile, and a red chip
+on every one of those rows teaches a loader to ignore red by Tuesday.
 
 Status colours (green / amber / red) and the product-class palette are deliberately *not*
-derived from the brand, and should not be changed with it: a red brand must not make every
-warning look like a brand element, and a blue brand must not make "information"
-indistinguishable from "Maslamani". The product-class palette is validated as a set for
-colour-vision safety — worst-pair CVD ΔE 9.2, normal-vision ΔE 27.6 on a light surface.
+derived from the brand, and should not be changed with it.
+
+The product classes are **blue, aqua, gold** — stepped per mode, same three hues in both.
+Violet had to go when the app went dark: on a charcoal ground blue and violet collapse into
+each other under protanopia and deuteranopia (ΔE 1.9 against a floor of 8) and are hard to
+separate even with full colour vision (ΔE 9.8 against a floor of 15). Blue / aqua / gold is
+the one triad that clears every gate on both grounds — all pairs, worst CVD ΔE 8.4 dark and
+9.1 light, worst normal-vision ΔE 19.8 dark and 22.9 light.
 
 ---
 

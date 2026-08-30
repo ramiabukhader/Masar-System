@@ -20,6 +20,8 @@ type View =
   | 'process'
   | 'roadmap';
 
+type Theme = 'dark' | 'light';
+
 interface NavGroup {
   key: string;
   items: { id: View; key: string; icon: string }[];
@@ -55,6 +57,9 @@ const SHIFT_END = 18 * 60;
 
 export function App() {
   const [lang, setLang] = useState<Lang>('ar');
+  // Their own site is a dark charcoal ground with red — that is the default here. The light
+  // ground stays one click away, because a dispatcher reads this screen for ten hours.
+  const [theme, setTheme] = useState<Theme>('dark');
   const [view, setView] = useState<View>('orders');
   const [openOrderId, setOpenOrderId] = useState<string | null>(null);
   const [nowMinutes, setNowMinutes] = useState(11 * 60);
@@ -68,6 +73,10 @@ export function App() {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   // Route ids are regenerated on every re-plan, so a stale selection has to be repaired.
   useEffect(() => {
@@ -163,9 +172,19 @@ export function App() {
             />
           </div>
 
-          <button className="lang-toggle" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>
-            {lang === 'ar' ? 'EN' : 'ع'}
-          </button>
+          <div className="topbar-toggles">
+            <button
+              className="lang-toggle"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title={t('themeToggle')}
+              aria-label={t('themeToggle')}
+            >
+              {theme === 'dark' ? '☀' : '☾'}
+            </button>
+            <button className="lang-toggle" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}>
+              {lang === 'ar' ? 'EN' : 'ع'}
+            </button>
+          </div>
         </header>
 
         <main className="main">

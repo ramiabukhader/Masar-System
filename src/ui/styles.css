@@ -6,89 +6,117 @@
    --------------------------------------------------------------------------- */
 
 :root {
+  color-scheme: dark;
+
   /* ═══════════════════════════════════════════════════════════════════════
      BRAND — Maslamani Home
 
-     Taken from their own site: charcoal header and footer, white body, warm
-     orange in the logo and the "بيتك حياتك" tagline.
+     Read off their own site: a dark charcoal ground, red section headings,
+     grey links. That is the default here, because that is what their brand
+     looks like. The light ground is one click away in the top bar.
 
-     Their site runs the charcoal heavy across the whole page. Here the charcoal
-     is kept where it earns its place — the sidebar, which mirrors their header —
-     and the working area is opened up in warm light neutrals so a screen someone
-     stares at for ten hours stays comfortable.
+     Red is both their identity colour and the only colour an operations
+     screen can use to mean "something is wrong", so the two are kept apart
+     by ROLE, not by shade:
 
-     Change these and the whole application re-skins.
+       red, solid and saturated  → identity and action (chrome, buttons, selection)
+       red, dark wash + light ink → alarm (late, blocked, failed) — chips only
+       light graphite             → progress and completion
+       green / amber              → on time / at risk
+
+     Every pair below is measured, not eyeballed. Body text clears 4.5:1 on
+     its own surface, UI boundaries clear 3:1, and the three product-class
+     colours pass an all-pairs colour-vision check on this ground.
      ═══════════════════════════════════════════════════════════════════════ */
-  --brand: #e87722;           /* their orange: nav, buttons, links, highlights */
-  --brand-strong: #c75f14;    /* hover / pressed                              */
-  --brand-ink: #9c4c0e;       /* orange TEXT on light — darkened for contrast */
-  --brand-wash: #fdf1e7;      /* tinted fill behind brand elements            */
-  --brand-line: #f3d2b3;      /* brand-tinted border                          */
-  --brand-contrast: #ffffff;  /* text sitting ON the brand colour             */
+  --brand: #dc333b;           /* their red: solid fills, buttons, active nav  */
+  --brand-strong: #f0555d;    /* hover — on a dark ground, hover means LIGHTER */
+  --brand-ink: #ffa0a5;       /* brand-coloured TEXT — 7.2:1 on a panel        */
+  --brand-wash: #3a1f20;      /* a wash is a DARK tint here, not a pale one    */
+  --brand-line: #6e3033;
+  --brand-contrast: #ffffff;  /* text sitting ON the brand red — 4.6:1         */
+  --brand-on-dark: #ffa0a5;
 
-  /* Their charcoal. Carries the sidebar, the way it carries their header. */
-  --charcoal: #2f2d2b;
-  --charcoal-soft: #3d3a37;
-  --charcoal-line: #4a4643;
+  /* --- Sidebar: the deepest plane, so the app is anchored on one edge ----- */
+  --side-bg: #1c1a19;
+  --side-soft: #282524;
+  --side-line: #35312e;
+  --side-text: #c9c3bc;
+  --side-text-dim: #8f8880;
+  --side-text-strong: #ffffff;
 
-  /* --- Neutrals: warm grey, out of the same family as the charcoal ------- */
-  --bg: #f7f6f4;
-  --bg-raised: #ffffff;
-  --bg-panel: #ffffff;
-  --bg-inset: #f2f0ed;
-  --border: #e5e2dd;
-  --border-strong: #ccc7bf;
+  /* --- Surfaces: an elevation ramp, deepest to highest -------------------- */
+  --bg: #232120;              /* the page ground                              */
+  --bg-raised: #383533;       /* their exact footer charcoal — top bar, hover */
+  --bg-panel: #2e2b2a;        /* cards and panels                             */
+  --bg-inset: #1b1918;        /* wells: inputs, table heads, progress tracks  */
+  --border: #3d3936;
+  --border-strong: #7a736c;   /* checkbox and chip boundaries — 3.0:1         */
 
-  --text: #2b2a28;
-  --text-muted: #6b6762;
-  --text-dim: #9a948d;
+  --text: #ece7e1;
+  --text-muted: #ada69e;
+  --text-dim: #9a938a;
 
-  /* --- Status: reserved. Never used to identify a category. -------------- */
-  --green: #0e7a38;
-  --green-mark: #0ca30c;
-  --green-wash: #e7f5ea;
-  --green-line: #b6e0c0;
+  /* --- Progress: how far along, not how good -----------------------------
+     Light graphite. On a dark ground the "filled" end of a meter has to be
+     the lighter one, which is the exact inverse of the light theme. */
+  --progress: #c2bab2;
+  --progress-soft: #847d76;
+  --progress-contrast: #232120;  /* glyph sitting ON --progress */
 
-  --amber: #8a5d00;
-  --amber-mark: #fab219;
-  --amber-wash: #fdf3df;
-  --amber-line: #f0dba6;
+  /* --- Status: reserved. Never used to identify a category. --------------
+     On dark the ink goes lighter and the wash goes darker — the mirror of
+     what these values are on a white page. */
+  --green: #5fd68f;
+  --green-mark: #2fbf6a;
+  --green-solid: #17864a;     /* solid fill under white glyphs — 4.6:1        */
+  --green-wash: #102a1b;
+  --green-line: #2c6b45;
 
-  --red: #b02a2a;
-  --red-mark: #d03b3b;
-  --red-wash: #fbeaea;
-  --red-line: #f0c4c4;
+  --amber: #f5bf4a;
+  --amber-mark: #e8a317;
+  --amber-wash: #302408;
+  --amber-line: #6f5518;
 
-  /* "Information" is the brand — one less hue competing on screen. */
-  --info: var(--brand-ink);
-  --info-wash: var(--brand-wash);
-  --info-line: var(--brand-line);
+  --red: #ff7676;
+  --red-mark: #e4494f;
+  --red-solid: #cc3940;       /* solid fill under white glyphs — 5.0:1        */
+  --red-wash: #351b1c;
+  --red-line: #6d3032;
+
+  /* "Information" is slate, not brand. A red brand cannot also carry the
+     neutral, nothing-is-happening note. */
+  --info: #a3bcd6;
+  --info-wash: #1a232c;
+  --info-line: #37485a;
 
   /* --- Product classes: categorical identity ----------------------------
-     Re-picked around the orange brand so a class chip can never be mistaken
-     for a brand element. Validated as a set (all pairs, light surface):
-     worst CVD ΔE 13.0, worst normal-vision ΔE 16.3. The aqua step sits under
-     3:1 against white, which is permitted because every chip carries its
-     visible letter — colour never has to carry the meaning alone. */
-  --class-a: #2a78d6;      /* major appliances    */
-  --class-a-ink: #1a5698;
-  --class-a-wash: #e9f1fb;
-  --class-b: #1baf7a;      /* small appliances    */
-  --class-b-ink: #0b6b48;
-  --class-b-wash: #e6f7f0;
-  --class-c: #4a3aa7;      /* fragile kitchenware */
-  --class-c-ink: #3b2e85;
-  --class-c-wash: #ecebf7;
+     Blue, aqua, gold. Violet had to go: on a dark ground blue and violet
+     collapse into each other under protanopia and deuteranopia (ΔE 1.9,
+     against a floor of 8) and they are hard to separate even with full
+     colour vision (ΔE 9.8, floor 15). Blue / aqua / gold is the one triad
+     that clears every gate on this ground — all pairs, worst CVD ΔE 8.4,
+     worst normal-vision ΔE 19.8, every step above 3:1 against the panel. */
+  --class-a: #3987e5;      /* major appliances    */
+  --class-a-ink: #9cc6f5;
+  --class-a-wash: #142433;
+  --class-b: #199e70;      /* small appliances    */
+  --class-b-ink: #74dcb4;
+  --class-b-wash: #0e2b22;
+  --class-c: #c98500;      /* fragile kitchenware */
+  --class-c-ink: #f0c264;
+  --class-c-wash: #33260c;
 
   /* --- Chrome ------------------------------------------------------------ */
-  --phone-bezel: #232a33;
-  --map-grid: #e8ebef;
-  --map-locality: #ccd3dc;
-  --map-route-idle: #b7c0cb;
+  --phone-bezel: #0d0c0b;
+  --map-grid: #2c2927;
+  --map-locality: #4b4642;
+  --map-route-idle: #5c5651;
 
   --radius: 10px;
   --radius-sm: 6px;
-  --shadow: 0 1px 2px rgba(22, 32, 43, 0.05), 0 6px 20px rgba(22, 32, 43, 0.06);
+  /* A soft dark shadow does nothing on a dark ground, so it is deepened and
+     paired with the lighter panel fill to read as elevation. */
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 26px rgba(0, 0, 0, 0.4);
 
   --font-sans: 'Tajawal', system-ui, -apple-system, 'Segoe UI', sans-serif;
   /*
@@ -103,9 +131,88 @@
   /* Legacy aliases so every existing rule resolves through the brand. */
   --accent: var(--brand);
   --accent-dim: var(--brand-line);
-  --teal: var(--brand);
+  --teal: var(--brand-ink);
   --blue: var(--info);
   --violet: var(--class-c);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT — the same brand on a warm light ground.
+
+   Same six brand values, same role system, same three class hues stepped for
+   a white surface. Offered because a dispatcher reads this screen for ten
+   hours and not everyone wants to do that on charcoal.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --brand: #d4262e;
+  --brand-strong: #ae1a22;    /* hover — on a light ground, hover means DARKER */
+  --brand-ink: #9b1920;       /* 8.2:1 on white                                */
+  --brand-wash: #fdecec;
+  --brand-line: #f2cacc;
+  --brand-contrast: #ffffff;
+  --brand-on-dark: #f97b81;   /* the sidebar stays charcoal even here          */
+
+  --side-bg: #383634;
+  --side-soft: #454240;
+  --side-line: #524f4c;
+  --side-text: #c6c1ba;
+  --side-text-dim: #8c867f;
+  --side-text-strong: #ffffff;
+
+  --bg: #f7f6f4;
+  --bg-raised: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-inset: #f2f0ed;
+  --border: #e5e2dd;
+  --border-strong: #ccc7bf;
+
+  --text: #2b2a28;
+  --text-muted: #6b6762;
+  --text-dim: #857f78;
+
+  --progress: #43403c;
+  --progress-soft: #7d7871;
+  --progress-contrast: #ffffff;
+
+  --green: #0e7a38;
+  --green-mark: #0ca30c;
+  --green-solid: #0e7a38;
+  --green-wash: #e7f5ea;
+  --green-line: #b6e0c0;
+
+  --amber: #8a5d00;
+  --amber-mark: #fab219;
+  --amber-wash: #fdf3df;
+  --amber-line: #f0dba6;
+
+  --red: #a4161a;
+  --red-mark: #d13c3c;
+  --red-solid: #a4161a;
+  --red-wash: #fbeaea;
+  --red-line: #f0c4c4;
+
+  --info: #44515e;
+  --info-wash: #eef1f5;
+  --info-line: #d4dbe3;
+
+  --class-a: #2a78d6;
+  --class-a-ink: #1a5698;
+  --class-a-wash: #e9f1fb;
+  --class-b: #1baf7a;
+  --class-b-ink: #0b6b48;
+  --class-b-wash: #e6f7f0;
+  --class-c: #eda100;
+  --class-c-ink: #7a5300;
+  --class-c-wash: #fdf4e0;
+
+  --phone-bezel: #2a2724;
+  --map-grid: #eae7e3;
+  --map-locality: #d2ccc5;
+  --map-route-idle: #bdb6ae;
+
+  --shadow: 0 1px 2px rgba(32, 28, 26, 0.05), 0 6px 20px rgba(32, 28, 26, 0.07);
 }
 
 * { box-sizing: border-box; }
@@ -132,8 +239,8 @@ button { font-family: inherit; cursor: pointer; }
 .sidebar {
   width: 252px;
   flex: none;
-  background: var(--charcoal);
-  border-inline-end: 1px solid var(--charcoal);
+  background: var(--side-bg);
+  border-inline-end: 1px solid var(--side-line);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -143,39 +250,39 @@ button { font-family: inherit; cursor: pointer; }
 
 .sidebar-brand {
   padding: 20px 20px 18px;
-  border-block-end: 1px solid var(--charcoal-line);
+  border-block-end: 1px solid var(--side-line);
 }
-.brand-mark { font-size: 27px; font-weight: 800; color: var(--brand); letter-spacing: -0.01em; display: block; }
-.brand-tag { color: #a8a29b; }
+.brand-mark { font-size: 27px; font-weight: 800; color: var(--brand-on-dark); letter-spacing: -0.01em; display: block; }
+.brand-tag { color: var(--side-text-dim); }
 .brand-tag { font-size: 12.5px; line-height: 1.4; display: block; margin-top: 3px; }
 
 .sidebar-nav { flex: 1; overflow-y: auto; padding: 14px 10px; }
 .nav-group + .nav-group { margin-top: 18px; }
 .nav-group-label {
   font-size: 11.5px; text-transform: uppercase; letter-spacing: .1em;
-  color: #8c867f; padding: 0 10px 6px;
+  color: var(--side-text-dim); padding: 0 10px 6px;
 }
 
 .nav-item {
   display: flex; align-items: center; gap: 10px; width: 100%;
-  background: transparent; border: 1px solid transparent; color: #c6c1ba;
+  background: transparent; border: 1px solid transparent; color: var(--side-text);
   padding: 8px 10px; border-radius: var(--radius-sm);
   font-size: 15.5px; font-weight: 500; text-align: start;
   transition: background .13s, color .13s;
 }
-.nav-item:hover { background: var(--charcoal-soft); color: #ffffff; }
+.nav-item:hover { background: var(--side-soft); color: var(--side-text-strong); }
 .nav-item[data-active='true'] {
   background: var(--brand); border-color: var(--brand); color: var(--brand-contrast);
 }
 .nav-icon { font-size: 15px; width: 16px; text-align: center; opacity: .85; }
 
-.sidebar-foot { padding: 14px 16px; border-block-start: 1px solid var(--charcoal-line); }
+.sidebar-foot { padding: 14px 16px; border-block-start: 1px solid var(--side-line); }
 
 .demo-pill {
   display: inline-block;
   font-size: 12px; padding: 3px 9px; border-radius: 999px;
-  background: rgba(232, 119, 34, 0.16); color: var(--brand);
-  border: 1px solid rgba(232, 119, 34, 0.4);
+  background: var(--brand-wash); color: var(--brand-on-dark);
+  border: 1px solid var(--brand-line);
 }
 
 .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -212,6 +319,9 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 13.5px; font-weight: 700; flex: none;
 }
 .lang-toggle:hover { color: var(--text); border-color: var(--border-strong); }
+
+.topbar-toggles { display: flex; gap: 6px; flex: none; }
+.topbar-toggles .lang-toggle { min-width: 40px; text-align: center; }
 
 .main { padding: 20px 24px 64px; flex: 1; }
 .page-sub { color: var(--text-muted); font-size: 15.5px; margin: 0; }
@@ -355,10 +465,18 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .chip.danger { color: var(--red); border-color: var(--red-line); background: var(--red-wash); }
 .chip.ok { color: var(--green); border-color: var(--green-line); background: var(--green-wash); }
 
+/* Handling attributes. A property of the goods, not a problem with the order —
+   half the kitchenware is fragile, and a red chip on every one of those rows
+   teaches the loader to ignore red. Fragile borrows the class-C violet it
+   already carries in the catalogue; the class itself is a circled letter, so
+   the two never collide. */
+.chip.fragile { color: var(--class-c-ink); border-color: var(--class-c); background: var(--class-c-wash); }
+.chip.attr { color: var(--info); border-color: var(--info-line); background: var(--info-wash); }
+
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
 
 .bar { height: 6px; background: var(--bg-inset); border-radius: 999px; overflow: hidden; min-width: 60px; }
-.bar > i { display: block; height: 100%; border-radius: 999px; background: var(--brand); }
+.bar > i { display: block; height: 100%; border-radius: 999px; background: var(--progress); }
 .bar > i[data-low='true'] { background: var(--amber-mark); }
 
 /* --- Toggles -------------------------------------------------------------- */
@@ -420,7 +538,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .phone {
   width: 384px;
   flex: none;
-  background: var(--bg-panel);
+  background: var(--bg-raised);
   border: 8px solid var(--phone-bezel);
   border-radius: 30px;
   box-shadow: var(--shadow);
@@ -491,7 +609,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   font-size: 13.5px; font-weight: 800; color: var(--brand-contrast);
   margin-top: 1px;
 }
-.check-item[data-done='true'] .check-box { background: var(--green); border-color: var(--green); }
+.check-item[data-done='true'] .check-box { background: var(--green-solid); border-color: var(--green-solid); }
 
 .alert {
   border-radius: var(--radius-sm);
@@ -508,7 +626,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .step-rail i {
   flex: 1; height: 3px; border-radius: 999px; background: var(--border); display: block;
 }
-.step-rail i[data-on='true'] { background: var(--accent); }
+.step-rail i[data-on='true'] { background: var(--progress); }
 
 .driver-notes { flex: 1; min-width: 300px; max-width: 560px; }
 
@@ -521,7 +639,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   width: 30px; height: 30px; border-radius: 50%;
   background: var(--bg-inset); border: 1px solid var(--border-strong);
   display: grid; place-items: center;
-  font-size: 13.5px; font-weight: 800; color: var(--accent);
+  font-size: 13.5px; font-weight: 800; color: var(--brand-ink);
   font-family: var(--font-mono);
 }
 .flow-line { flex: 1; width: 2px; background: var(--border); min-height: 14px; }
@@ -540,7 +658,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 
 .log-line { font-family: var(--font-mono); font-size: 13.5px; padding: 5px 0; border-block-end: 1px solid var(--border); display: flex; gap: 10px; }
 .log-line:last-child { border: none; }
-.log-phase { color: var(--accent); min-width: 76px; }
+.log-phase { color: var(--info); min-width: 76px; }
 .log-time { color: var(--text-dim); margin-inline-start: auto; }
 
 .empty { color: var(--text-dim); font-size: 15px; padding: 18px; text-align: center; }
@@ -565,19 +683,20 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   font-size: 14px; font-weight: 500; transition: all .13s;
 }
 .filter-chip:hover { color: var(--text); border-color: var(--border-strong); }
-.filter-chip[data-active='true'] { background: var(--bg-inset); border-color: var(--accent); color: var(--accent); }
+.filter-chip[data-active='true'] { background: var(--brand-wash); border-color: var(--brand); color: var(--brand-ink); }
 .filter-count {
   font-family: var(--font-mono); font-size: 12.5px;
   background: var(--bg-inset); border-radius: 999px; padding: 1px 6px; color: var(--text-dim);
 }
-.filter-chip[data-active='true'] .filter-count { color: var(--accent); }
+.filter-chip[data-active='true'] .filter-count { color: var(--brand-ink); }
 
 .search {
   flex: 1; min-width: 220px; max-width: 380px;
   background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius-sm);
   color: var(--text); padding: 8px 13px; font-family: inherit; font-size: 15px;
 }
-.search::placeholder { color: var(--text-dim); }
+.search::placeholder { color: var(--text-dim); opacity: 1; }
+.search { color-scheme: inherit; }
 .search:focus { border-color: var(--border-strong); outline: none; }
 
 .cell-sub { font-size: 13px; color: var(--text-dim); }
@@ -591,7 +710,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .milestone-bar > i {
   display: block; flex: 1; height: 5px; border-radius: 1px; background: var(--bg-inset);
 }
-.milestone-bar > i[data-on='true'] { background: var(--brand); }
+.milestone-bar > i[data-on='true'] { background: var(--progress); }
 .milestone-bar > i[data-blocked='true'] { background: var(--red-mark); }
 
 .chip.info { color: var(--info); border-color: var(--info-line); background: var(--info-wash); }
@@ -628,7 +747,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   width: 2px; background: var(--border);
 }
 .tl-item[data-last='true']::before { display: none; }
-.tl-item[data-done='true']::before { background: var(--brand); }
+.tl-item[data-done='true']::before { background: var(--progress-soft); }
 
 .tl-dot {
   position: relative; z-index: 1; flex: none;
@@ -637,8 +756,8 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   display: grid; place-items: center;
   font-size: 13.5px; font-weight: 800; color: var(--brand-contrast);
 }
-.tl-item[data-done='true'] .tl-dot { background: var(--brand); border-color: var(--brand); }
-.tl-item[data-blocked='true'] .tl-dot { background: var(--red); border-color: var(--red); color: #ffffff; }
+.tl-item[data-done='true'] .tl-dot { background: var(--progress); border-color: var(--progress); color: var(--progress-contrast); }
+.tl-item[data-blocked='true'] .tl-dot { background: var(--red-solid); border-color: var(--red); color: #ffffff; }
 
 .tl-body { display: flex; justify-content: space-between; gap: 14px; flex: 1; padding-top: 2px; }
 .tl-title { font-size: 15.5px; }
@@ -677,7 +796,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
   font-size: 12.5px; font-weight: 800; color: var(--brand-contrast);
 }
 .check-list li[data-status='done'] { color: var(--text); }
-.check-list li[data-status='done'] .check-mark { background: var(--green); border-color: var(--green); }
+.check-list li[data-status='done'] .check-mark { background: var(--green-solid); border-color: var(--green-solid); }
 .check-list li[data-status='next'] .check-mark { border-color: var(--amber); }
 
 .btn.sm { padding: 5px 11px; font-size: 13.5px; }
@@ -698,8 +817,8 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 .dg-route      { stroke: var(--map-route-idle); }
 .dg-route-on   { stroke: var(--brand); }
 .dg-stop       { fill: var(--brand); stroke: var(--bg-panel); }
-.dg-node       { fill: var(--bg-panel); stroke: var(--charcoal); }
-.dg-node-dc    { fill: var(--charcoal); stroke: var(--charcoal); }
+.dg-node       { fill: var(--bg-panel); stroke: var(--text-muted); }
+.dg-node-dc    { fill: var(--text-muted); stroke: var(--text-muted); }
 .dg-label      { fill: var(--text-muted); stroke: none; }
 .dg-label-halo { fill: none; stroke: var(--bg-inset); }
 

@@ -260,7 +260,7 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                           <span className={`chip ${product.productClass.toLowerCase()}`}>{product.productClass}</span>
                           <span>{loc(lang, product.nameEn, product.nameAr)}</span>
-                          {product.fragile && <span className="chip danger">{t('fragile')}</span>}
+                          {product.fragile && <span className="chip fragile">{t('fragile')}</span>}
                         </div>
                       </td>
                       <td className="mono">{line.quantity}</td>
