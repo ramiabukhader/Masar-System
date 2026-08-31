@@ -442,7 +442,6 @@ button { font-family: inherit; cursor: pointer; }
 /* Roles that used to be written as raw px inside JSX, so the type scale could
    never reach them. */
 .lead-line { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
-.phase-text { margin: 0; font-size: 15px; }
 .tier-tagline { color: var(--text-muted); font-size: 15px; margin-top: 0; }
 .tier-req-head { margin: 18px 0 8px; font-size: 15px; font-weight: 700; }
 
@@ -463,7 +462,6 @@ button { font-family: inherit; cursor: pointer; }
 [dir='rtl'] .window-badge .label,
 [dir='rtl'] .flow-role,
 [dir='rtl'] .kv > span,
-[dir='rtl'] .mini-label,
 [dir='rtl'] .tech-detail > span,
 [dir='rtl'] .zone-picker > span,
 [dir='rtl'] .brand-mark {
@@ -905,24 +903,7 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 
 /* --- Roadmap -------------------------------------------------------------- */
 
-.progress-head { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 8px; }
-.mini-label {
-  font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
-  color: var(--text-dim); margin-bottom: 5px;
-}
-.phase-panel[data-status='done'] { border-color: var(--green-line); }
-.phase-panel[data-status='next'] { border-color: var(--amber-line); }
 
-.check-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
-.check-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 15.5px; color: var(--text-muted); }
-.check-mark {
-  flex: none; width: 17px; height: 17px; border-radius: 4px; margin-top: 2px;
-  border: 1.5px solid var(--control-line); display: grid; place-items: center;
-  font-size: 12.5px; font-weight: 800; color: var(--glyph-on-solid);
-}
-.check-list li[data-status='done'] { color: var(--text); }
-.check-list li[data-status='done'] .check-mark { background: var(--green-solid); border-color: var(--green-solid); }
-.check-list li[data-status='next'] .check-mark { border-color: var(--amber); }
 
 .btn.sm { padding: 5px 11px; font-size: 13.5px; }
 

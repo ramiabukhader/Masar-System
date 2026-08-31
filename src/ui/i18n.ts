@@ -212,7 +212,6 @@ export const STRINGS: Dict = {
   technicalDetail: { ar: 'التفصيل الفني', en: 'Technical detail' },
   navOrders: { ar: 'الطلبات', en: 'Orders' },
   navOptions: { ar: 'خيارات التوصيل', en: 'Delivery options' },
-  navRoadmap: { ar: 'خارطة الطريق', en: 'Roadmap' },
   groupOps: { ar: 'التشغيل', en: 'Operations' },
   groupSetup: { ar: 'الإعداد', en: 'Setup' },
   groupRef: { ar: 'المرجع', en: 'Reference' },
@@ -331,16 +330,6 @@ export const STRINGS: Dict = {
     ar: 'التوصيل في نفس اليوم موجود هنا عمداً كخيار غير مفعّل: تشغيله على شبكة لم تُصلح بعد نسبة الفشل من المحاولة الأولى وتعبئة المركبات يضاعف الكلفة بدل أن يخفضها.',
     en: 'Same-day sits here deliberately as a switched-off option: running it on a network that has not yet fixed first-attempt failure and truck fill multiplies the cost instead of reducing it.',
   },
-
-  // ── Roadmap ─────────────────────────────────────────────────────────────
-  roadmapTitle: { ar: 'خارطة الطريق', en: 'Roadmap' },
-  roadmapSub: { ar: 'أين وصلنا، وما التالي، وماذا تساوي كل مرحلة', en: 'Where we are, what is next, and what each phase is worth' },
-  phaseGoal: { ar: 'الهدف', en: 'Goal' },
-  phaseOutcome: { ar: 'الناتج', en: 'Outcome' },
-  st_done: { ar: 'مكتمل', en: 'Done' },
-  st_in_progress: { ar: 'جارٍ', en: 'In progress' },
-  st_next: { ar: 'التالي', en: 'Next' },
-  st_later: { ar: 'لاحقاً', en: 'Later' },
 
   km: { ar: 'كم', en: 'km' },
   m3: { ar: 'م³', en: 'm³' },

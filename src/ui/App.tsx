@@ -10,7 +10,6 @@ import { ControlTower } from './screens/ControlTower';
 import { BranchOps } from './screens/BranchOps';
 import { DriverApp } from './screens/DriverApp';
 import { ProcessGuide } from './screens/ProcessGuide';
-import { Roadmap } from './screens/Roadmap';
 
 type View =
   | 'orders'
@@ -18,8 +17,7 @@ type View =
   | 'tower'
   | 'branch'
   | 'driver'
-  | 'process'
-  | 'roadmap';
+  | 'process';
 
 type Theme = 'dark' | 'light';
 
@@ -48,7 +46,6 @@ const NAV: NavGroup[] = [
     key: 'groupRef',
     items: [
       { id: 'process', key: 'navProcess', icon: '☰' },
-      { id: 'roadmap', key: 'navRoadmap', icon: '◈' },
     ],
   },
 ];
@@ -65,7 +62,6 @@ const SUB: Record<View, string> = {
   driver: 'driverSub',
   options: 'optionsSub',
   process: 'processSub',
-  roadmap: 'roadmapSub',
 };
 
 const SHIFT_START = 7 * 60;
@@ -234,8 +230,6 @@ export function App() {
             />
           ) : view === 'options' ? (
             <DeliveryOptions t={t} lang={lang} state={state} />
-          ) : view === 'roadmap' ? (
-            <Roadmap t={t} lang={lang} />
           ) : view === 'tower' ? (
             <ControlTower
               t={t}
