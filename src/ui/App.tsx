@@ -90,7 +90,11 @@ export function App() {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
-  // Route ids are regenerated on every re-plan, so a stale selection has to be repaired.
+  // Route ids are POSITIONAL — `RT-${routes.length + 1}` — so a re-plan reuses the same
+  // strings for different vehicles and stop lists. An id therefore survives a re-plan
+  // without meaning the same route, and this effect only catches the narrow case where
+  // it disappears entirely. Screens holding per-route state must key it on the plan, not
+  // on the id; see DriverApp and BranchOps.
   useEffect(() => {
     if (!state.plan) return;
     if (!selectedRouteId || !state.plan.routes.some((r) => r.id === selectedRouteId)) {

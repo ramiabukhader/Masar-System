@@ -41,13 +41,19 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
   const [showExceptions, setShowExceptions] = useState(false);
 
   // Re-planning replaces the route entirely; the phone has to start from the top.
+  //
+  // Keyed on the plan, not on route.id: ids are positional (`RT-${n}`), so the same
+  // string comes back after a re-plan attached to a different vehicle and a different
+  // stop list. Keyed on the id this never fired — the driver kept a cursor of 7 against
+  // a 6-stop route, so `done` went true and the phone showed "route complete" with every
+  // stop marked failed, for a route on which nothing had been delivered.
   useEffect(() => {
     setIndex(0);
     setPhase('enroute');
     setChecked(new Set());
     setOutcomes({});
     setShowExceptions(false);
-  }, [route?.id]);
+  }, [plan, route?.id]);
 
   const stop = route?.stops[index];
   const shipment = stop ? shipmentMap.get(stop.shipmentId) : undefined;

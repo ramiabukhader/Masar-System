@@ -54,7 +54,11 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
       width={WIDTH}
       height={HEIGHT}
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      role="img"
+      // Not role="img": that role is Children Presentational, so it prunes the whole
+      // subtree from the accessibility tree — including the route groups below, which are
+      // focusable buttons. They were tab stops that announced nothing. A group keeps the
+      // map named while leaving its controls reachable.
+      role="group"
       aria-label="Network map of planned routes"
     >
       <defs>

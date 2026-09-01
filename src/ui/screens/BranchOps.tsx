@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { InfoTip } from '../components/InfoTip';
 import { fmtCube, fmtNum, fmtTime, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
@@ -24,6 +24,15 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
   const [verified, setVerified] = useState<Set<number>>(new Set());
 
   const route = plan?.routes.find((r) => r.id === selectedRouteId) ?? plan?.routes[0];
+
+  // A tick means "I have seen this item on this manifest", so it cannot outlive the
+  // manifest. Route ids are positional, so a re-plan hands the same id a different load
+  // plan; clearing only in the route-picker left 18 ticks against a 10-line manifest —
+  // "18/10 verified", a bar at 180%, and all ten new rows showing as already scanned,
+  // on the one screen whose job is to prove each item was checked.
+  useEffect(() => {
+    setVerified(new Set());
+  }, [plan, route?.id]);
 
   const pickList = useMemo(() => {
     if (!route) return [];
