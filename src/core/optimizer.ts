@@ -77,6 +77,20 @@ function toDate(planDate: Date, minutes: number): Date {
 
 const round15 = (minutes: number) => Math.floor(minutes / 15) * 15;
 
+/**
+ * YYYY-MM-DD of a LOCAL date.
+ *
+ * Not toISOString().slice(0, 10): planDate is local midnight by contract, and
+ * toISOString converts to UTC first, so east of Greenwich it names the evening before.
+ * In Asia/Hebron — the timezone this runs in — the plan id read one day behind the day
+ * it delivers, while the top bar beside it read the right one.
+ */
+function localDateStamp(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 // ---------------------------------------------------------------------------
 // Route evaluation
 // ---------------------------------------------------------------------------
@@ -1016,7 +1030,7 @@ export class WavePlanner {
     });
 
     return {
-      id: `PLAN-${planDate.toISOString().slice(0, 10)}-${this.input.waveName}`,
+      id: `PLAN-${localDateStamp(planDate)}-${this.input.waveName}`,
       waveName: this.input.waveName,
       generatedAt: new Date(),
       routes,

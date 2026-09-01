@@ -457,6 +457,16 @@ describe('full wave', () => {
     for (const item of budgetStopped) expect(item.detail).toContain('budget');
   });
 
+  it('names the day it delivers in the plan id, in any timezone', async () => {
+    const { plan } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+    // PLAN_DATE is local midnight of 15 September. toISOString() converts to UTC first,
+    // so east of Greenwich the id used to name the 14th while the top bar named the 15th.
+    const month = String(PLAN_DATE.getMonth() + 1).padStart(2, '0');
+    const day = String(PLAN_DATE.getDate()).padStart(2, '0');
+    expect(plan.id).toBe(`PLAN-${PLAN_DATE.getFullYear()}-${month}-${day}-daily`);
+    expect(plan.id).toContain('2026-09-15');
+  });
+
   it('explains every unassigned shipment with an actionable reason', async () => {
     const { plan } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
     for (const item of plan.unassigned) {
