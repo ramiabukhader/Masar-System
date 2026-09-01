@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { buildOrderTracks, MILESTONES, summarise, type OrderTrack } from './lifecycle';
+import {
+  buildOrderTracks,
+  MILESTONES,
+  summarise,
+  triageRank,
+  type OrderState,
+  type OrderTrack,
+  type SlaRisk,
+} from './lifecycle';
 import { runDemoWave } from '../data/scenario';
 import type { DeliveryPlan, Order, Shipment } from './types';
 
@@ -137,5 +145,49 @@ describe('order lifecycle', () => {
     expect(s.held + s.blocked + s.scheduled + s.active + s.delivered).toBe(s.total);
     expect(s.total).toBe(tracks.length);
     expect(s.cashToCollect).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('triage order', () => {
+  const track = (state: OrderState, slaRisk: SlaRisk): OrderTrack =>
+    ({ state, slaRisk } as OrderTrack);
+
+  it('ranks a missed promise above a merely tight one', () => {
+    // SlaRisk has three values. Scoring only 'tight' put 'breach' in the same bucket as
+    // 'ok', so a row showing a red "missed" chip sorted below an amber "tight" one.
+    expect(triageRank(track('active', 'breach'))).toBeLessThan(triageRank(track('active', 'tight')));
+    expect(triageRank(track('active', 'tight'))).toBeLessThan(triageRank(track('active', 'ok')));
+    expect(triageRank(track('scheduled', 'breach'))).toBeLessThan(triageRank(track('scheduled', 'ok')));
+  });
+
+  it('puts work needing a person above every live order', () => {
+    for (const risk of ['breach', 'tight', 'ok'] as SlaRisk[]) {
+      expect(triageRank(track('held', 'ok'))).toBeLessThan(triageRank(track('active', risk)));
+      expect(triageRank(track('blocked', 'ok'))).toBeLessThan(triageRank(track('active', risk)));
+    }
+    expect(triageRank(track('held', 'ok'))).toBeLessThan(triageRank(track('blocked', 'ok')));
+  });
+
+  it('sinks finished orders whatever their risk was on the day', () => {
+    for (const risk of ['breach', 'tight', 'ok'] as SlaRisk[]) {
+      expect(triageRank(track('delivered', risk))).toBeGreaterThan(triageRank(track('active', 'ok')));
+      expect(triageRank(track('delivered', risk))).toBeGreaterThan(triageRank(track('scheduled', 'ok')));
+    }
+  });
+
+  it('scores every state and risk combination, with no ties across urgency bands', () => {
+    const states: OrderState[] = ['held', 'blocked', 'scheduled', 'active', 'delivered'];
+    const risks: SlaRisk[] = ['ok', 'tight', 'breach'];
+    for (const state of states) {
+      for (const risk of risks) {
+        const rank = triageRank(track(state, risk));
+        expect(Number.isInteger(rank)).toBe(true);
+        expect(rank).toBeGreaterThanOrEqual(0);
+      }
+    }
+    // A live order at any risk level must never tie with a delivered one.
+    for (const risk of risks) {
+      expect(triageRank(track('active', risk))).not.toBe(triageRank(track('delivered', risk)));
+    }
   });
 });

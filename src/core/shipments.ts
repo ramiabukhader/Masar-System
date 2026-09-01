@@ -56,11 +56,19 @@ export interface ShipmentBuildResult {
 export function accessMinutes(access: AccessSurvey, classAUnits: number): number {
   if (classAUnits === 0) return access.parkingDifficult ? DIFFICULT_PARKING_MIN : 0;
 
+  // Nothing on an unsurveyed record is a fact — not the floor, and not the lift. Reading
+  // `hasElevator` off a survey nobody took priced the carry at 0.5 min/floor instead of
+  // 4, making an address we know nothing about CHEAPER than one we have been to. That is
+  // the inversion `surveyed` exists to prevent: "planned as a risk, not as a fact".
   const floor = access.surveyed ? access.floor : UNSURVEYED_ASSUMED_FLOOR;
-  const usableElevator = access.hasElevator && access.elevatorFitsAppliance;
+  const usableElevator = access.surveyed && access.hasElevator && access.elevatorFitsAppliance;
 
   let perFloor = usableElevator ? ELEVATOR_MIN_PER_FLOOR : STAIR_MIN_PER_FLOOR_CLASS_A;
-  if (!usableElevator && access.narrowStairs) perFloor *= NARROW_STAIRS_MULTIPLIER;
+  // An unsurveyed stairwell is not a known-wide one either, so it carries the same
+  // penalty rather than being quietly assumed clear.
+  if (!usableElevator && (access.narrowStairs || !access.surveyed)) {
+    perFloor *= NARROW_STAIRS_MULTIPLIER;
+  }
 
   const carry = floor * perFloor * classAUnits;
   return carry + (access.parkingDifficult ? DIFFICULT_PARKING_MIN : 0);

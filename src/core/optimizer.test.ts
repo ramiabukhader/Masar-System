@@ -248,10 +248,11 @@ describe('time-dependent travel', () => {
     const at12 = new Date(PLAN_DATE.getTime() + 12 * 3_600_000);
     const jerusalem = { location: { lat: 31.78, lng: 35.22 }, zone: 'jerusalem' as const };
 
-    for (const spelling of [
+    const spellings: Record<string, number>[] = [
       { 'central|jerusalem': Infinity, 'north|jerusalem': Infinity, 'south|jerusalem': Infinity, 'jerusalem|jordan_valley': Infinity },
       { 'jerusalem|central': Infinity, 'jerusalem|north': Infinity, 'jerusalem|south': Infinity, 'jordan_valley|jerusalem': Infinity },
-    ]) {
+    ];
+    for (const spelling of spellings) {
       const closed = new TimeDependentTravelProvider({ degradedCrossings: spelling });
       for (const zone of ['central', 'north', 'south', 'jordan_valley'] as const) {
         const leg = closed.leg({ location: { lat: 32.0, lng: 35.3 }, zone }, jerusalem, at12);
@@ -268,6 +269,48 @@ describe('time-dependent travel', () => {
       at(9),
     );
     expect(Number.isFinite(leg.minutes)).toBe(false);
+  });
+});
+
+describe('access time on an unsurveyed address', () => {
+  const survey = (over: Partial<AccessSurvey>): AccessSurvey => ({
+    floor: 3, hasElevator: false, elevatorFitsAppliance: false,
+    narrowStairs: false, parkingDifficult: false, surveyed: true, ...over,
+  });
+
+  it('never prices an address nobody visited below one that was surveyed', () => {
+    // `surveyed: false` means "planned as a risk, not as a fact". The floor was already
+    // treated that way; the lift was read straight off the survey that was never taken,
+    // so an unknown address came out EIGHT times cheaper per floor than a known one.
+    const unsurveyed = accessMinutes(
+      survey({ surveyed: false, hasElevator: true, elevatorFitsAppliance: true }), 2,
+    );
+    const surveyedWithLift = accessMinutes(
+      survey({ surveyed: true, hasElevator: true, elevatorFitsAppliance: true }), 2,
+    );
+    expect(unsurveyed).toBeGreaterThan(surveyedWithLift);
+  });
+
+  it('ignores every unrecorded flag, not just the floor', () => {
+    // Whatever the never-taken survey happens to contain, the answer must be the same.
+    const base = accessMinutes(survey({ surveyed: false, hasElevator: false, elevatorFitsAppliance: false, narrowStairs: false }), 1);
+    for (const over of [
+      { hasElevator: true, elevatorFitsAppliance: true },
+      { hasElevator: true, elevatorFitsAppliance: false },
+      { narrowStairs: true },
+      { floor: 0 },
+      { floor: 9 },
+    ]) {
+      expect(accessMinutes(survey({ surveyed: false, ...over }), 1)).toBe(base);
+    }
+  });
+
+  it('still trusts a survey that was actually taken', () => {
+    const stairs = accessMinutes(survey({ surveyed: true, floor: 3 }), 1);
+    const lift = accessMinutes(survey({ surveyed: true, floor: 3, hasElevator: true, elevatorFitsAppliance: true }), 1);
+    expect(lift).toBeLessThan(stairs);
+    // A lift too small for the appliance is no lift at all.
+    expect(accessMinutes(survey({ surveyed: true, floor: 3, hasElevator: true, elevatorFitsAppliance: false }), 1)).toBe(stairs);
   });
 });
 
