@@ -727,7 +727,11 @@ export class WavePlanner {
       while (improved) {
         improved = false;
         const n = route.shipments.length;
-        if (n < 3) break;
+        // Two stops still have two orders, and the second may be the cheaper one. The
+        // or-opt pass below reaches it with segLength 1, so the guard only needs to
+        // exclude routes with nothing to reorder. (No two-stop route survives the
+        // current wave, so this changes no plan today — it closes the gap.)
+        if (n < 2) break;
 
         for (let segLength = 1; segLength <= 3 && !improved; segLength++) {
           for (let from = 0; from + segLength <= n && !improved; from++) {
@@ -1051,17 +1055,24 @@ export class WavePlanner {
     assignment: Assignment,
   ): { earliest: number; latest: number } {
     const length = this.config.windowLengthMinutes;
-    let earliest = round15(arriveMin - length / 3);
-    let latest = earliest + length;
+    const shiftStart = assignment.driver.shiftStartMin;
+    const deadline = round15(dueMin);
 
-    if (latest > dueMin) {
-      latest = round15(dueMin);
-      earliest = latest - length;
-    }
-    if (earliest < assignment.driver.shiftStartMin) {
-      earliest = assignment.driver.shiftStartMin;
-      latest = earliest + length;
-    }
+    // Both bounds are applied when the window is built, rather than as two corrections
+    // in sequence. Clamping to the deadline and THEN to the shift start recomputed
+    // `latest` from the new `earliest`, which threw the deadline clamp away: a stop due
+    // before 10:00 came back with a window ending at 10:00, i.e. the customer was
+    // promised a slot that runs past the deadline the plan had just guaranteed. Not
+    // reachable on today's data — every generated dueAt is 11:00 or later — but it is
+    // the guard, not the data, that should be keeping that promise.
+    const earliest = Math.max(shiftStart, round15(arriveMin - length / 3));
+
+    // A shorter window is fine; one that outlives the promise is not. `latest` cannot
+    // fall below the arrival it describes: evaluateRoute guarantees
+    // shiftStart <= arriveMin <= dueMin - slaBufferMinutes, and the Math.max is here so
+    // that an slaBuffer under 15 minutes cannot invert the window through round15.
+    const latest = Math.max(arriveMin, Math.min(earliest + length, deadline));
+
     return { earliest, latest };
   }
 }

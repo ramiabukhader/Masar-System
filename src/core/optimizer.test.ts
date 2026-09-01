@@ -467,6 +467,45 @@ describe('full wave', () => {
     expect(plan.id).toContain('2026-09-15');
   });
 
+  it('never promises a window that outlives the deadline it is built from', async () => {
+    // The demo's generated dueAt is always 11:00 or later, which is the only reason this
+    // never showed. A stop due EARLY used to come back with a window past its own SLA:
+    // the deadline clamp ran first, then the shift-start clamp recomputed `latest` from
+    // the new `earliest` and threw the deadline away.
+    const early = shipment({ id: 'EARLY', dueAt: at(9, 30) });
+    const plan = planWave({
+      waveName: 'window-probe',
+      planDate: PLAN_DATE,
+      shipments: [early],
+      vehicles: VEHICLES,
+      drivers: DRIVERS,
+      nodes: NODE_MAP,
+      travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+    });
+
+    const stop = plan.routes.flatMap((r) => r.stops).find((s) => s.shipmentId === early.id);
+    expect(stop).toBeDefined();
+    expect(stop!.promisedWindow.latest.getTime()).toBeLessThanOrEqual(early.dueAt.getTime());
+    // And it still contains the arrival it describes.
+    expect(stop!.arriveAt.getTime()).toBeGreaterThanOrEqual(stop!.promisedWindow.earliest.getTime());
+    expect(stop!.arriveAt.getTime()).toBeLessThanOrEqual(stop!.promisedWindow.latest.getTime());
+  });
+
+  it('keeps every promised window inside the deadline across the whole wave', async () => {
+    const { plan, shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+    const dueOf = new Map(shipments.map((s) => [s.id, s.dueAt.getTime()]));
+    for (const route of plan.routes) {
+      const driver = DRIVER_MAP.get(route.driverId)!;
+      for (const stop of route.stops) {
+        expect(stop.promisedWindow.latest.getTime()).toBeLessThanOrEqual(dueOf.get(stop.shipmentId)!);
+        // Never before the crew is on shift either.
+        const earliestMin =
+          (stop.promisedWindow.earliest.getTime() - PLAN_DATE.getTime()) / 60_000;
+        expect(earliestMin).toBeGreaterThanOrEqual(driver.shiftStartMin);
+      }
+    }
+  });
+
   it('explains every unassigned shipment with an actionable reason', async () => {
     const { plan } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
     for (const item of plan.unassigned) {
