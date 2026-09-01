@@ -92,4 +92,32 @@ describe('baseline under disruption', () => {
     expect(congested.totalCost).toBeGreaterThan(calm.totalCost);
     expect(congested.totalDriveMinutes).toBeGreaterThan(calm.totalDriveMinutes);
   });
+
+  it('prices the same drops as the plan, so a saving cannot come from not delivering', async () => {
+    // The baseline allocates as many branch vans as it likes and always delivers
+    // everything; the optimiser is capped by a real fleet. Pricing the full set against
+    // the plan's assigned subset made the headline saving grow whenever the fleet failed.
+    const degradedCrossings = { 'north|central': 3.2, 'north|south': 3.2 };
+    const r = await runDemoWave({
+      planDate: PLAN_DATE,
+      orderCount: 78,
+      travelOptions: { degradedCrossings, networkFactor: 1.12 },
+      unavailableVehicleIds: ['VEH-T1'],
+    });
+    expect(r.plan.metrics.unassignedCount).toBeGreaterThan(0);
+
+    const assigned = new Set(r.plan.routes.flatMap((rt) => rt.stops.map((s) => s.shipmentId)));
+    const likeForLike = planBaseline({
+      shipments: r.shipments.filter((s) => assigned.has(s.id)),
+      nodes: NODE_MAP,
+      planDate: PLAN_DATE,
+      travel: new CachedTravelProvider(
+        new TimeDependentTravelProvider({ degradedCrossings, networkFactor: 1.12 }),
+      ),
+    });
+
+    // Both columns cover exactly the drops the plan served.
+    expect(likeForLike.dropCount + likeForLike.undeliverableCount).toBe(assigned.size);
+    expect(likeForLike.dropCount).toBe(r.plan.metrics.assignedCount);
+  });
 });
