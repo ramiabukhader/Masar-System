@@ -5,6 +5,7 @@ import { NODE_MAP } from '../../data/gazetteer';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { fill, loc, type Lang } from '../i18n';
 import { reasonText } from '../reasons';
+import { activatable } from '../activate';
 
 interface Props {
   t: (key: string) => string;
@@ -172,7 +173,7 @@ export function ControlTower({
                           key={route.id}
                           className="clickable"
                           data-selected={selectedRouteId === route.id}
-                          onClick={() => setSelectedRouteId(route.id)}
+                          {...activatable(() => setSelectedRouteId(route.id))}
                         >
                           <td><span className="dot" data-on={selectedRouteId === route.id} /></td>
                           <td>
@@ -370,11 +371,16 @@ function CompareRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+/**
+ * A real button with `role="switch"`, not a styled div. These three switches are the
+ * Control Tower's main interaction, and as a div they were unreachable by Tab, deaf to
+ * Enter and Space, and announced to a screen reader as neither a control nor on/off.
+ */
 function Toggle({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
   return (
-    <div className="switch-row" onClick={onToggle} style={{ cursor: 'pointer' }}>
+    <button type="button" className="switch-row" role="switch" aria-checked={on} onClick={onToggle}>
       <span className="switch" data-on={on} />
       <span>{label}</span>
-    </div>
+    </button>
   );
 }

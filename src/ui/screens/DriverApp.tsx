@@ -4,6 +4,7 @@ import { PRODUCT_MAP } from '../../data/catalog';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { NODE_MAP } from '../../data/gazetteer';
 import { loc, type Lang } from '../i18n';
+import { activatable } from '../activate';
 
 interface Props {
   t: (key: string) => string;
@@ -200,12 +201,15 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
                           key={item.id}
                           className="check-item"
                           data-done={isDone}
-                          onClick={() => {
+                          role="checkbox"
+                          aria-checked={isDone}
+                          aria-label={t(item.key)}
+                          {...activatable(() => {
                             const next = new Set(checked);
                             if (next.has(item.id)) next.delete(item.id);
                             else next.add(item.id);
                             setChecked(next);
-                          }}
+                          })}
                         >
                           <span className="check-box">{isDone ? '✓' : ''}</span>
                           <span>{t(item.key)}</span>

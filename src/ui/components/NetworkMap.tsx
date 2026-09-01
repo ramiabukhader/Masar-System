@@ -1,5 +1,6 @@
 import { LOCALITIES } from '../../data/gazetteer';
 import type { DeliveryPlan, LatLng, Node, Shipment } from '../../core/types';
+import { activatable } from '../activate';
 
 const BOUNDS = { latMin: 31.38, latMax: 32.52, lngMin: 34.86, lngMax: 35.58 };
 const WIDTH = 380;
@@ -88,8 +89,9 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
           <g
             key={route.id}
             style={{ cursor: 'pointer' }}
-            onClick={() => onSelectRoute(route.id)}
+            role="button"
             aria-label={route.id}
+            {...activatable(() => onSelectRoute(route.id))}
           >
             <polyline
               points={points.map((p) => `${p.x},${p.y}`).join(' ')}

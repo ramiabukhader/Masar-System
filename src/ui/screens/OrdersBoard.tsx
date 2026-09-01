@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { MILESTONES, summarise, type OrderState, type OrderTrack } from '../../core/lifecycle';
+import { activatable } from '../activate';
 import { LOCALITY_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { fmtDue, fmtNum, fmtTime, PLAN_DATE } from '../usePlan';
@@ -144,7 +145,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                       <tr
                         key={track.orderId}
                         className="clickable"
-                        onClick={() => onOpenOrder(track.orderId)}
+                        {...activatable(() => onOpenOrder(track.orderId))}
                       >
                         <td className="mono">{track.orderId}</td>
                         <td>

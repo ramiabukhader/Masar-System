@@ -5,6 +5,7 @@ import { NODE_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { VEHICLE_MAP } from '../../data/fleet';
 import { loc, type Lang } from '../i18n';
+import { activatable } from '../activate';
 
 interface Props {
   t: (key: string) => string;
@@ -136,7 +137,14 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                     const product = PRODUCT_MAP.get(line.sku)!;
                     const isVerified = verified.has(line.loadSeq);
                     return (
-                      <tr key={line.loadSeq} className="clickable" onClick={() => toggle(line.loadSeq)}>
+                      <tr
+                        key={line.loadSeq}
+                        className="clickable"
+                        role="checkbox"
+                        aria-checked={isVerified}
+                        aria-label={`${line.loadSeq}. ${lang === 'ar' ? product.nameAr : product.nameEn} — ${t(line.zoneInVehicle)} — ${t('deliverySeq')} ${line.deliverySeq}`}
+                        {...activatable(() => toggle(line.loadSeq))}
+                      >
                         <td className="mono" style={{ fontWeight: 700, color: 'var(--progress)' }}>{line.loadSeq}</td>
                         <td>
                           <div>{lang === 'ar' ? product.nameAr : product.nameEn}</div>
