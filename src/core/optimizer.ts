@@ -475,6 +475,18 @@ export class WavePlanner {
     while (pending.length > 0) {
       if (Date.now() - this.startedAt > this.config.timeBudgetMs) {
         this.trace('construct', 'budgetReached', { count: pending.length });
+        // A shipment is either on a route or explained — never neither. Breaking out
+        // with `pending` still full used to drop those deliveries from the plan
+        // entirely: absent from every route, absent from `unassigned`, and absent from
+        // the counts, so the wave reported a clean success while quietly abandoning
+        // them. Their reason is the budget, not the fleet, and it has to say so.
+        for (const shipment of pending) {
+          this.unassigned.push({
+            shipmentId: shipment.id,
+            reason: 'planner_budget_exhausted',
+            detail: `The wave hit its ${this.config.timeBudgetMs}ms planning budget before this shipment was placed. It is not necessarily unservable — re-run with a longer budget.`,
+          });
+        }
         break;
       }
 

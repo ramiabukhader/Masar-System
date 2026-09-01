@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildLoadPlan, evaluateRoute, DEFAULT_CONFIG } from './optimizer';
-import { TimeDependentTravelProvider } from './travel';
+import { buildLoadPlan, evaluateRoute, planWave, DEFAULT_CONFIG } from './optimizer';
+import { CachedTravelProvider, TimeDependentTravelProvider } from './travel';
 import { accessMinutes, serviceMinutesFor } from './shipments';
 import { runDemoWave } from '../data/scenario';
 import { PRODUCT_MAP } from '../data/catalog';
 import { NODE_MAP } from '../data/gazetteer';
-import { VEHICLE_MAP, DRIVER_MAP } from '../data/fleet';
+import { VEHICLES, DRIVERS, VEHICLE_MAP, DRIVER_MAP } from '../data/fleet';
 import type { AccessSurvey, Shipment, ShipmentUnit } from './types';
 
 const PLAN_DATE = new Date(2026, 8, 15);
@@ -331,6 +331,36 @@ describe('full wave', () => {
       );
       expect(route.loadPlan.length).toBe(plannedUnits);
     }
+  });
+
+  it('accounts for every shipment when the planning budget runs out', async () => {
+    const { shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+
+    // A budget this small bites during construction, which is the case that used to
+    // drop the remaining shipments on the floor: absent from every route, absent from
+    // `unassigned`, and absent from the counts, while the wave reported a clean success.
+    const plan = planWave({
+      waveName: 'budget-probe',
+      planDate: PLAN_DATE,
+      shipments,
+      vehicles: VEHICLES,
+      drivers: DRIVERS,
+      nodes: NODE_MAP,
+      travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+      config: { timeBudgetMs: 1 },
+    });
+
+    expect(plan.solverLog.some((entry) => entry.code === 'budgetReached')).toBe(true);
+    expect(plan.metrics.assignedCount + plan.metrics.unassignedCount).toBe(shipments.length);
+
+    // And the plan must not read as a clean success while it is carrying unplaced work.
+    expect(plan.solverLog.some((entry) => entry.code === 'routesBuiltWithUnplaced')).toBe(true);
+
+    // Every dropped shipment says the budget stopped it, not that the fleet could not
+    // serve it — those call for opposite responses from the planner.
+    const budgetStopped = plan.unassigned.filter((u) => u.reason === 'planner_budget_exhausted');
+    expect(budgetStopped.length).toBeGreaterThan(0);
+    for (const item of budgetStopped) expect(item.detail).toContain('budget');
   });
 
   it('explains every unassigned shipment with an actionable reason', async () => {

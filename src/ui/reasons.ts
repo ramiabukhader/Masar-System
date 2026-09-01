@@ -28,6 +28,10 @@ const REASONS: Record<string, { ar: string; en: string }> = {
   },
   no_eligible_vehicle: { ar: 'لا توجد مركبة أو سائق مؤهل لهذا الطلب', en: 'No eligible vehicle or driver for this order' },
   not_planned: { ar: 'خارج الموجة الحالية', en: 'Outside the current wave' },
+  planner_budget_exhausted: {
+    ar: 'انتهت مهلة التخطيط قبل جدولة الطلب — ليس بالضرورة غير قابل للخدمة، أعد تشغيل الموجة بمهلة أطول',
+    en: 'Planning time ran out before this order was scheduled — not necessarily unservable, re-run the wave with a longer budget',
+  },
 
   // Hard-constraint rejections
   zone_ineligible_vehicle: { ar: 'المركبة غير مخوّلة لدخول منطقة التسليم', en: 'Vehicle is not eligible for the delivery zone' },
