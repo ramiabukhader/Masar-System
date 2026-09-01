@@ -76,10 +76,24 @@ export function offerSlots(input: PromiseInput): SlotOffer[] {
     }
 
     const hours = (slot.endMin - slot.startMin) / 60;
-    const capacityStops = Math.max(
-      1,
-      Math.round(eligibleVehicles.length * hours * STOPS_PER_VEHICLE_HOUR),
+
+    /**
+     * A vehicle eligible for four zones is still one vehicle, and it can only be in one
+     * of them during a given slot. Counting the whole eligible sub-fleet per zone sold
+     * VEH-T1 as 16 morning stops against a physical 4, and the fleet as 121 against 55 —
+     * so `utilisation` was a fraction of a denominator that did not exist, never reached
+     * FULL_AT, and `deliverable` could not go false however loaded the network was.
+     *
+     * Each vehicle therefore contributes its slot capacity split across the zones it may
+     * enter. That is still an approximation — it assumes demand is spread evenly over a
+     * vehicle's zones rather than solving where it will actually be — but it is bounded
+     * by the real fleet, which is what makes the fullness test mean anything.
+     */
+    const vehicleStops = eligibleVehicles.reduce(
+      (sum, vehicle) => sum + 1 / Math.max(vehicle.eligibleZones.length, 1),
+      0,
     );
+    const capacityStops = Math.max(1, Math.round(vehicleStops * hours * STOPS_PER_VEHICLE_HOUR));
     const utilisation = plannedStops / capacityStops;
 
     /**
