@@ -1,6 +1,6 @@
 import type { TravelTimeProvider } from './travel';
 import { haversineKm } from './geo';
-import type { Node, Shipment } from './types';
+import type { Node, Shipment, Zone } from './types';
 
 /**
  * Models how the network runs TODAY, so the optimised plan has something to be measured
@@ -27,6 +27,21 @@ const BRANCH_VAN = {
 const TYPICAL_DROPS_PER_TRIP = 6;
 
 const SHIFT_START_MIN = 7 * 60;
+
+/**
+ * The Jerusalem access regime is a permit boundary, not a longer drive.
+ *
+ * `Zone` exists because it "is the unit at which vehicle and driver eligibility is
+ * granted, which is how Jerusalem access is enforced structurally rather than by anyone
+ * remembering a rule" (types.ts), and not one of the 13 real vehicles holds Jerusalem
+ * together with any other zone. The generic BRANCH_VAN has no eligibility at all, so the
+ * baseline used to drive straight across a boundary the optimised side is structurally
+ * forbidden to cross — a BR-JRS van out to a north-zone customer, 325.3 km — and those
+ * kilometres inflated the "before" column the saving is measured against.
+ */
+function crossesAccessRegime(from: Zone, to: Zone): boolean {
+  return (from === 'jerusalem') !== (to === 'jerusalem');
+}
 
 export interface BaselineRoute {
   branchId: string;
@@ -183,6 +198,8 @@ function simulateTrip(
       // added to a running total, or one blocked stop turns every headline number into
       // `Infinity`. The driver cannot take this leg, so it is not a candidate.
       if (!Number.isFinite(leg.minutes)) continue;
+      // Nor is a permit boundary something a branch van can price its way across.
+      if (crossesAccessRegime(branch.zone, remaining[i].zone)) continue;
       if (leg.minutes < bestMinutes) {
         bestMinutes = leg.minutes;
         bestIndex = i;

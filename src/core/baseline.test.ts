@@ -3,6 +3,7 @@ import { planBaseline } from './baseline';
 import { CachedTravelProvider, TimeDependentTravelProvider } from './travel';
 import { runDemoWave } from '../data/scenario';
 import { NODE_MAP } from '../data/gazetteer';
+import { VEHICLES } from '../data/fleet';
 
 const PLAN_DATE = new Date(2026, 8, 15);
 
@@ -50,12 +51,20 @@ describe('baseline under disruption', () => {
     expect(result.dropCount + result.undeliverableCount).toBe(shipments.length);
   });
 
-  it('serves everything when no crossing is shut', async () => {
+  it('leaves nothing unserved for want of a road when no crossing is shut', async () => {
     const { shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
     const result = baselineWith({}, shipments);
 
-    expect(result.undeliverableCount).toBe(0);
-    expect(result.dropCount).toBe(shipments.length);
+    // With every crossing open, the only stops a branch van cannot take are the ones on
+    // the far side of the Jerusalem permit boundary — a rule, not a road.
+    const zoneOf = new Map(shipments.map((s) => [s.id, s.zone]));
+    const branchZoneOf = new Map(shipments.map((s) => [s.id, NODE_MAP.get(s.sellingBranchId)?.zone]));
+    const undelivered = result.routes.flatMap((r) => r.undeliveredShipmentIds);
+
+    for (const id of undelivered) {
+      expect((zoneOf.get(id) === 'jerusalem') !== (branchZoneOf.get(id) === 'jerusalem')).toBe(true);
+    }
+    expect(result.dropCount + result.undeliverableCount).toBe(shipments.length);
     expect(Number.isFinite(result.totalCost)).toBe(true);
   });
 
@@ -116,8 +125,43 @@ describe('baseline under disruption', () => {
       ),
     });
 
-    // Both columns cover exactly the drops the plan served.
+    // Both columns are offered exactly the drops the plan served — nothing extra goes
+    // into the "before" numerator. What the baseline then cannot serve is reported
+    // rather than silently delivered, so it never takes credit for a stop no branch van
+    // may legally reach.
     expect(likeForLike.dropCount + likeForLike.undeliverableCount).toBe(assigned.size);
-    expect(likeForLike.dropCount).toBe(r.plan.metrics.assignedCount);
+    expect(likeForLike.dropCount).toBeLessThanOrEqual(r.plan.metrics.assignedCount);
+  });
+
+  it('never drives a branch van across the Jerusalem permit boundary', async () => {
+    // Zone is "the unit at which vehicle and driver eligibility is granted, which is how
+    // Jerusalem access is enforced structurally". Not one of the 13 real vehicles holds
+    // jerusalem together with another zone — but BRANCH_VAN had no eligibility at all,
+    // so the baseline priced a BR-JRS van out to a north-zone customer and charged the
+    // "before" column 325 km for a journey no vehicle may make.
+    const { plan, shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+    expect(VEHICLES.filter((v) => v.eligibleZones.includes('jerusalem') && v.eligibleZones.length > 1))
+      .toHaveLength(0);
+
+    const zoneOf = new Map(shipments.map((s) => [s.id, s.zone]));
+    const result = planBaseline({
+      shipments,
+      nodes: NODE_MAP,
+      planDate: PLAN_DATE,
+      travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+    });
+
+    for (const route of result.routes) {
+      const branchZone = NODE_MAP.get(route.branchId)!.zone;
+      for (const stop of route.stops) {
+        const stopZone = zoneOf.get(stop.shipmentId)!;
+        expect((stopZone === 'jerusalem') === (branchZone === 'jerusalem')).toBe(true);
+      }
+    }
+
+    // The stops it may not reach are reported, not silently dropped.
+    expect(result.undeliverableCount).toBeGreaterThan(0);
+    expect(result.dropCount + result.undeliverableCount).toBe(shipments.length);
+    expect(plan.metrics.assignedCount).toBeGreaterThan(result.dropCount);
   });
 });
