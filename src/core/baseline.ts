@@ -84,9 +84,16 @@ export function planBaseline(input: {
     // system still groups "everything going south today" onto one van — giving the
     // baseline that credit keeps the comparison honest. What it cannot do is consolidate
     // across branches, plan by cube, or sequence against time-dependent travel.
+    //
+    // Urgency day is counted from `planDate` — local midnight of the delivery day — and
+    // not from the epoch. Bucketing on `dueAt.getTime() / 86_400_000` measures the UTC
+    // calendar, so the day boundary moved with the host's offset and landed somewhere
+    // inside the 15-hour spread of due times. In Asia/Hebron, the timezone this runs in,
+    // it fell outside that spread altogether and collapsed every shipment into one
+    // bucket, quietly disabling the batching this comment describes.
     const queue = [...branchShipments].sort((a, b) => {
-      const dayA = Math.floor(a.dueAt.getTime() / 86_400_000);
-      const dayB = Math.floor(b.dueAt.getTime() / 86_400_000);
+      const dayA = Math.floor((a.dueAt.getTime() - planDate.getTime()) / 86_400_000);
+      const dayB = Math.floor((b.dueAt.getTime() - planDate.getTime()) / 86_400_000);
       if (dayA !== dayB) return dayA - dayB;
       return (
         haversineKm(branch.location, a.destination) - haversineKm(branch.location, b.destination)

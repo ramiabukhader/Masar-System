@@ -59,6 +59,29 @@ describe('baseline under disruption', () => {
     expect(Number.isFinite(result.totalCost)).toBe(true);
   });
 
+  it('batches by urgency day counted from the plan date, not from the UTC calendar', async () => {
+    const { shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+
+    // `dueAt` runs 11-26h after local midnight. Bucketing on the raw epoch measured the
+    // UTC calendar instead, so the day boundary slid with the host's offset: the total
+    // cost swung 13% between timezones, and in Asia/Hebron (+03:00) the boundary fell
+    // outside the spread entirely and collapsed every shipment into a single bucket,
+    // silently disabling the batching. Counted from planDate, the split is a property of
+    // the data.
+    const buckets = new Set(
+      shipments.map((s) => Math.floor((s.dueAt.getTime() - PLAN_DATE.getTime()) / 86_400_000)),
+    );
+    expect(buckets.size).toBeGreaterThan(1);
+
+    // The comparator must agree with that split for every pair, whatever the host offset.
+    const sorted = [...shipments].sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime());
+    const dayOf = (s: (typeof shipments)[number]) =>
+      Math.floor((s.dueAt.getTime() - PLAN_DATE.getTime()) / 86_400_000);
+    for (let i = 1; i < sorted.length; i++) {
+      expect(dayOf(sorted[i])).toBeGreaterThanOrEqual(dayOf(sorted[i - 1]));
+    }
+  });
+
   it('costs more to run once the network slows down', async () => {
     const { shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
     const calm = baselineWith({}, shipments);
