@@ -124,7 +124,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
         {/* ---- Load manifest ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('loadManifest')}<InfoTip text={t('loadOrderHint')} label={t('explain')} /></h2>
+            <h2>{t('loadManifest')}<InfoTip text={t('loadOrderHint')} label={`${t('explain')}: ${t('loadManifest')}`} /></h2>
             <span className="sub">{verified.size}/{route.loadPlan.length} {t('verified')}</span>
           </div>
           <div className="panel-body">

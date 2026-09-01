@@ -165,7 +165,7 @@ export function App() {
           <div className="topbar-title">
             <h1>
               {t(titleKey)}
-              <InfoTip text={t(subKey)} label={t('explain')} />
+              <InfoTip text={t(subKey)} label={`${t('explainScreen')}: ${t(titleKey)}`} />
             </h1>
             {openTrack && (
               <button className="btn ghost sm" onClick={() => setOpenOrderId(null)}>

@@ -55,7 +55,7 @@ export function DeliveryOptions({ t, lang, state }: Props) {
           showroom, instead of confirming a window by message the day before. */}
       <div className="panel">
         <div className="panel-head">
-          <h2>{t('promiseTitle')}<InfoTip text={t('promiseSub')} label={t('explain')} /></h2>
+          <h2>{t('promiseTitle')}<InfoTip text={t('promiseSub')} label={`${t('explain')}: ${t('promiseTitle')}`} /></h2>
           <div className="zone-picker">
             <span>{t('promiseZone')}</span>
             {ZONES.map((option) => (
@@ -116,7 +116,7 @@ export function DeliveryOptions({ t, lang, state }: Props) {
 
       {/* Comparison first — the whole menu at a glance. */}
       <div className="panel">
-        <div className="panel-head"><h2>{t('optionsTitle')}<InfoTip text={t('optionsNote')} label={t('explain')} /></h2></div>
+        <div className="panel-head"><h2>{t('optionsTitle')}<InfoTip text={t('optionsNote')} label={`${t('explain')}: ${t('optionsTitle')}`} /></h2></div>
         <div className="panel-body tight">
           <div className="scroll-x">
             <table>

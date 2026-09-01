@@ -35,6 +35,7 @@ export const STRINGS: Dict = {
   after: { ar: 'بعد التحسين', en: 'Optimised' },
   saving: { ar: 'التوفير', en: 'Saving' },
   explain: { ar: 'شرح', en: 'Explain' },
+  explainScreen: { ar: 'شرح الشاشة', en: 'About this screen' },
   guardLabel: { ar: 'ما يمنعه هذا الإجراء', en: 'What this step prevents' },
   processIntro: {
     ar: 'من البيع في المعرض حتى التسليم عند باب الزبون وتسوية المبالغ. كل خطوة لها مسؤول، وكل تحذير يمنع خسارة محددة.',

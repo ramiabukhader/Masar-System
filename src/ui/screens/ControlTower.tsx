@@ -60,7 +60,7 @@ export function ControlTower({
         {/* ---- Before / after ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('planTitle')}<InfoTip text={t('baselineCaveat')} label={t('explain')} /></h2>
+            <h2>{t('planTitle')}<InfoTip text={t('baselineCaveat')} label={`${t('explain')}: ${t('planTitle')}`} /></h2>
             <span className="sub">{plan.id}</span>
           </div>
           <div className="panel-body">
@@ -91,7 +91,7 @@ export function ControlTower({
         {/* ---- Disruption simulator ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('disruptions')}<InfoTip text={t('disruptionHint')} label={t('explain')} /></h2>
+            <h2>{t('disruptions')}<InfoTip text={t('disruptionHint')} label={`${t('explain')}: ${t('disruptions')}`} /></h2>
             {loading && <span className="sub">{t('replanning')}</span>}
           </div>
           <div className="panel-body">
@@ -278,7 +278,7 @@ export function ControlTower({
       {/* ---- Exceptions ---- */}
       <div className="grid grid-2">
         <div className="panel">
-          <div className="panel-head"><h2>{t('kpiUnassigned')}<InfoTip text={t('unassignedHint')} label={t('explain')} /></h2><span className="sub">{plan.unassigned.length}</span></div>
+          <div className="panel-head"><h2>{t('kpiUnassigned')}<InfoTip text={t('unassignedHint')} label={`${t('explain')}: ${t('kpiUnassigned')}`} /></h2><span className="sub">{plan.unassigned.length}</span></div>
           <div className="panel-body">
             {plan.unassigned.length === 0 ? (
               <div className="empty">{t('noneToday')}</div>
@@ -297,7 +297,7 @@ export function ControlTower({
         </div>
 
         <div className="panel">
-          <div className="panel-head"><h2>{t('heldOrders')}<InfoTip text={t('heldHint')} label={t('explain')} /></h2><span className="sub">{held.length}</span></div>
+          <div className="panel-head"><h2>{t('heldOrders')}<InfoTip text={t('heldHint')} label={`${t('explain')}: ${t('heldOrders')}`} /></h2><span className="sub">{held.length}</span></div>
           <div className="panel-body">
             <div className="scroll">
               {held.map((item) => (
@@ -338,7 +338,7 @@ function ExceptionRow({
     <div className="exception-row">
       <span className="mono">{id}</span>
       <span className="chip warn">{reason}</span>
-      <InfoTip text={detail} label={t('technicalDetail')} />
+      <InfoTip text={detail} label={`${t('technicalDetail')}: ${id}`} />
     </div>
   );
 }

@@ -252,7 +252,7 @@ export function ProcessGuide({ t, lang }: { t: (key: string) => string; lang: La
     <div className="grid">
       <div className="panel">
         <div className="panel-head">
-          <h2>{t('navProcess')}<InfoTip text={t('processIntro')} label={t('explain')} /></h2>
+          <h2>{t('navProcess')}<InfoTip text={t('processIntro')} label={`${t('explain')}: ${t('navProcess')}`} /></h2>
           <span className="sub">{STEPS.length} {lang === 'ar' ? 'خطوة' : 'steps'}</span>
         </div>
         <div className="panel-body">
@@ -271,7 +271,7 @@ export function ProcessGuide({ t, lang }: { t: (key: string) => string; lang: La
                         keeping and worth reading once, but printing all 23 of
                         them turned the guide into a wall you had to scroll past
                         rather than a list you could scan. */}
-                    {step.guard && <InfoTip text={step.guard[lang]} label={t('guardLabel')} />}
+                    {step.guard && <InfoTip text={step.guard[lang]} label={`${t('guardLabel')}: ${step.title[lang]}`} />}
                   </div>
                   <p className="flow-desc">{step.desc[lang]}</p>
                 </div>
