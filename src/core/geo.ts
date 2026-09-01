@@ -1,3 +1,4 @@
+import { ZONES } from './types';
 import type { LatLng, Zone } from './types';
 
 const EARTH_RADIUS_KM = 6371;
@@ -44,8 +45,18 @@ const ZONE_PAIR_CIRCUITY: Record<string, number> = {
   'jerusalem|jordan_valley': 1.9,
 };
 
-function zonePairKey(a: Zone, b: Zone): string {
-  return [a, b].sort().join('|');
+/**
+ * Canonical key for an unordered zone pair.
+ *
+ * Ordered by ZONES — the geographic order the tables below are written in — and NOT by
+ * Array.prototype.sort(), which is lexicographic. The two disagree for five of the ten
+ * pairs ('central' < 'jerusalem' < 'jordan_valley' < 'north' < 'south' is not the
+ * north-to-south order anyone writes a crossing table in), and a key that misses its
+ * table falls through to the default without saying so. Exported because travel.ts keys
+ * its crossing table the same way and the two must not drift apart again.
+ */
+export function zonePairKey(a: Zone, b: Zone): string {
+  return ZONES.indexOf(a) <= ZONES.indexOf(b) ? `${a}|${b}` : `${b}|${a}`;
 }
 
 export function circuityFactor(fromZone: Zone, toZone: Zone): number {

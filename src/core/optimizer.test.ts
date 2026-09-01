@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { buildLoadPlan, evaluateRoute, planWave, DEFAULT_CONFIG } from './optimizer';
 import { CachedTravelProvider, TimeDependentTravelProvider } from './travel';
 import { accessMinutes, serviceMinutesFor } from './shipments';
+import { circuityFactor } from './geo';
 import { runDemoWave } from '../data/scenario';
 import { PRODUCT_MAP } from '../data/catalog';
 import { NODE_MAP } from '../data/gazetteer';
 import { VEHICLES, DRIVERS, VEHICLE_MAP, DRIVER_MAP } from '../data/fleet';
-import type { AccessSurvey, Shipment, ShipmentUnit } from './types';
+import type { AccessSurvey, Shipment, ShipmentUnit, Zone } from './types';
 
 const PLAN_DATE = new Date(2026, 8, 15);
 const travel = new TimeDependentTravelProvider();
@@ -207,6 +208,56 @@ describe('time-dependent travel', () => {
     const c = { location: { lat: 31.7887, lng: 35.229 }, zone: 'jerusalem' as const };
     expect(travel.leg(a, b, at(9)).crossingMinutes).toBe(0);
     expect(travel.leg(a, c, at(9)).crossingMinutes).toBeGreaterThan(0);
+  });
+
+  it('applies every declared crossing time and circuity factor', () => {
+    // The tables are written in geographic order (north, central, south, jerusalem,
+    // jordan_valley); Array.prototype.sort() is alphabetical. The two agree for only
+    // five of the ten pairs, so half of each table used to miss its own key and take the
+    // `?? 15` / `?? 1.6` default — silently, and precisely on the expensive Jerusalem
+    // crossings the model exists to represent.
+    const at12 = new Date(PLAN_DATE.getTime() + 12 * 3_600_000); // hour multiplier 1.0
+    const declared: [Zone, Zone, number, number][] = [
+      ['north', 'central', 12, 1.5],
+      ['central', 'south', 14, 1.55],
+      ['north', 'south', 22, 1.6],
+      ['central', 'jordan_valley', 10, 1.45],
+      ['north', 'jordan_valley', 16, 1.7],
+      ['south', 'jordan_valley', 18, 1.8],
+      ['central', 'jerusalem', 30, 1.9],
+      ['south', 'jerusalem', 28, 1.85],
+      ['north', 'jerusalem', 38, 2.0],
+      ['jerusalem', 'jordan_valley', 32, 1.9],
+    ];
+
+    for (const [a, b, crossMinutes, circuity] of declared) {
+      const from = { location: { lat: 32.0, lng: 35.3 }, zone: a };
+      const to = { location: { lat: 31.7, lng: 35.2 }, zone: b };
+      // Both orientations: the key must not depend on which end you start from.
+      expect(travel.leg(from, to, at12).crossingMinutes).toBeCloseTo(crossMinutes, 6);
+      expect(travel.leg(to, from, at12).crossingMinutes).toBeCloseTo(crossMinutes, 6);
+      expect(circuityFactor(a, b)).toBeCloseTo(circuity, 9);
+      expect(circuityFactor(b, a)).toBeCloseTo(circuity, 9);
+    }
+  });
+
+  it('closes a crossing the dispatcher shuts, whichever way the key is written', () => {
+    // The UI writes these keys geographically. Half of them used to normalise to a
+    // string the lookup never checked, so "close the Jerusalem crossing" left the north
+    // and south crossings wide open and the optimiser drove straight through them.
+    const at12 = new Date(PLAN_DATE.getTime() + 12 * 3_600_000);
+    const jerusalem = { location: { lat: 31.78, lng: 35.22 }, zone: 'jerusalem' as const };
+
+    for (const spelling of [
+      { 'central|jerusalem': Infinity, 'north|jerusalem': Infinity, 'south|jerusalem': Infinity, 'jerusalem|jordan_valley': Infinity },
+      { 'jerusalem|central': Infinity, 'jerusalem|north': Infinity, 'jerusalem|south': Infinity, 'jordan_valley|jerusalem': Infinity },
+    ]) {
+      const closed = new TimeDependentTravelProvider({ degradedCrossings: spelling });
+      for (const zone of ['central', 'north', 'south', 'jordan_valley'] as const) {
+        const leg = closed.leg({ location: { lat: 32.0, lng: 35.3 }, zone }, jerusalem, at12);
+        expect(Number.isFinite(leg.minutes)).toBe(false);
+      }
+    }
   });
 
   it('treats a closed crossing as impassable rather than merely expensive', () => {
