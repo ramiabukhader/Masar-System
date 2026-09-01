@@ -40,6 +40,8 @@ export interface BaselineRoute {
   cubeUtilisation: number;
   cost: number;
   lateStops: number;
+  /** Stops the van could not reach at all, e.g. behind a closed crossing. */
+  undeliveredShipmentIds: string[];
 }
 
 export interface BaselineResult {
@@ -52,6 +54,8 @@ export interface BaselineResult {
   dropCount: number;
   lateCount: number;
   totalDriveMinutes: number;
+  /** Drops the modelled current state could not serve at all. Counted, never priced. */
+  undeliverableCount: number;
 }
 
 export function planBaseline(input: {
@@ -132,6 +136,7 @@ export function planBaseline(input: {
       : 0,
     lateCount: routes.reduce((sum, r) => sum + r.lateStops, 0),
     totalDriveMinutes: routes.reduce((sum, r) => sum + r.driveMinutes, 0),
+    undeliverableCount: routes.reduce((sum, r) => sum + r.undeliveredShipmentIds.length, 0),
   };
 }
 
@@ -155,9 +160,10 @@ function simulateTrip(
   let driveMinutes = 0;
   let serviceMinutes = 0;
   let lateStops = 0;
+  const undeliveredShipmentIds: string[] = [];
 
   while (remaining.length > 0) {
-    let bestIndex = 0;
+    let bestIndex = -1;
     let bestMinutes = Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < remaining.length; i++) {
@@ -166,10 +172,22 @@ function simulateTrip(
         { location: remaining[i].destination, zone: remaining[i].zone },
         new Date(planDate.getTime() + cursor * 60_000),
       );
+      // An impassable crossing is not merely a slow leg: `Infinity` here must never be
+      // added to a running total, or one blocked stop turns every headline number into
+      // `Infinity`. The driver cannot take this leg, so it is not a candidate.
+      if (!Number.isFinite(leg.minutes)) continue;
       if (leg.minutes < bestMinutes) {
         bestMinutes = leg.minutes;
         bestIndex = i;
       }
+    }
+
+    if (bestIndex === -1) {
+      // Nothing left on the list is reachable from here. Without a system the branch
+      // finds this out at the checkpoint, so the van turns back and those customers
+      // simply do not get their delivery today. Counted, not priced.
+      undeliveredShipmentIds.push(...remaining.map((s) => s.id));
+      break;
     }
 
     const next = remaining.splice(bestIndex, 1)[0];
@@ -197,9 +215,13 @@ function simulateTrip(
     { location: branch.location, zone: branch.zone },
     new Date(planDate.getTime() + cursor * 60_000),
   );
-  distanceKm += returnLeg.km;
-  driveMinutes += returnLeg.minutes;
-  cursor += returnLeg.minutes;
+  // Crossing costs are symmetric in this model, so a van that got here can get back;
+  // the guard is here so a future asymmetric provider cannot reintroduce `Infinity`.
+  if (Number.isFinite(returnLeg.minutes)) {
+    distanceKm += returnLeg.km;
+    driveMinutes += returnLeg.minutes;
+    cursor += returnLeg.minutes;
+  }
 
   const totalMinutes = cursor - SHIFT_START_MIN;
   const loadM3 = trip.reduce((sum, s) => sum + s.totalCubeM3, 0);
@@ -222,5 +244,6 @@ function simulateTrip(
       ).toFixed(2),
     ),
     lateStops,
+    undeliveredShipmentIds,
   };
 }

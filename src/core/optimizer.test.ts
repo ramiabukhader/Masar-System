@@ -238,6 +238,49 @@ describe('load plan', () => {
       plan.findIndex((l) => l.sku === 'LUM-DS-44'),
     );
   });
+
+  it('splits the floor into even thirds however many units a stop carries', () => {
+    // Nine floor units over three stops. Normalising the box position by the STOP count
+    // instead of the floor-line count used to push everything past the third unit to the
+    // rear door.
+    const bulky = (id: string) =>
+      shipment({
+        id,
+        units: [
+          unit('SAM-RF-SBS-620'),
+          unit('SAM-RF-SBS-620'),
+          unit('SAM-RF-SBS-620'),
+        ],
+      });
+    const plan = buildLoadPlan([bulky('A'), bulky('B'), bulky('C')]);
+
+    const counts = plan.reduce<Record<string, number>>((acc, line) => {
+      acc[line.zoneInVehicle] = (acc[line.zoneInVehicle] ?? 0) + 1;
+      return acc;
+    }, {});
+    expect(counts).toEqual({ floor_front: 3, floor_mid: 3, floor_rear: 3 });
+
+    // Deepest first, door last: the bands follow load order, never run backwards.
+    const rank = { floor_front: 0, floor_mid: 1, floor_rear: 2 } as const;
+    for (let i = 1; i < plan.length; i++) {
+      expect(rank[plan[i].zoneInVehicle as keyof typeof rank]).toBeGreaterThanOrEqual(
+        rank[plan[i - 1].zoneInVehicle as keyof typeof rank],
+      );
+    }
+  });
+
+  it('divides the floor among floor lines only, ignoring shelf goods', () => {
+    // Three floor units and six shelf units. The floor thirds must be decided by the
+    // three items actually on the floor.
+    const withGlass = (id: string) =>
+      shipment({ id, units: [unit('SAM-RF-SBS-620'), unit('LUM-DS-44'), unit('LUM-DS-44')] });
+    const plan = buildLoadPlan([withGlass('A'), withGlass('B'), withGlass('C')]);
+
+    const floor = plan.filter((l) => l.zoneInVehicle !== 'top_shelf');
+    expect(floor.length).toBe(3);
+    expect(floor.map((l) => l.zoneInVehicle)).toEqual(['floor_front', 'floor_mid', 'floor_rear']);
+    expect(plan.filter((l) => l.zoneInVehicle === 'top_shelf').length).toBe(6);
+  });
 });
 
 describe('full wave', () => {

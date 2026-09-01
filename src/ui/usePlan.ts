@@ -80,11 +80,23 @@ export function usePlan(disruptions: Disruptions): PlanState {
 
       if (cancelled) return;
 
+      // The baseline drives the SAME roads as the optimised plan. Giving only one side
+      // of the comparison the closure or the congestion would make the disruption
+      // simulator read as the optimiser losing ground, when all that changed is that the
+      // "before" column was quietly allowed to drive through a shut crossing.
+      //
+      // Fleet availability is deliberately NOT shared: `truckDown` names a hub vehicle,
+      // and the baseline models branch vans that were never in that pool.
       const baseline = planBaseline({
         shipments: result.shipments,
         nodes: NODE_MAP,
         planDate: PLAN_DATE,
-        travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+        travel: new CachedTravelProvider(
+          new TimeDependentTravelProvider({
+            degradedCrossings,
+            networkFactor: disruptions.northCongested ? 1.12 : 1,
+          }),
+        ),
       });
 
       setState({

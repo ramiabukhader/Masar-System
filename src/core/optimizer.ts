@@ -9,6 +9,7 @@ import type {
   Route,
   RouteMetrics,
   Shipment,
+  ShipmentUnit,
   SolverLogEntry,
   SolverPhase,
   UnassignedShipment,
@@ -1052,8 +1053,18 @@ export class WavePlanner {
  * regardless of sequence — never underneath a refrigerator.
  */
 export function buildLoadPlan(deliverySequence: Shipment[]): LoadLine[] {
-  const lines: LoadLine[] = [];
-  let loadSeq = 1;
+  // Pass 1: fix the load order, and decide which lines go on the shelf rather than the
+  // floor. Shelf lines take no floor space, so they must not be counted when the floor
+  // is divided into front/middle/rear — otherwise a van full of glassware pushes every
+  // appliance to the rear door.
+  interface Placement {
+    shipment: Shipment;
+    deliverySeq: number;
+    unit: ShipmentUnit;
+    onShelf: boolean;
+  }
+
+  const placements: Placement[] = [];
 
   for (let i = deliverySequence.length - 1; i >= 0; i--) {
     const shipment = deliverySequence[i];
@@ -1066,28 +1077,45 @@ export function buildLoadPlan(deliverySequence: Shipment[]): LoadLine[] {
     });
 
     for (const unit of ordered) {
-      const positionRatio = (loadSeq - 1) / Math.max(deliverySequence.length, 1);
-      const zoneInVehicle: LoadLine['zoneInVehicle'] =
-        unit.fragile && !unit.stackable
-          ? 'top_shelf'
-          : positionRatio < 0.34
-            ? 'floor_front'
-            : positionRatio < 0.67
-              ? 'floor_mid'
-              : 'floor_rear';
-
-      lines.push({
-        loadSeq: loadSeq++,
-        shipmentId: shipment.id,
+      placements.push({
+        shipment,
         deliverySeq,
-        sku: unit.sku,
-        quantity: unit.quantity,
-        cubeM3: Number(unit.cubeM3.toFixed(3)),
-        fragile: unit.fragile,
-        productClass: unit.productClass,
-        zoneInVehicle,
+        unit,
+        onShelf: unit.fragile && !unit.stackable,
       });
     }
+  }
+
+  // Pass 2: walk the floor lines in load order and split them into even thirds — first
+  // loaded is deepest, last loaded is at the door. Integer arithmetic so the band
+  // boundaries land exactly on the thirds instead of on a floating-point near-miss.
+  const floorCount = placements.filter((placement) => !placement.onShelf).length;
+  const lines: LoadLine[] = [];
+  let loadSeq = 1;
+  let floorIndex = 0;
+
+  for (const { shipment, deliverySeq, unit, onShelf } of placements) {
+    let zoneInVehicle: LoadLine['zoneInVehicle'];
+
+    if (onShelf) {
+      zoneInVehicle = 'top_shelf';
+    } else {
+      const band = Math.floor((floorIndex * 3) / Math.max(floorCount, 1));
+      zoneInVehicle = band === 0 ? 'floor_front' : band === 1 ? 'floor_mid' : 'floor_rear';
+      floorIndex++;
+    }
+
+    lines.push({
+      loadSeq: loadSeq++,
+      shipmentId: shipment.id,
+      deliverySeq,
+      sku: unit.sku,
+      quantity: unit.quantity,
+      cubeM3: Number(unit.cubeM3.toFixed(3)),
+      fragile: unit.fragile,
+      productClass: unit.productClass,
+      zoneInVehicle,
+    });
   }
 
   return lines;

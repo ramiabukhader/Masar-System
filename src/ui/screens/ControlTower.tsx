@@ -71,6 +71,7 @@ export function ControlTower({
                 <CompareRow label={t('kpiRoutes')} value={String(baseline.routeCount)} />
                 <CompareRow label={t('kpiFill')} value={`${fmtNum(baseline.avgCubeUtilisation * 100)}%`} />
                 <CompareRow label={t('kpiDriveTime')} value={`${fmtNum(baseline.totalDriveMinutes / 60, 1)} ${t('hours')}`} />
+                <CompareRow label={t('kpiUnassigned')} value={String(baseline.undeliverableCount)} />
               </div>
               <div className="compare-arrow">{lang === 'ar' ? '←' : '→'}</div>
               <div className="compare-side after">
@@ -80,6 +81,7 @@ export function ControlTower({
                 <CompareRow label={t('kpiRoutes')} value={String(plan.metrics.routeCount)} />
                 <CompareRow label={t('kpiFill')} value={`${fmtNum(plan.metrics.avgCubeUtilisation * 100)}%`} />
                 <CompareRow label={t('kpiDriveTime')} value={`${fmtNum(plan.metrics.totalDriveMinutes / 60, 1)} ${t('hours')}`} />
+                <CompareRow label={t('kpiUnassigned')} value={String(plan.metrics.unassignedCount)} />
               </div>
             </div>
           </div>
