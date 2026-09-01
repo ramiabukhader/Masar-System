@@ -147,12 +147,15 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                     const product = PRODUCT_MAP.get(line.sku)!;
                     const isVerified = verified.has(line.loadSeq);
                     return (
+                      // The row keeps its implicit `row` role. Overriding it with
+                      // `checkbox` left the <tbody> rowgroup owning nothing, so the
+                      // manifest exposed five column headers and zero rows — table
+                      // navigation could not reach the Position column at all, on the
+                      // one screen whose job is proving each item was checked. The
+                      // checkbox semantics belong to the scan cell, not to the row.
                       <tr
                         key={line.loadSeq}
                         className="clickable"
-                        role="checkbox"
-                        aria-checked={isVerified}
-                        aria-label={`${line.loadSeq}. ${lang === 'ar' ? product.nameAr : product.nameEn} — ${t(line.zoneInVehicle)} — ${t('deliverySeq')} ${line.deliverySeq}`}
                         {...activatable(() => toggle(line.loadSeq))}
                       >
                         <td className="mono" style={{ fontWeight: 700, color: 'var(--progress)' }}>{line.loadSeq}</td>
@@ -163,7 +166,13 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                         <td>{t(line.zoneInVehicle)}</td>
                         <td className="mono">{line.deliverySeq}</td>
                         <td>
-                          <span className="check-box" style={isVerified ? { background: 'var(--green-solid)', borderColor: 'var(--green-solid)' } : undefined}>
+                          <span
+                            className="check-box"
+                            role="checkbox"
+                            aria-checked={isVerified}
+                            aria-label={`${t('scanToVerify')} ${line.loadSeq} — ${lang === 'ar' ? product.nameAr : product.nameEn}`}
+                            style={isVerified ? { background: 'var(--green-solid)', borderColor: 'var(--green-solid)' } : undefined}
+                          >
                             {isVerified ? '✓' : ''}
                           </span>
                         </td>

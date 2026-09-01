@@ -63,6 +63,7 @@ export function DeliveryOptions({ t, lang, state }: Props) {
                 key={option}
                 className="filter-chip"
                 data-active={zone === option}
+                aria-pressed={zone === option}
                 onClick={() => setZone(option)}
               >
                 {t(`zone_${option}`)}

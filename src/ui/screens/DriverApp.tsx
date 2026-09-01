@@ -89,6 +89,9 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
     if (!stop) return;
     setOutcomes({ ...outcomes, [stop.shipmentId]: 'delivered' });
     setChecked(new Set());
+    // As fail() already does. Left open, the six red failure buttons followed the
+    // driver to the next customer, where one tap fails that stop with no confirmation.
+    setShowExceptions(false);
     setPhase('enroute');
     setIndex(index + 1);
   };

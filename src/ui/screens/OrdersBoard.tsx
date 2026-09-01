@@ -91,6 +91,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                 key={option}
                 className="filter-chip"
                 data-active={filter === option}
+                aria-pressed={filter === option}
                 onClick={() => setFilter(option)}
               >
                 {option === 'all' ? t('filterAll') : t(`state_${option}`)}

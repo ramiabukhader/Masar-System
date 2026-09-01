@@ -114,10 +114,25 @@ export function ControlTower({
             {/* Diagnostic, not operational — folded away so it stops competing
                 with the switches above it for the reader's attention. */}
             <details className="log-details">
-              <summary>
+              {/*
+                The ⓘ is a real <button> nested in the <summary>, which is a trap twice
+                over. A summary's accessible name is computed from its whole subtree, so
+                the disclosure announced as "Solver log 17 Explain"; it carries its own
+                name now. And Gecko toggles <details> on any bubbled click from a
+                descendant that did not preventDefault — Blink and WebKit suppress it,
+                Firefox does not — so pressing the ⓘ there opened the log while InfoTip
+                closed its own tooltip. The click is stopped before it reaches summary.
+              */}
+              <summary aria-label={`${t('solverLog')} (${plan.solverLog.length})`}>
                 {t('solverLog')}
                 <span className="log-count">{plan.solverLog.length}</span>
-                <InfoTip text={t('solverLogNote')} label={t('explain')} />
+                <span
+                  onClick={(event) => event.stopPropagation()}
+                  onKeyDown={(event) => event.stopPropagation()}
+                  style={{ display: 'inline-flex' }}
+                >
+                  <InfoTip text={t('solverLogNote')} label={`${t('explain')}: ${t('solverLog')}`} />
+                </span>
               </summary>
               <div className="log-body">
                 {plan.solverLog.map((entry, i) => (
