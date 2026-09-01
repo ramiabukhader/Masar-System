@@ -35,6 +35,7 @@ export const STRINGS: Dict = {
   after: { ar: 'بعد التحسين', en: 'Optimised' },
   saving: { ar: 'التوفير', en: 'Saving' },
   explain: { ar: 'شرح', en: 'Explain' },
+  explainScreen: { ar: 'شرح الشاشة', en: 'About this screen' },
   guardLabel: { ar: 'ما يمنعه هذا الإجراء', en: 'What this step prevents' },
   processIntro: {
     ar: 'من البيع في المعرض حتى التسليم عند باب الزبون وتسوية المبالغ. كل خطوة لها مسؤول، وكل تحذير يمنع خسارة محددة.',
@@ -142,6 +143,10 @@ export const STRINGS: Dict = {
   floor: { ar: 'الطابق', en: 'Floor' },
   elevator: { ar: 'مصعد', en: 'Elevator' },
   noElevator: { ar: 'بدون مصعد', en: 'No elevator' },
+  // A lift that will not take a boxed appliance is a third state, not "no lift": the
+  // crew still carries the fridge up the stairs, but the small items can ride.
+  elevatorTooSmall: { ar: 'مصعد لا يتسع للأجهزة', en: 'Lift too small for appliances' },
+  cancel: { ar: 'إلغاء', en: 'Cancel' },
   narrowStairs: { ar: 'درج ضيق', en: 'Narrow stairs' },
   notSurveyed: { ar: 'لم يتم مسح الوصول — تحقق قبل الصعود', en: 'Access not surveyed — check before carrying up' },
   installNeeded: { ar: 'يتطلب تركيب', en: 'Installation required' },

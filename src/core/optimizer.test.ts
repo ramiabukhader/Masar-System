@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { buildLoadPlan, evaluateRoute, DEFAULT_CONFIG } from './optimizer';
-import { TimeDependentTravelProvider } from './travel';
+import { buildLoadPlan, evaluateRoute, planWave, DEFAULT_CONFIG } from './optimizer';
+import { CachedTravelProvider, TimeDependentTravelProvider } from './travel';
 import { accessMinutes, serviceMinutesFor } from './shipments';
+import { circuityFactor } from './geo';
 import { runDemoWave } from '../data/scenario';
 import { PRODUCT_MAP } from '../data/catalog';
 import { NODE_MAP } from '../data/gazetteer';
-import { VEHICLE_MAP, DRIVER_MAP } from '../data/fleet';
-import type { AccessSurvey, Shipment, ShipmentUnit } from './types';
+import { VEHICLES, DRIVERS, VEHICLE_MAP, DRIVER_MAP } from '../data/fleet';
+import type { AccessSurvey, Shipment, ShipmentUnit, Zone } from './types';
 
 const PLAN_DATE = new Date(2026, 8, 15);
 const travel = new TimeDependentTravelProvider();
@@ -209,6 +210,57 @@ describe('time-dependent travel', () => {
     expect(travel.leg(a, c, at(9)).crossingMinutes).toBeGreaterThan(0);
   });
 
+  it('applies every declared crossing time and circuity factor', () => {
+    // The tables are written in geographic order (north, central, south, jerusalem,
+    // jordan_valley); Array.prototype.sort() is alphabetical. The two agree for only
+    // five of the ten pairs, so half of each table used to miss its own key and take the
+    // `?? 15` / `?? 1.6` default — silently, and precisely on the expensive Jerusalem
+    // crossings the model exists to represent.
+    const at12 = new Date(PLAN_DATE.getTime() + 12 * 3_600_000); // hour multiplier 1.0
+    const declared: [Zone, Zone, number, number][] = [
+      ['north', 'central', 12, 1.5],
+      ['central', 'south', 14, 1.55],
+      ['north', 'south', 22, 1.6],
+      ['central', 'jordan_valley', 10, 1.45],
+      ['north', 'jordan_valley', 16, 1.7],
+      ['south', 'jordan_valley', 18, 1.8],
+      ['central', 'jerusalem', 30, 1.9],
+      ['south', 'jerusalem', 28, 1.85],
+      ['north', 'jerusalem', 38, 2.0],
+      ['jerusalem', 'jordan_valley', 32, 1.9],
+    ];
+
+    for (const [a, b, crossMinutes, circuity] of declared) {
+      const from = { location: { lat: 32.0, lng: 35.3 }, zone: a };
+      const to = { location: { lat: 31.7, lng: 35.2 }, zone: b };
+      // Both orientations: the key must not depend on which end you start from.
+      expect(travel.leg(from, to, at12).crossingMinutes).toBeCloseTo(crossMinutes, 6);
+      expect(travel.leg(to, from, at12).crossingMinutes).toBeCloseTo(crossMinutes, 6);
+      expect(circuityFactor(a, b)).toBeCloseTo(circuity, 9);
+      expect(circuityFactor(b, a)).toBeCloseTo(circuity, 9);
+    }
+  });
+
+  it('closes a crossing the dispatcher shuts, whichever way the key is written', () => {
+    // The UI writes these keys geographically. Half of them used to normalise to a
+    // string the lookup never checked, so "close the Jerusalem crossing" left the north
+    // and south crossings wide open and the optimiser drove straight through them.
+    const at12 = new Date(PLAN_DATE.getTime() + 12 * 3_600_000);
+    const jerusalem = { location: { lat: 31.78, lng: 35.22 }, zone: 'jerusalem' as const };
+
+    const spellings: Record<string, number>[] = [
+      { 'central|jerusalem': Infinity, 'north|jerusalem': Infinity, 'south|jerusalem': Infinity, 'jerusalem|jordan_valley': Infinity },
+      { 'jerusalem|central': Infinity, 'jerusalem|north': Infinity, 'jerusalem|south': Infinity, 'jordan_valley|jerusalem': Infinity },
+    ];
+    for (const spelling of spellings) {
+      const closed = new TimeDependentTravelProvider({ degradedCrossings: spelling });
+      for (const zone of ['central', 'north', 'south', 'jordan_valley'] as const) {
+        const leg = closed.leg({ location: { lat: 32.0, lng: 35.3 }, zone }, jerusalem, at12);
+        expect(Number.isFinite(leg.minutes)).toBe(false);
+      }
+    }
+  });
+
   it('treats a closed crossing as impassable rather than merely expensive', () => {
     const closed = new TimeDependentTravelProvider({ degradedCrossings: { 'central|jerusalem': Infinity } });
     const leg = closed.leg(
@@ -217,6 +269,48 @@ describe('time-dependent travel', () => {
       at(9),
     );
     expect(Number.isFinite(leg.minutes)).toBe(false);
+  });
+});
+
+describe('access time on an unsurveyed address', () => {
+  const survey = (over: Partial<AccessSurvey>): AccessSurvey => ({
+    floor: 3, hasElevator: false, elevatorFitsAppliance: false,
+    narrowStairs: false, parkingDifficult: false, surveyed: true, ...over,
+  });
+
+  it('never prices an address nobody visited below one that was surveyed', () => {
+    // `surveyed: false` means "planned as a risk, not as a fact". The floor was already
+    // treated that way; the lift was read straight off the survey that was never taken,
+    // so an unknown address came out EIGHT times cheaper per floor than a known one.
+    const unsurveyed = accessMinutes(
+      survey({ surveyed: false, hasElevator: true, elevatorFitsAppliance: true }), 2,
+    );
+    const surveyedWithLift = accessMinutes(
+      survey({ surveyed: true, hasElevator: true, elevatorFitsAppliance: true }), 2,
+    );
+    expect(unsurveyed).toBeGreaterThan(surveyedWithLift);
+  });
+
+  it('ignores every unrecorded flag, not just the floor', () => {
+    // Whatever the never-taken survey happens to contain, the answer must be the same.
+    const base = accessMinutes(survey({ surveyed: false, hasElevator: false, elevatorFitsAppliance: false, narrowStairs: false }), 1);
+    for (const over of [
+      { hasElevator: true, elevatorFitsAppliance: true },
+      { hasElevator: true, elevatorFitsAppliance: false },
+      { narrowStairs: true },
+      { floor: 0 },
+      { floor: 9 },
+    ]) {
+      expect(accessMinutes(survey({ surveyed: false, ...over }), 1)).toBe(base);
+    }
+  });
+
+  it('still trusts a survey that was actually taken', () => {
+    const stairs = accessMinutes(survey({ surveyed: true, floor: 3 }), 1);
+    const lift = accessMinutes(survey({ surveyed: true, floor: 3, hasElevator: true, elevatorFitsAppliance: true }), 1);
+    expect(lift).toBeLessThan(stairs);
+    // A lift too small for the appliance is no lift at all.
+    expect(accessMinutes(survey({ surveyed: true, floor: 3, hasElevator: true, elevatorFitsAppliance: false }), 1)).toBe(stairs);
   });
 });
 
@@ -237,6 +331,49 @@ describe('load plan', () => {
     expect(plan.findIndex((l) => l.sku === 'SAM-RF-SBS-620')).toBeLessThan(
       plan.findIndex((l) => l.sku === 'LUM-DS-44'),
     );
+  });
+
+  it('splits the floor into even thirds however many units a stop carries', () => {
+    // Nine floor units over three stops. Normalising the box position by the STOP count
+    // instead of the floor-line count used to push everything past the third unit to the
+    // rear door.
+    const bulky = (id: string) =>
+      shipment({
+        id,
+        units: [
+          unit('SAM-RF-SBS-620'),
+          unit('SAM-RF-SBS-620'),
+          unit('SAM-RF-SBS-620'),
+        ],
+      });
+    const plan = buildLoadPlan([bulky('A'), bulky('B'), bulky('C')]);
+
+    const counts = plan.reduce<Record<string, number>>((acc, line) => {
+      acc[line.zoneInVehicle] = (acc[line.zoneInVehicle] ?? 0) + 1;
+      return acc;
+    }, {});
+    expect(counts).toEqual({ floor_front: 3, floor_mid: 3, floor_rear: 3 });
+
+    // Deepest first, door last: the bands follow load order, never run backwards.
+    const rank = { floor_front: 0, floor_mid: 1, floor_rear: 2 } as const;
+    for (let i = 1; i < plan.length; i++) {
+      expect(rank[plan[i].zoneInVehicle as keyof typeof rank]).toBeGreaterThanOrEqual(
+        rank[plan[i - 1].zoneInVehicle as keyof typeof rank],
+      );
+    }
+  });
+
+  it('divides the floor among floor lines only, ignoring shelf goods', () => {
+    // Three floor units and six shelf units. The floor thirds must be decided by the
+    // three items actually on the floor.
+    const withGlass = (id: string) =>
+      shipment({ id, units: [unit('SAM-RF-SBS-620'), unit('LUM-DS-44'), unit('LUM-DS-44')] });
+    const plan = buildLoadPlan([withGlass('A'), withGlass('B'), withGlass('C')]);
+
+    const floor = plan.filter((l) => l.zoneInVehicle !== 'top_shelf');
+    expect(floor.length).toBe(3);
+    expect(floor.map((l) => l.zoneInVehicle)).toEqual(['floor_front', 'floor_mid', 'floor_rear']);
+    expect(plan.filter((l) => l.zoneInVehicle === 'top_shelf').length).toBe(6);
   });
 });
 
@@ -287,6 +424,85 @@ describe('full wave', () => {
         0,
       );
       expect(route.loadPlan.length).toBe(plannedUnits);
+    }
+  });
+
+  it('accounts for every shipment when the planning budget runs out', async () => {
+    const { shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+
+    // A budget this small bites during construction, which is the case that used to
+    // drop the remaining shipments on the floor: absent from every route, absent from
+    // `unassigned`, and absent from the counts, while the wave reported a clean success.
+    const plan = planWave({
+      waveName: 'budget-probe',
+      planDate: PLAN_DATE,
+      shipments,
+      vehicles: VEHICLES,
+      drivers: DRIVERS,
+      nodes: NODE_MAP,
+      travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+      config: { timeBudgetMs: 1 },
+    });
+
+    expect(plan.solverLog.some((entry) => entry.code === 'budgetReached')).toBe(true);
+    expect(plan.metrics.assignedCount + plan.metrics.unassignedCount).toBe(shipments.length);
+
+    // And the plan must not read as a clean success while it is carrying unplaced work.
+    expect(plan.solverLog.some((entry) => entry.code === 'routesBuiltWithUnplaced')).toBe(true);
+
+    // Every dropped shipment says the budget stopped it, not that the fleet could not
+    // serve it — those call for opposite responses from the planner.
+    const budgetStopped = plan.unassigned.filter((u) => u.reason === 'planner_budget_exhausted');
+    expect(budgetStopped.length).toBeGreaterThan(0);
+    for (const item of budgetStopped) expect(item.detail).toContain('budget');
+  });
+
+  it('names the day it delivers in the plan id, in any timezone', async () => {
+    const { plan } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+    // PLAN_DATE is local midnight of 15 September. toISOString() converts to UTC first,
+    // so east of Greenwich the id used to name the 14th while the top bar named the 15th.
+    const month = String(PLAN_DATE.getMonth() + 1).padStart(2, '0');
+    const day = String(PLAN_DATE.getDate()).padStart(2, '0');
+    expect(plan.id).toBe(`PLAN-${PLAN_DATE.getFullYear()}-${month}-${day}-daily`);
+    expect(plan.id).toContain('2026-09-15');
+  });
+
+  it('never promises a window that outlives the deadline it is built from', async () => {
+    // The demo's generated dueAt is always 11:00 or later, which is the only reason this
+    // never showed. A stop due EARLY used to come back with a window past its own SLA:
+    // the deadline clamp ran first, then the shift-start clamp recomputed `latest` from
+    // the new `earliest` and threw the deadline away.
+    const early = shipment({ id: 'EARLY', dueAt: at(9, 30) });
+    const plan = planWave({
+      waveName: 'window-probe',
+      planDate: PLAN_DATE,
+      shipments: [early],
+      vehicles: VEHICLES,
+      drivers: DRIVERS,
+      nodes: NODE_MAP,
+      travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+    });
+
+    const stop = plan.routes.flatMap((r) => r.stops).find((s) => s.shipmentId === early.id);
+    expect(stop).toBeDefined();
+    expect(stop!.promisedWindow.latest.getTime()).toBeLessThanOrEqual(early.dueAt.getTime());
+    // And it still contains the arrival it describes.
+    expect(stop!.arriveAt.getTime()).toBeGreaterThanOrEqual(stop!.promisedWindow.earliest.getTime());
+    expect(stop!.arriveAt.getTime()).toBeLessThanOrEqual(stop!.promisedWindow.latest.getTime());
+  });
+
+  it('keeps every promised window inside the deadline across the whole wave', async () => {
+    const { plan, shipments } = await runDemoWave({ planDate: PLAN_DATE, orderCount: 78 });
+    const dueOf = new Map(shipments.map((s) => [s.id, s.dueAt.getTime()]));
+    for (const route of plan.routes) {
+      const driver = DRIVER_MAP.get(route.driverId)!;
+      for (const stop of route.stops) {
+        expect(stop.promisedWindow.latest.getTime()).toBeLessThanOrEqual(dueOf.get(stop.shipmentId)!);
+        // Never before the crew is on shift either.
+        const earliestMin =
+          (stop.promisedWindow.earliest.getTime() - PLAN_DATE.getTime()) / 60_000;
+        expect(earliestMin).toBeGreaterThanOrEqual(driver.shiftStartMin);
+      }
     }
   });
 

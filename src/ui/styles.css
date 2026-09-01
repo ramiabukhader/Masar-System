@@ -537,8 +537,15 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 }
 [dir='rtl'] .ltr,
 [dir='rtl'] .kpi-value { text-align: right; }
+/* The row is laid out LTR so the elapsed-ms gutter and the cost column stay in a fixed
+   order, but the message inside it is Arabic prose. Forcing direction on the line
+   without isolating the message reordered its Arabic runs around the Latin route and
+   plate — "فتح {route} على {plate} من {originAr}" came out backwards to an Arabic
+   reader. This is the case the comment above .ltr warns about, so the message gets its
+   own isolated direction back. */
 .log-line { direction: ltr; }
 [dir='rtl'] .log-line { text-align: left; }
+[dir='rtl'] .log-line .log-message { direction: rtl; unicode-bidi: isolate; text-align: right; }
 
 .scroll { max-height: 530px; overflow-y: auto; }
 .scroll-x { overflow-x: auto; }
@@ -581,7 +588,24 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 
 /* --- Toggles -------------------------------------------------------------- */
 
-.switch-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; }
+/* Now a real <button role="switch"> rather than a styled div, so it can be tabbed to
+   and toggled with Enter or Space. The UA button chrome is stripped back to what the
+   div looked like; only the focus ring is new, and it has to stay. */
+.switch-row {
+  display: flex; align-items: center; gap: 10px; padding: 9px 0;
+  width: 100%;
+  background: none; border: none;
+  font: inherit; color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.switch-row:focus-visible,
+tr.clickable:focus-visible,
+.check-item:focus-visible,
+svg g[role='button']:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
 .switch {
   position: relative;
   width: 40px;
@@ -820,7 +844,11 @@ tbody tr[data-selected='true'] { background: var(--brand-wash); }
 }
 .search::placeholder { color: var(--text-dim); opacity: 1; }
 .search { color-scheme: inherit; }
-.search:focus { border-color: var(--border-strong); outline: none; }
+/* No `outline: none` here. :focus matches whenever :focus-visible does and this rule is
+   more specific, so removing the outline removed the keyboard ring too — leaving a 1px
+   border shift at 2.84:1, under SC 2.4.11, on the one control that then swallows the
+   user's keystrokes. */
+.search:focus { border-color: var(--border-strong); }
 
 .cell-sub { font-family: var(--font-sans); font-size: 13px; color: var(--text-dim); }
 

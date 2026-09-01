@@ -28,3 +28,17 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+
+      # masar-demo.html is a tracked build artifact, and the README tells the client to
+      # double-click it. Nothing regenerated it for six commits, so it went on shipping a
+      # whole screen that a later commit had deliberately deleted for not being for the
+      # client's eyes. Compare the rebuilt file against the committed one, the way a
+      # lockfile check works, so it cannot drift again.
+      - name: masar-demo.html is in sync with src
+        run: |
+          node scripts/build-standalone.mjs
+          if ! git diff --quiet -- masar-demo.html; then
+            echo "::error file=masar-demo.html::Stale standalone build. Run 'npm run build:standalone' and commit the result."
+            git diff --stat -- masar-demo.html
+            exit 1
+          fi

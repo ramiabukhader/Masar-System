@@ -5,6 +5,7 @@ import { NODE_MAP } from '../../data/gazetteer';
 import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { fill, loc, type Lang } from '../i18n';
 import { reasonText } from '../reasons';
+import { activatable } from '../activate';
 
 interface Props {
   t: (key: string) => string;
@@ -59,7 +60,7 @@ export function ControlTower({
         {/* ---- Before / after ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('planTitle')}<InfoTip text={t('baselineCaveat')} label={t('explain')} /></h2>
+            <h2>{t('planTitle')}<InfoTip text={t('baselineCaveat')} label={`${t('explain')}: ${t('planTitle')}`} /></h2>
             <span className="sub">{plan.id}</span>
           </div>
           <div className="panel-body">
@@ -71,6 +72,7 @@ export function ControlTower({
                 <CompareRow label={t('kpiRoutes')} value={String(baseline.routeCount)} />
                 <CompareRow label={t('kpiFill')} value={`${fmtNum(baseline.avgCubeUtilisation * 100)}%`} />
                 <CompareRow label={t('kpiDriveTime')} value={`${fmtNum(baseline.totalDriveMinutes / 60, 1)} ${t('hours')}`} />
+                <CompareRow label={t('kpiUnassigned')} value={String(baseline.undeliverableCount)} />
               </div>
               <div className="compare-arrow">{lang === 'ar' ? '←' : '→'}</div>
               <div className="compare-side after">
@@ -80,6 +82,7 @@ export function ControlTower({
                 <CompareRow label={t('kpiRoutes')} value={String(plan.metrics.routeCount)} />
                 <CompareRow label={t('kpiFill')} value={`${fmtNum(plan.metrics.avgCubeUtilisation * 100)}%`} />
                 <CompareRow label={t('kpiDriveTime')} value={`${fmtNum(plan.metrics.totalDriveMinutes / 60, 1)} ${t('hours')}`} />
+                <CompareRow label={t('kpiUnassigned')} value={String(plan.metrics.unassignedCount)} />
               </div>
             </div>
           </div>
@@ -88,7 +91,7 @@ export function ControlTower({
         {/* ---- Disruption simulator ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('disruptions')}<InfoTip text={t('disruptionHint')} label={t('explain')} /></h2>
+            <h2>{t('disruptions')}<InfoTip text={t('disruptionHint')} label={`${t('explain')}: ${t('disruptions')}`} /></h2>
             {loading && <span className="sub">{t('replanning')}</span>}
           </div>
           <div className="panel-body">
@@ -111,16 +114,31 @@ export function ControlTower({
             {/* Diagnostic, not operational — folded away so it stops competing
                 with the switches above it for the reader's attention. */}
             <details className="log-details">
-              <summary>
+              {/*
+                The ⓘ is a real <button> nested in the <summary>, which is a trap twice
+                over. A summary's accessible name is computed from its whole subtree, so
+                the disclosure announced as "Solver log 17 Explain"; it carries its own
+                name now. And Gecko toggles <details> on any bubbled click from a
+                descendant that did not preventDefault — Blink and WebKit suppress it,
+                Firefox does not — so pressing the ⓘ there opened the log while InfoTip
+                closed its own tooltip. The click is stopped before it reaches summary.
+              */}
+              <summary aria-label={`${t('solverLog')} (${plan.solverLog.length})`}>
                 {t('solverLog')}
                 <span className="log-count">{plan.solverLog.length}</span>
-                <InfoTip text={t('solverLogNote')} label={t('explain')} />
+                <span
+                  onClick={(event) => event.stopPropagation()}
+                  onKeyDown={(event) => event.stopPropagation()}
+                  style={{ display: 'inline-flex' }}
+                >
+                  <InfoTip text={t('solverLogNote')} label={`${t('explain')}: ${t('solverLog')}`} />
+                </span>
               </summary>
               <div className="log-body">
                 {plan.solverLog.map((entry, i) => (
                   <div className="log-line" key={i}>
                     <span className="log-phase">{t(`sp_${entry.phase}`)}</span>
-                    <span style={{ flex: 1 }}>{fill(t(`sl_${entry.code}`), entry.params)}</span>
+                    <span className="log-message" style={{ flex: 1 }}>{fill(t(`sl_${entry.code}`), entry.params)}</span>
                     <span className="log-time">{entry.elapsedMs}ms</span>
                   </div>
                 ))}
@@ -170,7 +188,7 @@ export function ControlTower({
                           key={route.id}
                           className="clickable"
                           data-selected={selectedRouteId === route.id}
-                          onClick={() => setSelectedRouteId(route.id)}
+                          {...activatable(() => setSelectedRouteId(route.id))}
                         >
                           <td><span className="dot" data-on={selectedRouteId === route.id} /></td>
                           <td>
@@ -260,7 +278,7 @@ export function ControlTower({
       {/* ---- Exceptions ---- */}
       <div className="grid grid-2">
         <div className="panel">
-          <div className="panel-head"><h2>{t('kpiUnassigned')}<InfoTip text={t('unassignedHint')} label={t('explain')} /></h2><span className="sub">{plan.unassigned.length}</span></div>
+          <div className="panel-head"><h2>{t('kpiUnassigned')}<InfoTip text={t('unassignedHint')} label={`${t('explain')}: ${t('kpiUnassigned')}`} /></h2><span className="sub">{plan.unassigned.length}</span></div>
           <div className="panel-body">
             {plan.unassigned.length === 0 ? (
               <div className="empty">{t('noneToday')}</div>
@@ -279,7 +297,7 @@ export function ControlTower({
         </div>
 
         <div className="panel">
-          <div className="panel-head"><h2>{t('heldOrders')}<InfoTip text={t('heldHint')} label={t('explain')} /></h2><span className="sub">{held.length}</span></div>
+          <div className="panel-head"><h2>{t('heldOrders')}<InfoTip text={t('heldHint')} label={`${t('explain')}: ${t('heldOrders')}`} /></h2><span className="sub">{held.length}</span></div>
           <div className="panel-body">
             <div className="scroll">
               {held.map((item) => (
@@ -320,7 +338,7 @@ function ExceptionRow({
     <div className="exception-row">
       <span className="mono">{id}</span>
       <span className="chip warn">{reason}</span>
-      <InfoTip text={detail} label={t('technicalDetail')} />
+      <InfoTip text={detail} label={`${t('technicalDetail')}: ${id}`} />
     </div>
   );
 }
@@ -368,11 +386,16 @@ function CompareRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+/**
+ * A real button with `role="switch"`, not a styled div. These three switches are the
+ * Control Tower's main interaction, and as a div they were unreachable by Tab, deaf to
+ * Enter and Space, and announced to a screen reader as neither a control nor on/off.
+ */
 function Toggle({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
   return (
-    <div className="switch-row" onClick={onToggle} style={{ cursor: 'pointer' }}>
+    <button type="button" className="switch-row" role="switch" aria-checked={on} onClick={onToggle}>
       <span className="switch" data-on={on} />
       <span>{label}</span>
-    </div>
+    </button>
   );
 }

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { MILESTONES, summarise, type OrderState, type OrderTrack } from '../../core/lifecycle';
+import { MILESTONES, summarise, triageRank, type OrderState, type OrderTrack } from '../../core/lifecycle';
+import { activatable } from '../activate';
 import { LOCALITY_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { fmtDue, fmtNum, fmtTime, PLAN_DATE } from '../usePlan';
@@ -55,10 +56,10 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
           .some((field) => String(field).toLowerCase().includes(needle));
       })
       .sort((a, b) => {
-        // Anything needing a human comes first, then by urgency.
-        const weight = (track: OrderTrack) =>
-          track.state === 'held' ? 0 : track.state === 'blocked' ? 1 : track.slaRisk === 'tight' ? 2 : 3;
-        return weight(a) - weight(b) || a.order.dueAt.getTime() - b.order.dueAt.getTime();
+        // Anything needing a human comes first, then by urgency, and finished work last.
+        // See triageRank: it scores all three SlaRisk values and sinks delivered orders,
+        // which is what the risk chip further down this row already assumed.
+        return triageRank(a) - triageRank(b) || a.order.dueAt.getTime() - b.order.dueAt.getTime();
       });
   }, [tracks, filter, query]);
 
@@ -90,6 +91,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                 key={option}
                 className="filter-chip"
                 data-active={filter === option}
+                aria-pressed={filter === option}
                 onClick={() => setFilter(option)}
               >
                 {option === 'all' ? t('filterAll') : t(`state_${option}`)}
@@ -144,7 +146,7 @@ export function OrdersBoard({ t, lang, tracks, loading, onOpenOrder }: Props) {
                       <tr
                         key={track.orderId}
                         className="clickable"
-                        onClick={() => onOpenOrder(track.orderId)}
+                        {...activatable(() => onOpenOrder(track.orderId))}
                       >
                         <td className="mono">{track.orderId}</td>
                         <td>

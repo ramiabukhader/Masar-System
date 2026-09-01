@@ -1,5 +1,6 @@
 import { LOCALITIES } from '../../data/gazetteer';
 import type { DeliveryPlan, LatLng, Node, Shipment } from '../../core/types';
+import { activatable } from '../activate';
 
 const BOUNDS = { latMin: 31.38, latMax: 32.52, lngMin: 34.86, lngMax: 35.58 };
 const WIDTH = 380;
@@ -53,7 +54,11 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
       width={WIDTH}
       height={HEIGHT}
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      role="img"
+      // Not role="img": that role is Children Presentational, so it prunes the whole
+      // subtree from the accessibility tree — including the route groups below, which are
+      // focusable buttons. They were tab stops that announced nothing. A group keeps the
+      // map named while leaving its controls reachable.
+      role="group"
       aria-label="Network map of planned routes"
     >
       <defs>
@@ -88,8 +93,9 @@ export function NetworkMap({ plan, nodes, shipmentMap, selectedRouteId, onSelect
           <g
             key={route.id}
             style={{ cursor: 'pointer' }}
-            onClick={() => onSelectRoute(route.id)}
+            role="button"
             aria-label={route.id}
+            {...activatable(() => onSelectRoute(route.id))}
           >
             <polyline
               points={points.map((p) => `${p.x},${p.y}`).join(' ')}

@@ -9,6 +9,7 @@ import type {
   Route,
   RouteMetrics,
   Shipment,
+  ShipmentUnit,
   SolverLogEntry,
   SolverPhase,
   UnassignedShipment,
@@ -75,6 +76,20 @@ function toDate(planDate: Date, minutes: number): Date {
 }
 
 const round15 = (minutes: number) => Math.floor(minutes / 15) * 15;
+
+/**
+ * YYYY-MM-DD of a LOCAL date.
+ *
+ * Not toISOString().slice(0, 10): planDate is local midnight by contract, and
+ * toISOString converts to UTC first, so east of Greenwich it names the evening before.
+ * In Asia/Hebron — the timezone this runs in — the plan id read one day behind the day
+ * it delivers, while the top bar beside it read the right one.
+ */
+function localDateStamp(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
 
 // ---------------------------------------------------------------------------
 // Route evaluation
@@ -474,6 +489,18 @@ export class WavePlanner {
     while (pending.length > 0) {
       if (Date.now() - this.startedAt > this.config.timeBudgetMs) {
         this.trace('construct', 'budgetReached', { count: pending.length });
+        // A shipment is either on a route or explained — never neither. Breaking out
+        // with `pending` still full used to drop those deliveries from the plan
+        // entirely: absent from every route, absent from `unassigned`, and absent from
+        // the counts, so the wave reported a clean success while quietly abandoning
+        // them. Their reason is the budget, not the fleet, and it has to say so.
+        for (const shipment of pending) {
+          this.unassigned.push({
+            shipmentId: shipment.id,
+            reason: 'planner_budget_exhausted',
+            detail: `The wave hit its ${this.config.timeBudgetMs}ms planning budget before this shipment was placed. It is not necessarily unservable — re-run with a longer budget.`,
+          });
+        }
         break;
       }
 
@@ -700,7 +727,11 @@ export class WavePlanner {
       while (improved) {
         improved = false;
         const n = route.shipments.length;
-        if (n < 3) break;
+        // Two stops still have two orders, and the second may be the cheaper one. The
+        // or-opt pass below reaches it with segLength 1, so the guard only needs to
+        // exclude routes with nothing to reorder. (No two-stop route survives the
+        // current wave, so this changes no plan today — it closes the gap.)
+        if (n < 2) break;
 
         for (let segLength = 1; segLength <= 3 && !improved; segLength++) {
           for (let from = 0; from + segLength <= n && !improved; from++) {
@@ -1003,7 +1034,7 @@ export class WavePlanner {
     });
 
     return {
-      id: `PLAN-${planDate.toISOString().slice(0, 10)}-${this.input.waveName}`,
+      id: `PLAN-${localDateStamp(planDate)}-${this.input.waveName}`,
       waveName: this.input.waveName,
       generatedAt: new Date(),
       routes,
@@ -1024,17 +1055,24 @@ export class WavePlanner {
     assignment: Assignment,
   ): { earliest: number; latest: number } {
     const length = this.config.windowLengthMinutes;
-    let earliest = round15(arriveMin - length / 3);
-    let latest = earliest + length;
+    const shiftStart = assignment.driver.shiftStartMin;
+    const deadline = round15(dueMin);
 
-    if (latest > dueMin) {
-      latest = round15(dueMin);
-      earliest = latest - length;
-    }
-    if (earliest < assignment.driver.shiftStartMin) {
-      earliest = assignment.driver.shiftStartMin;
-      latest = earliest + length;
-    }
+    // Both bounds are applied when the window is built, rather than as two corrections
+    // in sequence. Clamping to the deadline and THEN to the shift start recomputed
+    // `latest` from the new `earliest`, which threw the deadline clamp away: a stop due
+    // before 10:00 came back with a window ending at 10:00, i.e. the customer was
+    // promised a slot that runs past the deadline the plan had just guaranteed. Not
+    // reachable on today's data — every generated dueAt is 11:00 or later — but it is
+    // the guard, not the data, that should be keeping that promise.
+    const earliest = Math.max(shiftStart, round15(arriveMin - length / 3));
+
+    // A shorter window is fine; one that outlives the promise is not. `latest` cannot
+    // fall below the arrival it describes: evaluateRoute guarantees
+    // shiftStart <= arriveMin <= dueMin - slaBufferMinutes, and the Math.max is here so
+    // that an slaBuffer under 15 minutes cannot invert the window through round15.
+    const latest = Math.max(arriveMin, Math.min(earliest + length, deadline));
+
     return { earliest, latest };
   }
 }
@@ -1052,8 +1090,18 @@ export class WavePlanner {
  * regardless of sequence — never underneath a refrigerator.
  */
 export function buildLoadPlan(deliverySequence: Shipment[]): LoadLine[] {
-  const lines: LoadLine[] = [];
-  let loadSeq = 1;
+  // Pass 1: fix the load order, and decide which lines go on the shelf rather than the
+  // floor. Shelf lines take no floor space, so they must not be counted when the floor
+  // is divided into front/middle/rear — otherwise a van full of glassware pushes every
+  // appliance to the rear door.
+  interface Placement {
+    shipment: Shipment;
+    deliverySeq: number;
+    unit: ShipmentUnit;
+    onShelf: boolean;
+  }
+
+  const placements: Placement[] = [];
 
   for (let i = deliverySequence.length - 1; i >= 0; i--) {
     const shipment = deliverySequence[i];
@@ -1066,28 +1114,45 @@ export function buildLoadPlan(deliverySequence: Shipment[]): LoadLine[] {
     });
 
     for (const unit of ordered) {
-      const positionRatio = (loadSeq - 1) / Math.max(deliverySequence.length, 1);
-      const zoneInVehicle: LoadLine['zoneInVehicle'] =
-        unit.fragile && !unit.stackable
-          ? 'top_shelf'
-          : positionRatio < 0.34
-            ? 'floor_front'
-            : positionRatio < 0.67
-              ? 'floor_mid'
-              : 'floor_rear';
-
-      lines.push({
-        loadSeq: loadSeq++,
-        shipmentId: shipment.id,
+      placements.push({
+        shipment,
         deliverySeq,
-        sku: unit.sku,
-        quantity: unit.quantity,
-        cubeM3: Number(unit.cubeM3.toFixed(3)),
-        fragile: unit.fragile,
-        productClass: unit.productClass,
-        zoneInVehicle,
+        unit,
+        onShelf: unit.fragile && !unit.stackable,
       });
     }
+  }
+
+  // Pass 2: walk the floor lines in load order and split them into even thirds — first
+  // loaded is deepest, last loaded is at the door. Integer arithmetic so the band
+  // boundaries land exactly on the thirds instead of on a floating-point near-miss.
+  const floorCount = placements.filter((placement) => !placement.onShelf).length;
+  const lines: LoadLine[] = [];
+  let loadSeq = 1;
+  let floorIndex = 0;
+
+  for (const { shipment, deliverySeq, unit, onShelf } of placements) {
+    let zoneInVehicle: LoadLine['zoneInVehicle'];
+
+    if (onShelf) {
+      zoneInVehicle = 'top_shelf';
+    } else {
+      const band = Math.floor((floorIndex * 3) / Math.max(floorCount, 1));
+      zoneInVehicle = band === 0 ? 'floor_front' : band === 1 ? 'floor_mid' : 'floor_rear';
+      floorIndex++;
+    }
+
+    lines.push({
+      loadSeq: loadSeq++,
+      shipmentId: shipment.id,
+      deliverySeq,
+      sku: unit.sku,
+      quantity: unit.quantity,
+      cubeM3: Number(unit.cubeM3.toFixed(3)),
+      fragile: unit.fragile,
+      productClass: unit.productClass,
+      zoneInVehicle,
+    });
   }
 
   return lines;

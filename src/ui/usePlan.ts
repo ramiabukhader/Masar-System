@@ -80,11 +80,34 @@ export function usePlan(disruptions: Disruptions): PlanState {
 
       if (cancelled) return;
 
+      // The baseline drives the SAME roads as the optimised plan. Giving only one side
+      // of the comparison the closure or the congestion would make the disruption
+      // simulator read as the optimiser losing ground, when all that changed is that the
+      // "before" column was quietly allowed to drive through a shut crossing.
+      //
+      // Fleet availability is deliberately NOT shared: `truckDown` names a hub vehicle,
+      // and the baseline models branch vans that were never in that pool.
+      // ...and it prices the SAME DROPS. The baseline allocates a fresh branch van
+      // whenever it needs one — no fleet cap, no shift end, no SLA buffer — so it always
+      // delivers everything, while the optimiser is bounded by 13 real vehicles and
+      // leaves work unassigned when they run out. Pricing all 70 against the plan's 65
+      // put five customers the optimiser never served into the "before" column only, and
+      // the saving grew every time the fleet failed. The delta has to measure routing,
+      // not coverage; the unassigned row beneath keeps the under-delivery visible.
+      const assigned = new Set(
+        result.plan.routes.flatMap((route) => route.stops.map((stop) => stop.shipmentId)),
+      );
+
       const baseline = planBaseline({
-        shipments: result.shipments,
+        shipments: result.shipments.filter((shipment) => assigned.has(shipment.id)),
         nodes: NODE_MAP,
         planDate: PLAN_DATE,
-        travel: new CachedTravelProvider(new TimeDependentTravelProvider()),
+        travel: new CachedTravelProvider(
+          new TimeDependentTravelProvider({
+            degradedCrossings,
+            networkFactor: disruptions.northCongested ? 1.12 : 1,
+          }),
+        ),
       });
 
       setState({

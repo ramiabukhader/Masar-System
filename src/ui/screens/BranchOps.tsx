@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { InfoTip } from '../components/InfoTip';
 import { fmtCube, fmtNum, fmtTime, type PlanState } from '../usePlan';
 import { NODE_MAP } from '../../data/gazetteer';
 import { PRODUCT_MAP } from '../../data/catalog';
 import { VEHICLE_MAP } from '../../data/fleet';
 import { loc, type Lang } from '../i18n';
+import { activatable } from '../activate';
+import { accessLabelKey } from '../access';
 
 interface Props {
   t: (key: string) => string;
@@ -23,6 +25,15 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
   const [verified, setVerified] = useState<Set<number>>(new Set());
 
   const route = plan?.routes.find((r) => r.id === selectedRouteId) ?? plan?.routes[0];
+
+  // A tick means "I have seen this item on this manifest", so it cannot outlive the
+  // manifest. Route ids are positional, so a re-plan hands the same id a different load
+  // plan; clearing only in the route-picker left 18 ticks against a 10-line manifest —
+  // "18/10 verified", a bar at 180%, and all ten new rows showing as already scanned,
+  // on the one screen whose job is to prove each item was checked.
+  useEffect(() => {
+    setVerified(new Set());
+  }, [plan, route?.id]);
 
   const pickList = useMemo(() => {
     if (!route) return [];
@@ -113,7 +124,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
         {/* ---- Load manifest ---- */}
         <div className="panel">
           <div className="panel-head">
-            <h2>{t('loadManifest')}<InfoTip text={t('loadOrderHint')} label={t('explain')} /></h2>
+            <h2>{t('loadManifest')}<InfoTip text={t('loadOrderHint')} label={`${t('explain')}: ${t('loadManifest')}`} /></h2>
             <span className="sub">{verified.size}/{route.loadPlan.length} {t('verified')}</span>
           </div>
           <div className="panel-body">
@@ -136,7 +147,17 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                     const product = PRODUCT_MAP.get(line.sku)!;
                     const isVerified = verified.has(line.loadSeq);
                     return (
-                      <tr key={line.loadSeq} className="clickable" onClick={() => toggle(line.loadSeq)}>
+                      // The row keeps its implicit `row` role. Overriding it with
+                      // `checkbox` left the <tbody> rowgroup owning nothing, so the
+                      // manifest exposed five column headers and zero rows — table
+                      // navigation could not reach the Position column at all, on the
+                      // one screen whose job is proving each item was checked. The
+                      // checkbox semantics belong to the scan cell, not to the row.
+                      <tr
+                        key={line.loadSeq}
+                        className="clickable"
+                        {...activatable(() => toggle(line.loadSeq))}
+                      >
                         <td className="mono" style={{ fontWeight: 700, color: 'var(--progress)' }}>{line.loadSeq}</td>
                         <td>
                           <div>{lang === 'ar' ? product.nameAr : product.nameEn}</div>
@@ -145,7 +166,13 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                         <td>{t(line.zoneInVehicle)}</td>
                         <td className="mono">{line.deliverySeq}</td>
                         <td>
-                          <span className="check-box" style={isVerified ? { background: 'var(--green-solid)', borderColor: 'var(--green-solid)' } : undefined}>
+                          <span
+                            className="check-box"
+                            role="checkbox"
+                            aria-checked={isVerified}
+                            aria-label={`${t('scanToVerify')} ${line.loadSeq} — ${lang === 'ar' ? product.nameAr : product.nameEn}`}
+                            style={isVerified ? { background: 'var(--green-solid)', borderColor: 'var(--green-solid)' } : undefined}
+                          >
                             {isVerified ? '✓' : ''}
                           </span>
                         </td>
@@ -190,7 +217,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                           <>
                             {t('floor')} {customer.access.floor}
                             {' · '}
-                            {customer.access.hasElevator && customer.access.elevatorFitsAppliance ? t('elevator') : t('noElevator')}
+                            {t(accessLabelKey(customer.access))}
                             {!customer.access.surveyed && <div><span className="chip warn">{t('notSurveyed')}</span></div>}
                           </>
                         )}

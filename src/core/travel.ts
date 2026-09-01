@@ -1,4 +1,5 @@
-import { roadDistanceKm } from './geo';
+import { roadDistanceKm, zonePairKey } from './geo';
+import { ZONES } from './types';
 import type { LatLng, Zone } from './types';
 
 export interface TravelLeg {
@@ -66,9 +67,9 @@ const CROSSING_HOUR_MULTIPLIER: number[] = [
   1.1, 0.8, 0.6, 0.5, 0.4, 0.4, // 18-23
 ];
 
-function pairKey(a: Zone, b: Zone): string {
-  return [a, b].sort().join('|');
-}
+// Shared with geo.ts so the crossing table and the circuity table can never be keyed
+// two different ways. See zonePairKey for why Array.prototype.sort() is wrong here.
+const pairKey = zonePairKey;
 
 export interface TravelOptions {
   /**
@@ -82,7 +83,16 @@ export interface TravelOptions {
 }
 
 export class TimeDependentTravelProvider implements TravelTimeProvider {
-  constructor(private readonly options: TravelOptions = {}) {}
+  /** Closure keys normalised to canonical order, so a caller may write either spelling. */
+  private readonly degraded: Record<string, number>;
+
+  constructor(private readonly options: TravelOptions = {}) {
+    this.degraded = {};
+    for (const [key, value] of Object.entries(options.degradedCrossings ?? {})) {
+      const [a, b] = key.split('|') as [Zone, Zone];
+      this.degraded[ZONES.includes(a) && ZONES.includes(b) ? pairKey(a, b) : key] = value;
+    }
+  }
 
   leg(from: TravelPoint, to: TravelPoint, departAt: Date): TravelLeg {
     const km = roadDistanceKm(from.location, from.zone, to.location, to.zone);
@@ -97,7 +107,7 @@ export class TimeDependentTravelProvider implements TravelTimeProvider {
     if (from.zone !== to.zone) {
       const key = pairKey(from.zone, to.zone);
       const base = CROSSING_BASE_MINUTES[key] ?? 15;
-      const degraded = this.options.degradedCrossings?.[key] ?? 1;
+      const degraded = this.degraded[key] ?? 1;
       if (!Number.isFinite(degraded)) {
         return { km, minutes: Number.POSITIVE_INFINITY, crossingMinutes: Number.POSITIVE_INFINITY };
       }

@@ -253,6 +253,31 @@ function buildEvents(
   });
 }
 
+/**
+ * Triage order for the board: work needing a person first, then live work by how close
+ * it is to breaking its promise, then what is already done.
+ *
+ * Lives here rather than inline in the sort because it is a statement about the domain,
+ * and because a comparator that silently mishandles one member of an enum is exactly the
+ * kind of thing that needs a test of its own. SlaRisk has three values and all three are
+ * scored: an earlier version tested only for 'tight', which put 'breach' — the worst —
+ * in the same bucket as 'ok'.
+ */
+export function triageRank(track: OrderTrack): number {
+  switch (track.state) {
+    case 'held':
+      return 0;
+    case 'blocked':
+      return 1;
+    case 'delivered':
+      // Finished work sinks: it cannot need anything, whatever its risk was on the day.
+      return 5;
+    case 'scheduled':
+    case 'active':
+      return track.slaRisk === 'breach' ? 2 : track.slaRisk === 'tight' ? 3 : 4;
+  }
+}
+
 export interface BoardSummary {
   total: number;
   held: number;

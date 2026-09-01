@@ -1,6 +1,6 @@
 import type { TravelTimeProvider } from './travel';
 import { haversineKm } from './geo';
-import type { Node, Shipment } from './types';
+import type { Node, Shipment, Zone } from './types';
 
 /**
  * Models how the network runs TODAY, so the optimised plan has something to be measured
@@ -28,6 +28,21 @@ const TYPICAL_DROPS_PER_TRIP = 6;
 
 const SHIFT_START_MIN = 7 * 60;
 
+/**
+ * The Jerusalem access regime is a permit boundary, not a longer drive.
+ *
+ * `Zone` exists because it "is the unit at which vehicle and driver eligibility is
+ * granted, which is how Jerusalem access is enforced structurally rather than by anyone
+ * remembering a rule" (types.ts), and not one of the 13 real vehicles holds Jerusalem
+ * together with any other zone. The generic BRANCH_VAN has no eligibility at all, so the
+ * baseline used to drive straight across a boundary the optimised side is structurally
+ * forbidden to cross — a BR-JRS van out to a north-zone customer, 325.3 km — and those
+ * kilometres inflated the "before" column the saving is measured against.
+ */
+function crossesAccessRegime(from: Zone, to: Zone): boolean {
+  return (from === 'jerusalem') !== (to === 'jerusalem');
+}
+
 export interface BaselineRoute {
   branchId: string;
   branchName: string;
@@ -40,6 +55,8 @@ export interface BaselineRoute {
   cubeUtilisation: number;
   cost: number;
   lateStops: number;
+  /** Stops the van could not reach at all, e.g. behind a closed crossing. */
+  undeliveredShipmentIds: string[];
 }
 
 export interface BaselineResult {
@@ -52,6 +69,8 @@ export interface BaselineResult {
   dropCount: number;
   lateCount: number;
   totalDriveMinutes: number;
+  /** Drops the modelled current state could not serve at all. Counted, never priced. */
+  undeliverableCount: number;
 }
 
 export function planBaseline(input: {
@@ -80,9 +99,16 @@ export function planBaseline(input: {
     // system still groups "everything going south today" onto one van — giving the
     // baseline that credit keeps the comparison honest. What it cannot do is consolidate
     // across branches, plan by cube, or sequence against time-dependent travel.
+    //
+    // Urgency day is counted from `planDate` — local midnight of the delivery day — and
+    // not from the epoch. Bucketing on `dueAt.getTime() / 86_400_000` measures the UTC
+    // calendar, so the day boundary moved with the host's offset and landed somewhere
+    // inside the 15-hour spread of due times. In Asia/Hebron, the timezone this runs in,
+    // it fell outside that spread altogether and collapsed every shipment into one
+    // bucket, quietly disabling the batching this comment describes.
     const queue = [...branchShipments].sort((a, b) => {
-      const dayA = Math.floor(a.dueAt.getTime() / 86_400_000);
-      const dayB = Math.floor(b.dueAt.getTime() / 86_400_000);
+      const dayA = Math.floor((a.dueAt.getTime() - planDate.getTime()) / 86_400_000);
+      const dayB = Math.floor((b.dueAt.getTime() - planDate.getTime()) / 86_400_000);
       if (dayA !== dayB) return dayA - dayB;
       return (
         haversineKm(branch.location, a.destination) - haversineKm(branch.location, b.destination)
@@ -132,6 +158,7 @@ export function planBaseline(input: {
       : 0,
     lateCount: routes.reduce((sum, r) => sum + r.lateStops, 0),
     totalDriveMinutes: routes.reduce((sum, r) => sum + r.driveMinutes, 0),
+    undeliverableCount: routes.reduce((sum, r) => sum + r.undeliveredShipmentIds.length, 0),
   };
 }
 
@@ -155,9 +182,10 @@ function simulateTrip(
   let driveMinutes = 0;
   let serviceMinutes = 0;
   let lateStops = 0;
+  const undeliveredShipmentIds: string[] = [];
 
   while (remaining.length > 0) {
-    let bestIndex = 0;
+    let bestIndex = -1;
     let bestMinutes = Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < remaining.length; i++) {
@@ -166,10 +194,24 @@ function simulateTrip(
         { location: remaining[i].destination, zone: remaining[i].zone },
         new Date(planDate.getTime() + cursor * 60_000),
       );
+      // An impassable crossing is not merely a slow leg: `Infinity` here must never be
+      // added to a running total, or one blocked stop turns every headline number into
+      // `Infinity`. The driver cannot take this leg, so it is not a candidate.
+      if (!Number.isFinite(leg.minutes)) continue;
+      // Nor is a permit boundary something a branch van can price its way across.
+      if (crossesAccessRegime(branch.zone, remaining[i].zone)) continue;
       if (leg.minutes < bestMinutes) {
         bestMinutes = leg.minutes;
         bestIndex = i;
       }
+    }
+
+    if (bestIndex === -1) {
+      // Nothing left on the list is reachable from here. Without a system the branch
+      // finds this out at the checkpoint, so the van turns back and those customers
+      // simply do not get their delivery today. Counted, not priced.
+      undeliveredShipmentIds.push(...remaining.map((s) => s.id));
+      break;
     }
 
     const next = remaining.splice(bestIndex, 1)[0];
@@ -197,9 +239,13 @@ function simulateTrip(
     { location: branch.location, zone: branch.zone },
     new Date(planDate.getTime() + cursor * 60_000),
   );
-  distanceKm += returnLeg.km;
-  driveMinutes += returnLeg.minutes;
-  cursor += returnLeg.minutes;
+  // Crossing costs are symmetric in this model, so a van that got here can get back;
+  // the guard is here so a future asymmetric provider cannot reintroduce `Infinity`.
+  if (Number.isFinite(returnLeg.minutes)) {
+    distanceKm += returnLeg.km;
+    driveMinutes += returnLeg.minutes;
+    cursor += returnLeg.minutes;
+  }
 
   const totalMinutes = cursor - SHIFT_START_MIN;
   const loadM3 = trip.reduce((sum, s) => sum + s.totalCubeM3, 0);
@@ -222,5 +268,6 @@ function simulateTrip(
       ).toFixed(2),
     ),
     lateStops,
+    undeliveredShipmentIds,
   };
 }
