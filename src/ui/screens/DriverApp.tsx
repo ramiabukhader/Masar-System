@@ -5,6 +5,7 @@ import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { NODE_MAP } from '../../data/gazetteer';
 import { loc, type Lang } from '../i18n';
 import { activatable } from '../activate';
+import { accessLabelKey, needsStairCarry } from '../access';
 
 interface Props {
   t: (key: string) => string;
@@ -158,9 +159,9 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
                 </div>
 
                 {!customer.access.surveyed && <div className="alert warn">{t('notSurveyed')}</div>}
-                {customer.access.floor > 0 && !(customer.access.hasElevator && customer.access.elevatorFitsAppliance) && (
+                {needsStairCarry(customer.access) && (
                   <div className="alert warn">
-                    {t('floor')} {customer.access.floor} · {t('noElevator')}
+                    {t('floor')} {customer.access.floor} · {t(accessLabelKey(customer.access))}
                     {customer.access.narrowStairs ? ` · ${t('narrowStairs')}` : ''}
                   </div>
                 )}
@@ -232,7 +233,14 @@ export function DriverApp({ t, lang, state, selectedRouteId, setSelectedRouteId 
                         {t(exception.key)}
                       </button>
                     ))}
-                    <button className="btn ghost block" onClick={() => setShowExceptions(false)}>✕</button>
+                    <button
+                      className="btn ghost block"
+                      aria-label={t('cancel')}
+                      title={t('cancel')}
+                      onClick={() => setShowExceptions(false)}
+                    >
+                      ✕
+                    </button>
                   </div>
                 )}
               </>

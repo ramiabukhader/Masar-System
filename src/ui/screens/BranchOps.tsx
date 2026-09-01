@@ -6,6 +6,7 @@ import { PRODUCT_MAP } from '../../data/catalog';
 import { VEHICLE_MAP } from '../../data/fleet';
 import { loc, type Lang } from '../i18n';
 import { activatable } from '../activate';
+import { accessLabelKey } from '../access';
 
 interface Props {
   t: (key: string) => string;
@@ -207,7 +208,7 @@ export function BranchOps({ t, lang, state, selectedRouteId, setSelectedRouteId 
                           <>
                             {t('floor')} {customer.access.floor}
                             {' · '}
-                            {customer.access.hasElevator && customer.access.elevatorFitsAppliance ? t('elevator') : t('noElevator')}
+                            {t(accessLabelKey(customer.access))}
                             {!customer.access.surveyed && <div><span className="chip warn">{t('notSurveyed')}</span></div>}
                           </>
                         )}

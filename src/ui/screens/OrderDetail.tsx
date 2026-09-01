@@ -5,6 +5,7 @@ import { DRIVER_MAP, VEHICLE_MAP } from '../../data/fleet';
 import { fmtCube, fmtDue, fmtNum, fmtStamp, fmtTime, PLAN_DATE, type PlanState } from '../usePlan';
 import { loc, type Lang } from '../i18n';
 import { reasonText } from '../reasons';
+import { accessLabelKey } from '../access';
 
 interface Props {
   t: (key: string) => string;
@@ -187,9 +188,7 @@ export function OrderDetail({ t, lang, track, state, onOpenRoute }: Props) {
                     {customer && (
                       <>
                         {t('floor')} {customer.access.floor} ·{' '}
-                        {customer.access.hasElevator && customer.access.elevatorFitsAppliance
-                          ? t('elevator')
-                          : t('noElevator')}
+                        {t(accessLabelKey(customer.access))}
                       </>
                     )}
                   </b>

@@ -123,7 +123,7 @@ export function ControlTower({
                 {plan.solverLog.map((entry, i) => (
                   <div className="log-line" key={i}>
                     <span className="log-phase">{t(`sp_${entry.phase}`)}</span>
-                    <span style={{ flex: 1 }}>{fill(t(`sl_${entry.code}`), entry.params)}</span>
+                    <span className="log-message" style={{ flex: 1 }}>{fill(t(`sl_${entry.code}`), entry.params)}</span>
                     <span className="log-time">{entry.elapsedMs}ms</span>
                   </div>
                 ))}
