@@ -1,7 +1,7 @@
 # 01 — Research Dossier: the retailer
 
 **Prepared:** August 2026
-**Subject:** A Palestinian home-appliance and kitchenware retail chain, referred to throughout as *the retailer*. It is a real business; its name is deliberately left out of this repository.
+**Subject:** A Palestinian home-appliance and kitchenware retail chain, referred to throughout as *the retailer*. It is a real business; its name and the details that would identify it are deliberately left out of this repository.
 **Purpose:** Establish the commercial and operational baseline before designing the delivery automation and optimisation programme.
 
 ---
@@ -29,10 +29,10 @@ consolidated discovery list — it is the first thing to run through when we get
 
 | | |
 |---|---|
-| Group founded | 1969 **[V]** |
-| Retail chain founded | 2017 **[V]** |
-| Market | Palestine — West Bank + Jerusalem; group also distributes into the Israeli market **[V]** |
-| Positioning | *"The largest chain store for the world's leading brands in home appliances, small electrical appliances, kitchenware and gifts"* **[V]** |
+| Group founded | More than fifty years ago, as a wholesale distributor **[V]** |
+| Retail chain founded | Within the last decade **[V]** |
+| Market | Palestine — West Bank and Jerusalem **[V]** |
+| Positioning | Presents itself as the largest chain for the world's leading brands in home appliances, small electricals, kitchenware and gifts **[V]** |
 | Group activity | Household appliance and electrical/electronic goods wholesale + retail + after-sales service **[V]** |
 | After-sales | Authorised service centre, described by the group as the largest in the region **[V]** |
 
@@ -46,17 +46,16 @@ trucks. **[I]**
 
 ## 2. Brand and product portfolio — what actually goes on the truck
 
-Brands carried (agency / exclusive distribution): **KMG** (own/house brand), **Samsung**, **TCL**,
-**Ariston**, **Lofra**, **Elica**, **Turbo Air**, **JBL**, **Moulinex**, **Tefal**, **Krups**,
-**BaByliss**, **Emsa**, **Pyrex**, **Luminarc**, **Cristal d'Arques**. **[V]**
+The portfolio is a house brand plus agency or exclusive distribution of the major global names
+in white goods, televisions, small domestic appliances, and branded kitchenware and glassware.
+**[V]** The demo catalogue in `src/data/catalog.ts` mirrors that mix with representative products.
 
 Grouped by how they behave in a delivery network — this is the single most important lens for
 route planning, because a truck is constrained by **volume and handling crew**, not by order count:
 
 ### Class A — Major appliances / white goods
 Refrigerators, washing machines, dryers, dishwashers, gas cookers and ranges, built-in ovens,
-extractor hoods, air conditioners, large-format TVs.
-Brands: Samsung, Ariston, Lofra, Elica, KMG, TCL, Turbo Air. **[V]**
+extractor hoods, air conditioners, large-format TVs. **[V]**
 
 - **0.3 – 1.6 m³ per unit**, 30 – 120 kg
 - Needs **2-person crew**, often stairs, often no elevator
@@ -67,14 +66,13 @@ Brands: Samsung, Ariston, Lofra, Elica, KMG, TCL, Turbo Air. **[V]**
 - This class is where 100% of the delivery cost problem lives **[I]**
 
 ### Class B — Small domestic appliances
-Kettles, blenders, food processors, irons, air fryers, coffee machines, personal care.
-Brands: Moulinex, Tefal, Krups, BaByliss, JBL. **[V]**
+Kettles, blenders, food processors, irons, air fryers, coffee machines, personal care. **[V]**
 
 - 0.005 – 0.05 m³, 1 – 8 kg, single-person, no installation
 - Can ride as fill in any vehicle, or go via a parcel courier entirely **[I]**
 
 ### Class C — Kitchenware, glassware, gifts
-Pyrex, Luminarc, Cristal d'Arques, Emsa. **[V]**
+Branded cookware, dinner sets, glassware and gift sets. **[V]**
 
 - Small, light, **fragile** — the company's own damage policy singles out fragile goods for
   same-day damage reporting **[V]**
@@ -88,13 +86,11 @@ should not share a single delivery process. Today it appears they do. **[?]**
 
 ## 3. Branch network — the origin nodes
 
-Confirmed showroom locations, from the retailer's public listings **[V]**: Hebron (الخليل),
-Bethlehem (بيت لحم), Jerusalem (القدس), Ramallah & Al-Bireh (رام الله والبيرة), Nablus (نابلس),
-Tulkarem (طولكرم) and Jericho (أريحا). Street addresses are left out here; the coordinates the
-demo plans against are in `src/data/gazetteer.ts`.
-
-The company's campaign copy refers to showrooms **"in all governorates"** (معارض في جميع المحافظات),
-so the real count is likely higher than the seven above. **[V]/[?]**
+The retailer runs showrooms across the West Bank governorates and advertises a presence in all
+of them **[V]**. The demo seeds seven of them — Hebron (الخليل), Bethlehem (بيت لحم), Jerusalem
+(القدس), Ramallah & Al-Bireh (رام الله والبيرة), Nablus (نابلس), Tulkarem (طولكرم) and Jericho
+(أريحا) — plus an assumed central distribution centre; the coordinates are in
+`src/data/gazetteer.ts`. The real count and the exact sites come out of discovery. **[?]**
 
 Geographically this is a **~135 km north–south corridor** from Jenin down to Hebron, roughly
 15–25 km wide, with Jericho hanging off to the east in the Jordan Valley and Jerusalem sitting
@@ -116,23 +112,23 @@ inside a separate access regime.
 | **Website** | Live, bilingual `/ar/` + `/en/`, custom PHP (`.php` routes, campaign microsites) — **not** Shopify/Magento **[V]** | Custom stack = we can integrate directly at the DB level, no platform middleware needed. Good news |
 | **Campaign microsites** | Seasonal and promotional microsites — Ramadan, autumn, cash-instalment campaigns **[V]** | Campaigns create **demand spikes**. A fleet sized for the mean will fail every Ramadan and every back-to-school **[I]** |
 | **Phone / WhatsApp / social** | Active on Facebook, YouTube, X **[V]** | Almost certainly generates orders that never enter a system until a salesperson types them in **[?]** |
-| **Bank instalment financing** | *"Easy financing through all major banks"* **[V]** | Paperwork must be complete **before** dispatch, or the driver arrives and cannot release the goods. A classic failed-delivery cause **[I]** |
+| **Bank instalment financing** | Instalment plans through the major local banks **[V]** | Paperwork must be complete **before** dispatch, or the driver arrives and cannot release the goods. A classic failed-delivery cause **[I]** |
 
 ---
 
 ## 5. The delivery promise as it stands today
 
-Straight from the company's own service copy **[V]**:
+Paraphrased from the company's own service copy **[V]**:
 
-> **Free delivery within 48 to 72 hours, across the country.**
+> **Free delivery within 48 to 72 hours, nationwide.**
 
-> **The delivery team will ensure that all free-standing appliances work properly upon delivery,
-> installed with the proper set-up related to plumbing and electrical works when needed.**
+> **The delivery crew installs free-standing appliances, including the plumbing and electrical
+> set-up where needed, and confirms they work before leaving.**
 
 And the damage-in-delivery policy **[V]**:
 
-> Report damage **within 24 hours** of receipt — **same day for fragile items**.
-> Product must be unused except for initial testing. All accessories and packaging must be retained.
+> Damage must be reported **within 24 hours** of receipt — **the same day for fragile items** —
+> with the product unused beyond initial testing, and all accessories and packaging retained.
 
 Three things follow from this, and they define the whole programme:
 

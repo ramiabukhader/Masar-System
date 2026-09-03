@@ -1,4 +1,4 @@
-# Publishes the Masar demo to GitHub Pages.
+# Publishes the Masar demo to GitHub Pages — the live demo linked from the README.
 #
 # There is no API key, no secret and no third-party account involved. The job
 # authenticates with the GITHUB_TOKEN that Actions mints for this run: it is
@@ -7,10 +7,11 @@
 # there is nothing to leak and nothing to revoke later.
 name: Publish demo to GitHub Pages
 
-# Manual only. Hosting runs on Vercel; this stays as a ready alternative rather
-# than a second pipeline racing it — and it would fail noisily on every push
-# until Pages is switched on in Settings, which it is not.
+# Every push to main redeploys, so the README link never goes stale. It can
+# also be run by hand from the Actions tab.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -36,12 +37,16 @@ jobs:
 
       - run: npm ci
 
-      # A red test must never reach the client's screen.
+      # A red test must never reach the live demo.
       - run: npm test
 
       - run: npm run build
 
+      # Switches Pages on for the repository the first time this runs, so there
+      # is nothing to click in Settings.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

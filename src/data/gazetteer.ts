@@ -56,7 +56,8 @@ export const LOCALITIES: Locality[] = [
 /**
  * Network nodes.
  *
- * Branch locations are the retailer's publicly listed showrooms (docs/01 §3).
+ * The branch network as seeded for the demo: one showroom in each of seven governorates
+ * the retailer serves (docs/01 §3), placed at the city centre rather than at a street address.
  * The central distribution centre is an ASSUMPTION pending discovery — the group's
  * wholesale arm strongly implies one exists, but its location must be confirmed.
  */

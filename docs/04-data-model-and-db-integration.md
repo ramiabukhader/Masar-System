@@ -143,7 +143,7 @@ Pragmatic path, in order of effort:
    70 kg / 2 crew / plumbing is far closer than no model at all.
 2. **Enrich the top movers by hand.** The top ~200 SKUs will be 80% of delivered volume. Two people,
    a tape measure and a week gets the cube model to production quality where it matters.
-3. **Pull from supplier data.** Samsung, Ariston, Lofra and TCL all publish packaged dimensions.
+3. **Pull from supplier data.** The major manufacturers all publish packaged dimensions.
    For an authorised distributor this data is obtainable, and it should become a required field at
    product onboarding from then on.
 4. **Self-correct from the field.** The driver app captures "did not fit / heavier than expected"

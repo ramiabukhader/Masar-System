@@ -1,5 +1,10 @@
 # مسار · Masar
 
+[![CI](https://github.com/ramiabukhader/Masar-System/actions/workflows/ci.yml/badge.svg)](https://github.com/ramiabukhader/Masar-System/actions/workflows/ci.yml)
+
+**[Open the live demo →](https://ramiabukhader.github.io/Masar-System/)** — runs entirely in
+the browser, on simulated data, Arabic-first with an English toggle.
+
 **Delivery orchestration and route optimisation for a home-appliance retailer that runs
 its own delivery fleet.**
 
@@ -8,9 +13,13 @@ operation: free delivery within 48 hours, with installation, across a corridor-s
 access-constrained network — currently run branch-by-branch, at a cost the business feels
 but cannot yet measure.
 
-It was designed against a real retail operation in the West Bank. The retailer's name is
-left out of this repository, and every order, customer and cost figure in the demo is
-simulated.
+It was designed against a real retail operation in the West Bank. The retailer's name and
+the details that would identify it are left out of this repository, and every order,
+customer and cost figure in the demo is simulated.
+
+![Control Tower: the wave plan, cost and SLA risk, the network map and the disruption simulator](docs/screenshots/control-tower.png)
+
+![Orders board: every order in the wave with its live state, Arabic-first and right-to-left](docs/screenshots/orders.png)
 
 ---
 
@@ -41,7 +50,8 @@ simulated.
 
 ## Running it locally
 
-Nothing is hosted. It runs on your machine, and it works with no internet connection.
+The live demo needs nothing installed. To run it on your own machine instead — it works
+with no internet connection:
 
 ### Option A — just open the file
 
@@ -92,13 +102,15 @@ One self-contained file, about 625 KB with the typeface embedded. Double-click t
 Email it, put it on a USB stick, or open it on the laptop you present from. No server, no
 account, no URL — for a demo shown in a meeting this is simply the right answer.
 
-### GitHub Pages
+### GitHub Pages — the live demo
 
-`.github/workflows/pages.yml` publishes the production build to GitHub Pages. It is set to
-**manual trigger**: enable **Settings → Pages → Source: GitHub Actions**, then run the
-workflow from the Actions tab. It needs no API key — it authenticates with the
-`GITHUB_TOKEN` Actions mints for the single run, scoped to this repository and expiring
-with the job. Nothing to store, rotate or revoke.
+`.github/workflows/pages.yml` publishes the production build to GitHub Pages on every push
+to `main`, and can also be run by hand from the Actions tab; the live demo linked at the
+top is that deployment. It needs no API key — it authenticates with the `GITHUB_TOKEN`
+Actions mints for the single run, scoped to this repository and expiring with the job.
+Nothing to store, rotate or revoke. Pages has to be switched on once, under
+**Settings → Pages → Source: GitHub Actions**; the workflow attempts that itself on its
+first run.
 
 ### Vercel and Render
 
@@ -108,9 +120,8 @@ picks up the Vite preset with no input. Whichever you pick, grant its GitHub app
 
 ### Search engines
 
-The build ships with `robots.txt` and a `noindex` meta tag, so a hosted copy stays out of
-search results. That is discoverability control, not access control: anyone with the link
-can open it. Remove both if you want the demo to be indexed.
+Nothing blocks indexing: there is no `robots.txt` and no `noindex` tag, so the live demo
+can be found by search. Add either back if a hosted copy should stay unlisted.
 
 ### Continuous integration
 

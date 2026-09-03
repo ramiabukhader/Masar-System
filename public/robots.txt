@@ -1,4 +1,0 @@
-# Keeps hosted copies of the demo out of search results. This is NOT access
-# control — anyone with the URL can still open it.
-User-agent: *
-Disallow: /
