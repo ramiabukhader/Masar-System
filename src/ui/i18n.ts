@@ -9,7 +9,7 @@ type Dict = Record<string, { ar: string; en: string }>;
  */
 export const STRINGS: Dict = {
   appName: { ar: 'مسار', en: 'Masar' },
-  appTagline: { ar: 'نظام إدارة وتحسين التوصيل — مسلماني هوم', en: 'Delivery orchestration & optimisation — Maslamani Home' },
+  appTagline: { ar: 'نظام إدارة وتحسين التوصيل', en: 'Delivery orchestration & optimisation' },
   demoNotice: { ar: 'نسخة تجريبية ببيانات محاكاة', en: 'Demo build on simulated data' },
   themeToggle: { ar: 'تبديل السمة — غامق / فاتح', en: 'Switch theme — dark / light' },
   langToggle: { ar: 'التبديل إلى الإنجليزية', en: 'Switch to Arabic' },

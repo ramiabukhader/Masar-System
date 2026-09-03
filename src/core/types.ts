@@ -1,7 +1,7 @@
 /**
  * Masar — canonical domain model.
  *
- * Deliberately NOT a mirror of Maslamani Home's commerce schema. This is the model a
+ * Deliberately NOT a mirror of the retailer's commerce schema. This is the model a
  * delivery network needs; the OrderSource adapter translates from theirs into this.
  * See docs/04-data-model-and-db-integration.md.
  */

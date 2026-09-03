@@ -1,6 +1,6 @@
 # 04 — Canonical Data Model & DB Integration
 
-How Masar models the world, and exactly how it plugs into Maslamani Home's existing database.
+How Masar models the world, and exactly how it plugs into the retailer's existing database.
 
 ---
 
@@ -79,8 +79,8 @@ export interface DeliveryStatusUpdate {
 Two implementations ship:
 
 - **`MockOrderSource`** — seeded, deterministic, drives the demo in this repo. No DB required.
-- **`MaslamaniDbOrderSource`** — thin SQL implementation against their read-replica. Skeleton and
-  the queries it needs are in §3.
+- **`CommerceDbOrderSource`** — thin SQL implementation against the retailer's read-replica.
+  Skeleton and the queries it needs are in §3.
 
 Swapping is one line in configuration. **Nothing in the optimiser, the UI, or the driver app knows
 which one is active.** That is the point: the demo you show them is running the same code that will
@@ -143,7 +143,7 @@ Pragmatic path, in order of effort:
    70 kg / 2 crew / plumbing is far closer than no model at all.
 2. **Enrich the top movers by hand.** The top ~200 SKUs will be 80% of delivered volume. Two people,
    a tape measure and a week gets the cube model to production quality where it matters.
-3. **Pull from supplier data.** Samsung, Ariston, Lofra and TCL all publish packaged dimensions.
+3. **Pull from supplier data.** The major manufacturers all publish packaged dimensions.
    For an authorised distributor this data is obtainable, and it should become a required field at
    product onboarding from then on.
 4. **Self-correct from the field.** The driver app captures "did not fit / heavier than expected"

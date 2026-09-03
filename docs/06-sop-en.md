@@ -9,7 +9,7 @@ These three must always say the same thing. When a process changes, change all t
 
 ## 1. Scope and principles
 
-Covers every delivery from a Maslamani Home showroom, the website, or the call centre to a
+Covers every delivery from a showroom, the website, or the call centre to a
 customer address, including installation and payment collection.
 
 Five principles, in priority order:
@@ -179,7 +179,7 @@ The system holds an order out of planning when any of these fail:
 
 ### C2. Pre-arrival call (Driver, 15–20 minutes out)
 
-*"Good morning, this is Maslamani Home. We are 20 minutes away with your [item].
+*"Good morning, this is the Masar delivery team. We are 20 minutes away with your [item].
 Is someone at the address? Is the stairway clear?"*
 
 If nobody will be there → do not drive to the address. Report **customer_absent** from the

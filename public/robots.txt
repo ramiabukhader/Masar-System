@@ -1,5 +1,0 @@
-# This is a private client demo. It is not meant to be discoverable.
-# Keeps the deployment out of search results; it is NOT access control —
-# anyone with the URL can still open it.
-User-agent: *
-Disallow: /

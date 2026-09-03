@@ -1,7 +1,7 @@
 import type { Customer, InventoryRecord, Node, Order, Product } from './types';
 
 /**
- * The entire integration surface with Maslamani Home's commerce database.
+ * The entire integration surface with the retailer's commerce database.
  *
  * Deliberately narrow (docs/03 §1): we read orders, customers, products, inventory and
  * branches; we write back exactly one thing — delivery status. Their system stays the
@@ -112,7 +112,7 @@ export class MockOrderSource implements OrderSource {
  * category defaults table and marks the product `dimensionsEstimated: true` so the
  * estimate is visible on the manifest instead of silently pretending to be measured.
  */
-export interface MaslamaniDbConfig {
+export interface CommerceDbConfig {
   replicaConnectionString: string;
   writeConnectionString: string;
   /** category -> assumed cube/weight/crew/install, used until the master is enriched. */

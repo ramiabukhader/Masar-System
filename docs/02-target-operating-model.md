@@ -1,6 +1,6 @@
 # 02 — Target Operating Model
 
-How Maslamani Home's delivery operation should run once **Masar** (مسار) is live.
+How the retailer's delivery operation should run once **Masar** (مسار) is live.
 This is the "path" — what changes, in what order, and what each change is worth.
 
 ---

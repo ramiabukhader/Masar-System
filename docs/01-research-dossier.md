@@ -1,23 +1,22 @@
-# 01 — Research Dossier: Maslamani Home
+# 01 — Research Dossier: the retailer
 
 **Prepared:** August 2026
-**Subject:** Maslamani Home (مسلماني هوم) — retail chain of Maslamani Group
+**Subject:** A Palestinian home-appliance and kitchenware retail chain, referred to throughout as *the retailer*. It is a real business; its name and the details that would identify it are deliberately left out of this repository.
 **Purpose:** Establish the commercial and operational baseline before designing the delivery automation and optimisation programme.
 
 ---
 
 ## 0. A note on sourcing and confidence
 
-This session's network policy blocked direct access to `maslamanihome.com`, `maslamani.com`,
-`almaslamani.ps` and `jobs.ps`, so the company's own pages could not be crawled page-by-page.
-Everything below was assembled from indexed search results, the group's public brand pages, and
+The retailer's own websites could not be crawled page-by-page during research, so everything
+below was assembled from indexed search results, the group's public brand pages, and
 retail/logistics domain knowledge.
 
 Every statement is tagged:
 
 | Tag | Meaning |
 |---|---|
-| **[V]** | Verified from a public Maslamani source (site copy, group page, indexed page) |
+| **[V]** | Verified from one of the retailer's public sources (site copy, group page, indexed page) |
 | **[I]** | Inferred with high confidence from the product mix and business model |
 | **[?]** | Assumption that **must be confirmed** with the client before build |
 
@@ -30,10 +29,10 @@ consolidated discovery list — it is the first thing to run through when we get
 
 | | |
 |---|---|
-| Group founded | 1969, by Al-Haj Khader Al-Maslamani **[V]** |
-| Retail chain founded | Maslamani Home, 2017 **[V]** |
-| Market | Palestine — West Bank + Jerusalem; group also distributes into the Israeli market **[V]** |
-| Positioning | *"The largest chain store for the world's leading brands in home appliances, small electrical appliances, kitchenware and gifts"* **[V]** |
+| Group founded | More than fifty years ago, as a wholesale distributor **[V]** |
+| Retail chain founded | Within the last decade **[V]** |
+| Market | Palestine — West Bank and Jerusalem **[V]** |
+| Positioning | Presents itself as the largest chain for the world's leading brands in home appliances, small electricals, kitchenware and gifts **[V]** |
 | Group activity | Household appliance and electrical/electronic goods wholesale + retail + after-sales service **[V]** |
 | After-sales | Authorised service centre, described by the group as the largest in the region **[V]** |
 
@@ -47,17 +46,16 @@ trucks. **[I]**
 
 ## 2. Brand and product portfolio — what actually goes on the truck
 
-Brands carried (agency / exclusive distribution): **KMG** (own/house brand), **Samsung**, **TCL**,
-**Ariston**, **Lofra**, **Elica**, **Turbo Air**, **JBL**, **Moulinex**, **Tefal**, **Krups**,
-**BaByliss**, **Emsa**, **Pyrex**, **Luminarc**, **Cristal d'Arques**. **[V]**
+The portfolio is a house brand plus agency or exclusive distribution of the major global names
+in white goods, televisions, small domestic appliances, and branded kitchenware and glassware.
+**[V]** The demo catalogue in `src/data/catalog.ts` mirrors that mix with representative products.
 
 Grouped by how they behave in a delivery network — this is the single most important lens for
 route planning, because a truck is constrained by **volume and handling crew**, not by order count:
 
 ### Class A — Major appliances / white goods
 Refrigerators, washing machines, dryers, dishwashers, gas cookers and ranges, built-in ovens,
-extractor hoods, air conditioners, large-format TVs.
-Brands: Samsung, Ariston, Lofra, Elica, KMG, TCL, Turbo Air. **[V]**
+extractor hoods, air conditioners, large-format TVs. **[V]**
 
 - **0.3 – 1.6 m³ per unit**, 30 – 120 kg
 - Needs **2-person crew**, often stairs, often no elevator
@@ -68,14 +66,13 @@ Brands: Samsung, Ariston, Lofra, Elica, KMG, TCL, Turbo Air. **[V]**
 - This class is where 100% of the delivery cost problem lives **[I]**
 
 ### Class B — Small domestic appliances
-Kettles, blenders, food processors, irons, air fryers, coffee machines, personal care.
-Brands: Moulinex, Tefal, Krups, BaByliss, JBL. **[V]**
+Kettles, blenders, food processors, irons, air fryers, coffee machines, personal care. **[V]**
 
 - 0.005 – 0.05 m³, 1 – 8 kg, single-person, no installation
 - Can ride as fill in any vehicle, or go via a parcel courier entirely **[I]**
 
 ### Class C — Kitchenware, glassware, gifts
-Pyrex, Luminarc, Cristal d'Arques, Emsa. **[V]**
+Branded cookware, dinner sets, glassware and gift sets. **[V]**
 
 - Small, light, **fragile** — the company's own damage policy singles out fragile goods for
   same-day damage reporting **[V]**
@@ -89,20 +86,11 @@ should not share a single delivery process. Today it appears they do. **[?]**
 
 ## 3. Branch network — the origin nodes
 
-Confirmed showroom locations **[V]**:
-
-| Governorate | Branch detail from public listings |
-|---|---|
-| Hebron (الخليل) | Peace Street, next to Al-Ansar Mosque |
-| Bethlehem (بيت لحم) | Al-Jabal Street, Sharia Court building |
-| Jerusalem (القدس) | Amr bin Al-Aas Street, near St. George Hotel |
-| Ramallah & Al-Bireh (رام الله والبيرة) | Ammar Tower, near Independence Park |
-| Nablus (نابلس) | listed |
-| Tulkarem (طولكرم) | Nablus Street, Aktaba roundabout |
-| Jericho (أريحا) | listed |
-
-The company's campaign copy refers to showrooms **"in all governorates"** (معارض مسلماني هوم في جميع المحافظات),
-so the real count is likely higher than the seven above. **[V]/[?]**
+The retailer runs showrooms across the West Bank governorates and advertises a presence in all
+of them **[V]**. The demo seeds seven of them — Hebron (الخليل), Bethlehem (بيت لحم), Jerusalem
+(القدس), Ramallah & Al-Bireh (رام الله والبيرة), Nablus (نابلس), Tulkarem (طولكرم) and Jericho
+(أريحا) — plus an assumed central distribution centre; the coordinates are in
+`src/data/gazetteer.ts`. The real count and the exact sites come out of discovery. **[?]**
 
 Geographically this is a **~135 km north–south corridor** from Jenin down to Hebron, roughly
 15–25 km wide, with Jericho hanging off to the east in the Jordan Valley and Jerusalem sitting
@@ -121,26 +109,26 @@ inside a separate access regime.
 | Channel | Status | Delivery implication |
 |---|---|---|
 | **Showroom floor** | Primary **[V]** | Salesperson captures the address verbally. This is the #1 source of bad address data and unrealistic promises **[I]** |
-| **Website** `maslamanihome.com` | Live, bilingual `/ar/` + `/en/`, custom PHP (`.php` routes, campaign microsites) — **not** Shopify/Magento **[V]** | Custom stack = we can integrate directly at the DB level, no platform middleware needed. Good news |
-| **Campaign microsites** | `/campaigns/ramadan-2025/`, `/campaigns/autumn-2023/`, `/campaigns/number-one/`, `/campaigns/day-by-day-cash/` **[V]** | Campaigns create **demand spikes**. A fleet sized for the mean will fail every Ramadan and every back-to-school **[I]** |
+| **Website** | Live, bilingual `/ar/` + `/en/`, custom PHP (`.php` routes, campaign microsites) — **not** Shopify/Magento **[V]** | Custom stack = we can integrate directly at the DB level, no platform middleware needed. Good news |
+| **Campaign microsites** | Seasonal and promotional microsites — Ramadan, autumn, cash-instalment campaigns **[V]** | Campaigns create **demand spikes**. A fleet sized for the mean will fail every Ramadan and every back-to-school **[I]** |
 | **Phone / WhatsApp / social** | Active on Facebook, YouTube, X **[V]** | Almost certainly generates orders that never enter a system until a salesperson types them in **[?]** |
-| **Bank instalment financing** | *"Easy financing through all major banks"* **[V]** | Paperwork must be complete **before** dispatch, or the driver arrives and cannot release the goods. A classic failed-delivery cause **[I]** |
+| **Bank instalment financing** | Instalment plans through the major local banks **[V]** | Paperwork must be complete **before** dispatch, or the driver arrives and cannot release the goods. A classic failed-delivery cause **[I]** |
 
 ---
 
 ## 5. The delivery promise as it stands today
 
-Straight from the company's own service copy **[V]**:
+Paraphrased from the company's own service copy **[V]**:
 
-> **Free delivery within 48 to 72 hours, across the country.**
+> **Free delivery within 48 to 72 hours, nationwide.**
 
-> **The delivery team will ensure that all free-standing appliances work properly upon delivery,
-> installed with the proper set-up related to plumbing and electrical works when needed.**
+> **The delivery crew installs free-standing appliances, including the plumbing and electrical
+> set-up where needed, and confirms they work before leaving.**
 
 And the damage-in-delivery policy **[V]**:
 
-> Report damage to Maslamani Home **within 24 hours** of receipt — **same day for fragile items**.
-> Product must be unused except for initial testing. All accessories and packaging must be retained.
+> Damage must be reported **within 24 hours** of receipt — **the same day for fragile items** —
+> with the product unused beyond initial testing, and all accessories and packaging retained.
 
 Three things follow from this, and they define the whole programme:
 
@@ -249,7 +237,7 @@ Ordered by how much each one changes the design.
 
 ## 9. Read-through: the strategic conclusion
 
-Maslamani Home is not suffering from a routing problem. It is suffering from a
+The retailer is not suffering from a routing problem. It is suffering from a
 **promise-and-visibility problem that shows up as a routing cost**.
 
 They promise free delivery in 48h, with installation, across a fragmented and access-constrained

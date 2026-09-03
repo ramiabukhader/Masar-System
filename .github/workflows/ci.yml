@@ -29,11 +29,11 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      # masar-demo.html is a tracked build artifact, and the README tells the client to
+      # masar-demo.html is a tracked build artifact, and the README tells the reader to
       # double-click it. Nothing regenerated it for six commits, so it went on shipping a
-      # whole screen that a later commit had deliberately deleted for not being for the
-      # client's eyes. Compare the rebuilt file against the committed one, the way a
-      # lockfile check works, so it cannot drift again.
+      # whole screen that a later commit had deliberately deleted. Compare the rebuilt
+      # file against the committed one, the way a lockfile check works, so it cannot
+      # drift again.
       - name: masar-demo.html is in sync with src
         run: |
           node scripts/build-standalone.mjs

@@ -1,12 +1,12 @@
 # 09 — How the good operators do it
 
 Benchmark research: retailers that carry their own inventory and run their own delivery,
-what they actually built, and what of it transfers to Maslamani Home.
+what they actually built, and what of it transfers to the retailer.
 
 The brief was "find good companies who have their own trucks and their own system, and see
 how they automate it." So this deliberately skips Amazon — a parcel network at that scale
 solves a different problem — and looks at **big-and-bulky retailers with installation**,
-which is exactly Maslamani Home's problem.
+which is exactly the retailer's problem.
 
 ---
 
@@ -28,7 +28,7 @@ target operating model reaches from first principles (docs/02 §3), arrived at b
 that has run it profitably for years.
 
 **What does not:** Coolblue treats delivery as a marketing differentiator and invests
-accordingly. Maslamani Home is not in a market where that arms race pays yet.
+accordingly. The retailer is not in a market where that arms race pays yet.
 
 ---
 
@@ -76,7 +76,7 @@ turns, **reduced damages**, and better on-time delivery rates.
 
 **What transfers:** every touch is a chance to damage a refrigerator and a chance to lose
 an hour. A showroom is a place to *sell* an appliance, not a place to *handle* one. The
-reduced-damages result is the one to quote to Maslamani Home, because it maps directly
+reduced-damages result is the one to quote to the retailer, because it maps directly
 onto their own 24-hour damage-claim exposure.
 
 Our architecture already supports this — shipments carry staging options and can be
@@ -108,7 +108,7 @@ Best Buy delivers and installs major appliances through Geek Squad, and **charge
 adjacent services**: haul-away and recycling of the old appliance (about $50), installation
 upgrades, and a workmanship warranty on the service itself.
 
-**What transfers:** Maslamani Home gives delivery and basic installation away free, so
+**What transfers:** The retailer gives delivery and basic installation away free, so
 there is no delivery line to price. But there are billable services sitting right next to
 it that customers genuinely want — taking the old fridge away is the obvious one. It does
 not touch the free-delivery promise, and it rides on a truck and a crew that are already at
@@ -124,8 +124,8 @@ through partners — DHL, UPS, PostNord — and **charges the customer** for bul
 (£15–40 in the UK, scaled by size and value).
 
 **What transfers:** the trade-off, stated plainly. Outsourcing the fleet is viable when you
-charge for delivery, because the cost lives in a line item the customer pays. Maslamani
-Home has chosen free delivery with installation, which means **they cannot outsource the
+charge for delivery, because the cost lives in a line item the customer pays. The retailer
+has chosen free delivery with installation, which means **they cannot outsource the
 margin problem away — they have to own the efficiency.** That is not a criticism of the
 free-delivery promise; it is the reason the promise requires this system.
 
@@ -159,7 +159,7 @@ to a given slot**, and whether the promise is deliverable at all. Where retailer
 shape demand, they discount off-peak slots and price peak ones — smoothing the day rather
 than rationing it.
 
-**For Maslamani Home, without charging anything:** offer the customer two or three slots
+**For the retailer, without charging anything:** offer the customer two or three slots
 and *label* the one that is cheapest for the network to serve. A "recommended" tag moves a
 large share of customers at zero cost to the promise.
 
@@ -179,9 +179,9 @@ a broken promise the customer paid attention to.
 
 ---
 
-## 3. Scorecard: where Maslamani Home sits
+## 3. Scorecard: where the retailer sits
 
-| Practice | Coolblue | John Lewis | Lowe's | Best Buy | Maslamani today | Masar target |
+| Practice | Coolblue | John Lewis | Lowe's | Best Buy | The retailer today | Masar target |
 |---|---|---|---|---|---|---|
 | Own fleet for big-and-bulky | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Installation at the door | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -195,7 +195,7 @@ a broken promise the customer paid attention to.
 | Paid adjacent services | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ Phase 3 |
 | Paid express tier | ✅ | ✅ | ✅ | ✅ | ❌ | Phase 4 |
 
-Maslamani Home already has the expensive half — the fleet, the crews, the installation
+The retailer already has the expensive half — the fleet, the crews, the installation
 skills, the branch network. What is missing is the **system layer** on top of it. That is a
 much better position to start from than the reverse.
 
@@ -228,7 +228,7 @@ touches, less damage, and showroom staff stop handling refrigerators.
 
 ### 4.3 Label the cheapest slot *(from dynamic slot pricing, adapted)*
 
-Maslamani Home cannot charge for delivery, so it cannot price slots. It can still **shape
+The retailer cannot charge for delivery, so it cannot price slots. It can still **shape
 demand for free** by marking the slot that is cheapest to serve as the recommended one.
 Same mechanism, no change to the promise, no cost to the customer.
 
@@ -242,7 +242,7 @@ without touching the free-delivery promise.
 
 ## 5. What we deliberately do not copy
 
-- **IKEA's outsourced fleet.** Only works if you charge for delivery. Maslamani Home does not.
+- **IKEA's outsourced fleet.** Only works if you charge for delivery. The retailer does not.
 - **Home Depot's $1.2bn node programme.** The idea (purpose-built big-and-bulky nodes)
   transfers; the capital does not. One DC and two corridor hubs is the right scale here.
 - **Same-day, for now.** Every operator on this list launched express *after* their base

@@ -69,8 +69,8 @@ const SHIFT_END = 18 * 60;
 
 export function App() {
   const [lang, setLang] = useState<Lang>('ar');
-  // Light by default — a dispatcher reads this screen for ten hours. The charcoal ground
-  // their own site uses is one click away in the top bar.
+  // Light by default — a dispatcher reads this screen for ten hours. The full charcoal
+  // ground is one click away in the top bar.
   const [theme, setTheme] = useState<Theme>('light');
   const [view, setView] = useState<View>('orders');
   const [openOrderId, setOpenOrderId] = useState<string | null>(null);
