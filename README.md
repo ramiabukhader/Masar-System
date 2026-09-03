@@ -108,9 +108,8 @@ account, no URL — for a demo shown in a meeting this is simply the right answe
 to `main`, and can also be run by hand from the Actions tab; the live demo linked at the
 top is that deployment. It needs no API key — it authenticates with the `GITHUB_TOKEN`
 Actions mints for the single run, scoped to this repository and expiring with the job.
-Nothing to store, rotate or revoke. Pages has to be switched on once, under
-**Settings → Pages → Source: GitHub Actions**; the workflow attempts that itself on its
-first run.
+Nothing to store, rotate or revoke. Pages has to be switched on once by hand, under
+**Settings → Pages → Source: GitHub Actions**; the job's token cannot do that itself.
 
 ### Vercel and Render
 
