@@ -56,7 +56,7 @@ export const LOCALITIES: Locality[] = [
 /**
  * Network nodes.
  *
- * Branch locations are the publicly listed Maslamani Home showrooms (docs/01 §3).
+ * Branch locations are the retailer's publicly listed showrooms (docs/01 §3).
  * The central distribution centre is an ASSUMPTION pending discovery — the group's
  * wholesale arm strongly implies one exists, but its location must be confirmed.
  */

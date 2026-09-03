@@ -1,23 +1,22 @@
-# 01 — Research Dossier: Maslamani Home
+# 01 — Research Dossier: the retailer
 
 **Prepared:** August 2026
-**Subject:** Maslamani Home (مسلماني هوم) — retail chain of Maslamani Group
+**Subject:** A Palestinian home-appliance and kitchenware retail chain, referred to throughout as *the retailer*. It is a real business; its name is deliberately left out of this repository.
 **Purpose:** Establish the commercial and operational baseline before designing the delivery automation and optimisation programme.
 
 ---
 
 ## 0. A note on sourcing and confidence
 
-This session's network policy blocked direct access to `maslamanihome.com`, `maslamani.com`,
-`almaslamani.ps` and `jobs.ps`, so the company's own pages could not be crawled page-by-page.
-Everything below was assembled from indexed search results, the group's public brand pages, and
+The retailer's own websites could not be crawled page-by-page during research, so everything
+below was assembled from indexed search results, the group's public brand pages, and
 retail/logistics domain knowledge.
 
 Every statement is tagged:
 
 | Tag | Meaning |
 |---|---|
-| **[V]** | Verified from a public Maslamani source (site copy, group page, indexed page) |
+| **[V]** | Verified from one of the retailer's public sources (site copy, group page, indexed page) |
 | **[I]** | Inferred with high confidence from the product mix and business model |
 | **[?]** | Assumption that **must be confirmed** with the client before build |
 
@@ -30,8 +29,8 @@ consolidated discovery list — it is the first thing to run through when we get
 
 | | |
 |---|---|
-| Group founded | 1969, by Al-Haj Khader Al-Maslamani **[V]** |
-| Retail chain founded | Maslamani Home, 2017 **[V]** |
+| Group founded | 1969 **[V]** |
+| Retail chain founded | 2017 **[V]** |
 | Market | Palestine — West Bank + Jerusalem; group also distributes into the Israeli market **[V]** |
 | Positioning | *"The largest chain store for the world's leading brands in home appliances, small electrical appliances, kitchenware and gifts"* **[V]** |
 | Group activity | Household appliance and electrical/electronic goods wholesale + retail + after-sales service **[V]** |
@@ -89,19 +88,12 @@ should not share a single delivery process. Today it appears they do. **[?]**
 
 ## 3. Branch network — the origin nodes
 
-Confirmed showroom locations **[V]**:
+Confirmed showroom locations, from the retailer's public listings **[V]**: Hebron (الخليل),
+Bethlehem (بيت لحم), Jerusalem (القدس), Ramallah & Al-Bireh (رام الله والبيرة), Nablus (نابلس),
+Tulkarem (طولكرم) and Jericho (أريحا). Street addresses are left out here; the coordinates the
+demo plans against are in `src/data/gazetteer.ts`.
 
-| Governorate | Branch detail from public listings |
-|---|---|
-| Hebron (الخليل) | Peace Street, next to Al-Ansar Mosque |
-| Bethlehem (بيت لحم) | Al-Jabal Street, Sharia Court building |
-| Jerusalem (القدس) | Amr bin Al-Aas Street, near St. George Hotel |
-| Ramallah & Al-Bireh (رام الله والبيرة) | Ammar Tower, near Independence Park |
-| Nablus (نابلس) | listed |
-| Tulkarem (طولكرم) | Nablus Street, Aktaba roundabout |
-| Jericho (أريحا) | listed |
-
-The company's campaign copy refers to showrooms **"in all governorates"** (معارض مسلماني هوم في جميع المحافظات),
+The company's campaign copy refers to showrooms **"in all governorates"** (معارض في جميع المحافظات),
 so the real count is likely higher than the seven above. **[V]/[?]**
 
 Geographically this is a **~135 km north–south corridor** from Jenin down to Hebron, roughly
@@ -121,8 +113,8 @@ inside a separate access regime.
 | Channel | Status | Delivery implication |
 |---|---|---|
 | **Showroom floor** | Primary **[V]** | Salesperson captures the address verbally. This is the #1 source of bad address data and unrealistic promises **[I]** |
-| **Website** `maslamanihome.com` | Live, bilingual `/ar/` + `/en/`, custom PHP (`.php` routes, campaign microsites) — **not** Shopify/Magento **[V]** | Custom stack = we can integrate directly at the DB level, no platform middleware needed. Good news |
-| **Campaign microsites** | `/campaigns/ramadan-2025/`, `/campaigns/autumn-2023/`, `/campaigns/number-one/`, `/campaigns/day-by-day-cash/` **[V]** | Campaigns create **demand spikes**. A fleet sized for the mean will fail every Ramadan and every back-to-school **[I]** |
+| **Website** | Live, bilingual `/ar/` + `/en/`, custom PHP (`.php` routes, campaign microsites) — **not** Shopify/Magento **[V]** | Custom stack = we can integrate directly at the DB level, no platform middleware needed. Good news |
+| **Campaign microsites** | Seasonal and promotional microsites — Ramadan, autumn, cash-instalment campaigns **[V]** | Campaigns create **demand spikes**. A fleet sized for the mean will fail every Ramadan and every back-to-school **[I]** |
 | **Phone / WhatsApp / social** | Active on Facebook, YouTube, X **[V]** | Almost certainly generates orders that never enter a system until a salesperson types them in **[?]** |
 | **Bank instalment financing** | *"Easy financing through all major banks"* **[V]** | Paperwork must be complete **before** dispatch, or the driver arrives and cannot release the goods. A classic failed-delivery cause **[I]** |
 
@@ -139,7 +131,7 @@ Straight from the company's own service copy **[V]**:
 
 And the damage-in-delivery policy **[V]**:
 
-> Report damage to Maslamani Home **within 24 hours** of receipt — **same day for fragile items**.
+> Report damage **within 24 hours** of receipt — **same day for fragile items**.
 > Product must be unused except for initial testing. All accessories and packaging must be retained.
 
 Three things follow from this, and they define the whole programme:
@@ -249,7 +241,7 @@ Ordered by how much each one changes the design.
 
 ## 9. Read-through: the strategic conclusion
 
-Maslamani Home is not suffering from a routing problem. It is suffering from a
+The retailer is not suffering from a routing problem. It is suffering from a
 **promise-and-visibility problem that shows up as a routing cost**.
 
 They promise free delivery in 48h, with installation, across a fragmented and access-constrained

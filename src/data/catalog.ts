@@ -1,7 +1,7 @@
 import type { Product } from '../core/types';
 
 /**
- * Product catalogue modelled on Maslamani Home's actual brand portfolio (docs/01 §2):
+ * Product catalogue modelled on the retailer's actual brand portfolio (docs/01 §2):
  * KMG, Samsung, TCL, Ariston, Lofra, Elica, Turbo Air, JBL, Moulinex, Tefal, Krups,
  * BaByliss, Emsa, Pyrex, Luminarc, Cristal d'Arques.
  *

@@ -6,14 +6,14 @@
 
 ## 1. Principle: read their world, own ours
 
-Maslamani Home has a working custom PHP stack with its own database. We do not migrate it, wrap it,
+The retailer has a working custom PHP stack with its own database. We do not migrate it, wrap it,
 or fight it.
 
 ```
    THEIR WORLD (source of truth for commerce)      OUR WORLD (source of truth for delivery)
    ┌──────────────────────────────────────┐        ┌──────────────────────────────────────┐
    │  POS / showroom                      │        │  Masar                               │
-   │  maslamanihome.com (PHP)             │──────▶ │   order intake → plan → dispatch     │
+   │  Retailer website (PHP)              │──────▶ │   order intake → plan → dispatch     │
    │  Orders · Customers · Products       │  read  │   → deliver → close                  │
    │  Inventory · Branches                │        │                                      │
    │                                      │ ◀──────│  writes back ONLY: delivery status,  │
@@ -58,7 +58,7 @@ single write-back table.
 │                          ADAPTERS (swap-in points)                           │
 │  OrderSource      TravelTimeProvider    NotificationChannel   GeocodeProvider│
 │  ├ Mock (demo)    ├ Matrix+profiles     ├ Mock (demo)         ├ Gazetteer    │
-│  └ MaslamaniDB    ├ OSRM/road-network   ├ SMS gateway         └ External     │
+│  └ CommerceDB     ├ OSRM/road-network   ├ SMS gateway         └ External     │
 │                   └ Learned-from-GPS    └ WhatsApp Business API              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -143,7 +143,7 @@ are not slightly wrong here; they are structurally wrong.
 Branch tablets ─┐
 Driver phones ──┼─▶  Masar app servers ──▶  Masar DB (Postgres + PostGIS)
 Dispatcher PCs ─┘         │
-                          ├──▶  read-replica of Maslamani commerce DB  (read-only)
+                          ├──▶  read-replica of the commerce DB        (read-only)
                           ├──▶  write-back table in commerce DB        (status only)
                           ├──▶  OSRM / road-network routing service    (self-hostable)
                           └──▶  SMS / WhatsApp Business API

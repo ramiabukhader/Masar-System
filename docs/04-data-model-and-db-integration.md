@@ -1,6 +1,6 @@
 # 04 — Canonical Data Model & DB Integration
 
-How Masar models the world, and exactly how it plugs into Maslamani Home's existing database.
+How Masar models the world, and exactly how it plugs into the retailer's existing database.
 
 ---
 
@@ -79,8 +79,8 @@ export interface DeliveryStatusUpdate {
 Two implementations ship:
 
 - **`MockOrderSource`** — seeded, deterministic, drives the demo in this repo. No DB required.
-- **`MaslamaniDbOrderSource`** — thin SQL implementation against their read-replica. Skeleton and
-  the queries it needs are in §3.
+- **`CommerceDbOrderSource`** — thin SQL implementation against the retailer's read-replica.
+  Skeleton and the queries it needs are in §3.
 
 Swapping is one line in configuration. **Nothing in the optimiser, the UI, or the driver app knows
 which one is active.** That is the point: the demo you show them is running the same code that will

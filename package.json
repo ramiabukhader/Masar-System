@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Masar - delivery orchestration and route optimization demo for Maslamani Home",
+  "description": "Masar - delivery orchestration and route optimisation for retailers that run their own delivery fleet",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

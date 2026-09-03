@@ -1,11 +1,16 @@
 # مسار · Masar
 
-**Delivery orchestration and route optimisation for Maslamani Home (مسلماني هوم).**
+**Delivery orchestration and route optimisation for a home-appliance retailer that runs
+its own delivery fleet.**
 
-A working demo of a system to automate and optimise Maslamani Home's delivery operation:
-free delivery within 48 hours, with installation, across a corridor-shaped and
+A working demo of a system to automate and optimise a multi-branch retailer's delivery
+operation: free delivery within 48 hours, with installation, across a corridor-shaped and
 access-constrained network — currently run branch-by-branch, at a cost the business feels
 but cannot yet measure.
+
+It was designed against a real retail operation in the West Bank. The retailer's name is
+left out of this repository, and every order, customer and cost figure in the demo is
+simulated.
 
 ---
 
@@ -23,9 +28,9 @@ but cannot yet measure.
 
 | Doc | What it answers |
 |---|---|
-| [`01-research-dossier.md`](docs/01-research-dossier.md) | Who they are, what they sell, how they sell it, and where the delivery cost actually leaks |
+| [`01-research-dossier.md`](docs/01-research-dossier.md) | Who the retailer is, what it sells, how it sells it, and where the delivery cost actually leaks |
 | [`02-target-operating-model.md`](docs/02-target-operating-model.md) | The path: what changes, in what order, and what each change is worth |
-| [`03-architecture.md`](docs/03-architecture.md) | How Masar plugs into their existing PHP stack without owning it |
+| [`03-architecture.md`](docs/03-architecture.md) | How Masar plugs into the retailer's existing PHP stack without owning it |
 | [`04-data-model-and-db-integration.md`](docs/04-data-model-and-db-integration.md) | The canonical model, the adapter contract, and the product-dimension gap that gates everything |
 | [`05-optimization-spec.md`](docs/05-optimization-spec.md) | What the optimiser solves and how |
 | [`06-sop-en.md`](docs/06-sop-en.md) | End-to-end SOPs, English |
@@ -57,7 +62,7 @@ own and open it.
 ```bash
 npm install
 npm run dev        # http://localhost:5173, hot reload
-npm test           # 36 tests over the planning engine, order lifecycle and promise engine
+npm test           # 61 tests over the planning engine, order lifecycle and promise engine
 ```
 
 ### للتشغيل محلياً
@@ -74,91 +79,44 @@ npm run build:standalone
 
 ## Hosting the demo
 
-It is a static bundle — no server, no database, no API, no secrets. So the question is not
-"can it be hosted" but **who do you have to trust, and with what**.
+It is a static bundle — no server, no database, no API, no secrets — so it can be hosted
+anywhere that serves files, or not hosted at all.
 
-**This repository is private, and it should stay that way** — it carries the client
-research, the operating model and the SOPs, not just the demo. Every option below is
-weighed against that.
-
-### 1. Don't host it — send the file *(safest, and already built)*
+### Send the file
 
 ```bash
 npm run build:standalone     # → masar-demo.html
 ```
 
-One self-contained file, ~310 KB. Double-click to open. No server, no account, no
-credential, no URL for anyone to find. Email it, put it on a USB stick, or open it on the
-laptop you present from.
+One self-contained file, about 625 KB with the typeface embedded. Double-click to open.
+Email it, put it on a USB stick, or open it on the laptop you present from. No server, no
+account, no URL — for a demo shown in a meeting this is simply the right answer.
 
-**Attack surface: zero.** For a demo shown in a meeting this is not a compromise, it is
-simply the right answer. Take the URL only when you actually need one.
+### GitHub Pages
 
-### 2. A separate, empty Cloudflare account *(when you need a private URL)*
+`.github/workflows/pages.yml` publishes the production build to GitHub Pages. It is set to
+**manual trigger**: enable **Settings → Pages → Source: GitHub Actions**, then run the
+workflow from the Actions tab. It needs no API key — it authenticates with the
+`GITHUB_TOKEN` Actions mints for the single run, scoped to this repository and expiring
+with the job. Nothing to store, rotate or revoke.
 
-If it must be reachable over the internet, do **not** put a token on your production
-Cloudflare account. Create a **second, free Cloudflare account** used for nothing else:
+### Vercel and Render
 
-- A brand-new account holds no zones, no DNS, no Workers, no billing relationship. Even a
-  fully compromised credential there reaches nothing, because there is nothing to reach.
-- Use the dashboard's **Git integration**, not an API token — then no credential exists at
-  all. When you install its GitHub app, grant it **this repository only**, not the account.
-- **Cloudflare Access** on the free plan gates the site to a list of invited email
-  addresses, so the demo is not public even though it is online.
-- Build `npm run build`, output `dist`, Node 20 or 22.
+`vercel.json` and `render.yaml` are committed. Import the repository and either platform
+picks up the Vite preset with no input. Whichever you pick, grant its GitHub app access to
+**this repository only**, never to the whole account.
 
-This is the option to use if the client needs a link before the meeting.
+### Search engines
 
-### 3. GitHub Pages — only if you are on GitHub Pro
-
-`.github/workflows/pages.yml` is committed but set to **manual trigger only**, so it never
-races the Vercel deploy. To use it instead: enable **Settings → Pages → Source: GitHub
-Actions**, then run the workflow from the Actions tab. It needs no API key at all — it
-authenticates with the `GITHUB_TOKEN` Actions mints for the single run, scoped to this
-repository and expiring with the job. Nothing to store, rotate or revoke.
-
-Two hard constraints, both worth checking before you rely on it:
-
-- **Publishing Pages from a private repository requires a paid GitHub plan.** On the free
-  plan the only way to make it work is to make the repository public — which would expose
-  the research and the SOPs, not just the demo. Don't.
-- **The published site is public regardless.** GitHub Pages has no password or email gate
-  outside Enterprise. Fine for simulated data, but decide it deliberately.
-
-### 4. Vercel
-
-Technically the easiest of the lot — `vercel.json` is committed, import the repo and it
-picks up the Vite preset with no input. Private repos deploy fine and custom domains are
-included. Two things to know before choosing it:
-
-- **The production URL is public on the free plan.** Vercel's free tier offers
-  *Vercel Authentication*, which restricts a deployment to members of your Vercel account —
-  that keeps the client out too, so it does not solve sharing. **Password Protection**, the
-  one that would, is a paid feature. Confirm the current plan limits before relying on either.
-- **The Hobby plan is for non-commercial use.** This is paid client work, which puts it
-  outside what the free tier is for. Worth knowing rather than discovering later.
-
-So on Vercel free you get a public-but-unlisted URL. Given what the bundle actually
-contains — the app and simulated orders, and nothing from `docs/` — that is a reasonable
-trade for a demo, as long as it is a decision rather than an accident. The build ships with
-`robots.txt` and a `noindex` meta tag so it stays out of search results. **That is
-discoverability control, not access control:** anyone with the link can still open it.
-
-### 5. Render
-
-`render.yaml` is committed. Same two settings, static site, PR previews on. The free tier's
-published URL is likewise public.
+The build ships with `robots.txt` and a `noindex` meta tag, so a hosted copy stays out of
+search results. That is discoverability control, not access control: anyone with the link
+can open it. Remove both if you want the demo to be indexed.
 
 ### Continuous integration
 
 `.github/workflows/ci.yml` runs the test suite and a production build on every push and
-pull request. Vercel builds the app but does not run the tests, so this is the check that
-actually catches a broken commit.
-
-### Whichever you pick
-
-Grant the platform's GitHub app access to **this repository only**, never to the whole
-account. Every one of them offers per-repository selection at install time.
+pull request, then rebuilds `masar-demo.html` and fails if the committed copy has drifted
+from the source.
 
 ### Settings, wherever you land
 
@@ -175,65 +133,67 @@ compiled into the bundle, so a deploy is reproducible and there is nothing to le
 
 ## Theming
 
-Every colour in the application resolves through one block at the top of
-[`src/ui/styles.css`](src/ui/styles.css) — six values:
+Every colour in the application resolves through one token block at the top of
+[`src/ui/styles.css`](src/ui/styles.css); no component writes a raw colour. The brand is
+eight values:
 
 ```css
---brand:          /* primary: nav, buttons, selection, highlights */
---brand-strong:   /* hover — lighter on dark, darker on light     */
---brand-ink:      /* brand-coloured text on the working surface   */
---brand-wash:     /* tinted fill behind brand elements            */
---brand-line:     /* brand-tinted border                          */
---brand-contrast: /* text sitting ON the brand colour             */
---brand-on-dark:  /* brand-coloured text on the charcoal sidebar  */
+--brand:          /* solid fills, marks, the heavy chart series         */
+--brand-strong:   /* hover / pressed — darker on light, lighter on dark */
+--brand-ink:      /* brand-coloured text on the working surface         */
+--brand-wash:     /* tinted fill behind brand elements                  */
+--brand-line:     /* brand-tinted border                                */
+--brand-contrast: /* text sitting ON the brand colour                   */
+--brand-soft:     /* the light highlight fill — the active nav pill     */
+--brand-soft-ink: /* text sitting ON the soft fill                      */
 ```
 
-Change those and the whole app re-skins: sidebar, navigation, buttons, focus rings,
-selection, map highlight.
+Change those and the whole app re-skins: navigation, buttons, focus rings, selection, map
+highlight.
 
-**These are Maslamani Home's own colours** — the orange off their logo and the
-"بيتك حياتك" tagline, and the charcoal of their header and footer, which carries the
-sidebar. Light is the default, because a dispatcher reads this screen for ten hours; the
-full charcoal ground their own site uses is one click away in the top bar
+**The default palette is a deep forest green on a light surface** — a sage page ground,
+white cards floating on it with a shadow you barely see, a white sidebar separated from the
+content by a hairline, and two greens doing all the identity work: a near-black forest for
+weight and a soft green for the highlight. Light is the default, because a dispatcher reads
+this screen for ten hours; the dark theme is one click away in the top bar
 (`[data-theme='dark']`).
 
-**White does not go on this orange.** It manages 3.0:1, which fails. `--brand-contrast` is
-a near-black instead, which is what their own buttons do and what almost every orange brand
-ends up doing. For orange as a *thin* mark on a light ground — a 19px numeral, a 2px route
-line — the solid brand only clears 3.2:1, so those use `--brand-ink` and `--brand-strong`.
+**The one compromise this palette makes:** with a green brand, "done" green is no longer a
+hue nothing else uses. It is held apart by value — the brand is a very dark forest, the
+status green a mid green — and the two never appear in the same role.
 
 Only **one hue is saturated on the working surface at a time**. That is the difference
-between this palette and a noisy one: orange lives in the chrome, the class ramp is a single
-blue, progress is graphite, and the three status hues appear only inside small labelled
-chips. The amber is pushed toward yellow and its wash toward cream, because "at risk" must
-never read as a brand element next to an orange accent.
+between this palette and a noisy one: the brand lives in the chrome, the class ramp is a
+single blue, progress is graphite, and the three status hues appear only inside small
+labelled chips. The amber is pushed toward yellow and its wash toward cream, because "at
+risk" must never read as a brand element.
 
 Going dark is not a token swap. Three things invert, and every one of them is a bug if you
 miss it:
 
-- **A wash is a dark tint, not a pale one.** `--red-wash` is `#351b1c` here, not `#fbeaea`.
-- **Ink goes lighter, not darker.** On white, status text is darkened for contrast; on
-  charcoal it has to be lightened. `--red` is `#a4161a` light and `#ff7676` dark.
+- **A wash is a dark tint, not a pale one.** `--red-wash` is `#331b1a` here, not `#fbeae9`.
+- **Ink goes lighter, not darker.** On white, status text is darkened for contrast; on a
+  dark ground it has to be lightened. `--red` is `#b02a24` light and `#ff7d78` dark.
 - **A "filled" meter is the lighter end.** `--progress` is graphite on white and bone on
-  charcoal — and anything drawn *on* it needs `--progress-contrast`, which flips with it.
+  dark — and anything drawn *on* it needs `--progress-contrast`, which flips with it.
 - **The class ramp reverses**, so the heaviest step stays the most prominent one.
 
 Shadows also stop working (a soft dark shadow does nothing on a dark ground, so elevation
 is carried by the panel fill and a deepened shadow), and `--green-solid` / `--red-solid`
 exist because a white tick cannot sit on the light status ink that dark mode requires.
 
-### Red is the brand *and* the alarm — so roles, not shades, keep them apart
+### Roles, not shades, keep the brand and the alarm apart
 
-An operations screen has to keep one hue free to mean "something is wrong", and on this
-brand that hue is also the logo. Four rules resolve it, and they are what stop the app
-from looking like everything is on fire:
+An operations screen has to keep one hue free to mean "something is wrong", and it must
+never be confused with the colour that means "this is the system" or "this is done". Four
+rules resolve it, and they are what stop the app from looking like everything is on fire:
 
 | Role | Treatment | Where |
 |---|---|---|
-| Identity and action | red, solid and saturated | sidebar, active nav, primary button, selection, focus ring, the route you clicked |
+| Identity and action | forest green, solid; soft green for the active nav pill | primary button, selection, focus ring, the route you clicked |
 | Alarm | red, pale wash + dark ink | blocked orders, missed windows, unavailable slots — chips only |
 | Progress and completion | graphite (`--progress`) | milestone bars, timeline, load meters, step rails |
-| Handling attributes | class-C violet / slate | "fragile", "needs installation" — properties of the goods, not problems |
+| Handling attributes | class-C pale blue / slate | "fragile", "needs installation" — properties of the goods, not problems |
 
 The last row matters more than it looks: half the kitchenware is fragile, and a red chip
 on every one of those rows teaches a loader to ignore red by Tuesday.
@@ -246,10 +206,10 @@ unrelated categories — they are an ordinal handling scale (bulky white goods �
 appliances → fragile kitchenware), and a sequential ramp is the correct encoding for that.
 It is also the calm one: three saturated hues on every row of a 78-row table was most of
 what made the earlier palette noisy, and every triad of distinct hues that survives a
-colour-vision check on white fails on charcoal (blue and violet collapse under protanopia
-at ΔE 1.9 against a floor of 8). The ramp sidesteps that entirely — lightness is the one
-channel colour-vision deficiency cannot take away. It passes the ordinal check in both
-themes: monotone lightness, every adjacent gap at or above ΔL 0.06, single hue within 4°.
+colour-vision check on white fails on a dark ground (blue and violet collapse under
+protanopia at ΔE 1.9 against a floor of 8). The ramp sidesteps that entirely — lightness is
+the one channel colour-vision deficiency cannot take away. It passes the ordinal check in
+both themes: monotone lightness, every adjacent gap at or above ΔL 0.06, single hue within 4°.
 
 The chip carries the step as its **fill**, not as a tint, so A / B / C read as dark → mid →
 pale at a glance; each step's letter clears 4.5:1 against its own fill.
@@ -309,10 +269,10 @@ Being precise about this matters more than the demo looking impressive.
 - The travel model's *shape*: time-dependent, asymmetric, with explicit zone-crossing costs
   and closures as impassable arcs.
 - The service-time model: handling, installation, stairs and lifts, doorstep payment.
-- The branch network, brand portfolio, delivery promise and damage policy — from Maslamani
-  Home's own public information.
+- The branch network, brand portfolio, delivery promise and damage policy — from the
+  retailer's own public information.
 
-**Simulated, and to be replaced with their data:**
+**Simulated, and to be replaced with the retailer's data:**
 - Orders, customers and stock positions are generated from a fixed seed.
 - Product dimensions are representative, not measured. **This is the single biggest
   integration dependency** — see [`docs/04` §4](docs/04-data-model-and-db-integration.md).
@@ -346,6 +306,6 @@ to carry it.
 
 ## Status
 
-Version 1 of the demo — built to be shown, then improved. Not connected to any Maslamani
-Home system, and holding no real customer data. The integration contract is deliberately narrow: read orders, customers, products,
+Version 1 of the demo — built to be shown, then improved. Not connected to any live
+system, and holding no real customer data. The integration contract is deliberately narrow: read orders, customers, products,
 inventory and branches from a read-replica; write back one thing — delivery status.
